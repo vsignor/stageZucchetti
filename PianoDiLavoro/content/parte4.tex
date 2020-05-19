@@ -1,20 +1,21 @@
-\section{Obiettivi}
+\section{Obiettivi fissati}
 \subsection{Notazione}
 Si farà riferimento ai requisiti seguendo le seguenti notazioni:
 \begin{itemize}
-\item \textbf{O}: utilizzato per i \textit{requisiti obbligatori}, sono da considerarsi vincolanti in quanto obiettivo primario richiesto dal committente;
-\item \textbf{D}: utilizzato per i requisiti \textit{desiderabili}, sono da considerarsi non vincolanti o strettamente necessari, ma dal riconoscibile valore
-aggiunto;
-\item \textbf{F}: utilizzato per i \textit{requisiti facoltativi}, sono da considerarsi portatori di valore aggiunto non strettamente competitivo.
+\item \textbf{O}: requisito \textit{Obbligatorio}, da considerarsi vincolante in quanto obiettivo primario richiesto dal committente;
+\item \textbf{D}: requisito \textit{Desiderabile}, non vincolante o strettamente necessario, ma dal riconoscibile valore aggiunto;
+\item \textbf{F}: requisito \textit{Facoltativo}, la cui implementazione renderebbe il sistema più completo, portando,
+con molta probabilità, ad un dispendio di risorse con conseguente aumento dei
+costi.
 \end{itemize}
-Le sigle precedentemente indicate saranno seguite da una coppia sequenziale di numeri, rappresentati l'identificativo del requisito.
+Le sigle sopra esposte saranno seguite da una coppia sequenziale di numeri, rappresentanti il \textit{Codice} del requisito.
 
 {\renewcommand{\arraystretch}{2}
 \begin{longtable}{|p{1cm}| p{12.25cm} |}
 	% ----- Intestazione ----- %
 	\hline
 	\rowcolor{blue} \multicolumn{2}{|c|}{
-	\textbf{Obbligatori}
+	\textbf{\textcolor{white}{Obbligatori}}
 	} \\
 	% ------------------------ 
 		\endhead
@@ -29,26 +30,30 @@ Le sigle precedentemente indicate saranno seguite da una coppia sequenziale di n
 		% ------------------------ % 		
 		\hline \rowcolor{lightbrown}
 		O03 & 
-		Studio degli algoritmi di k-Means, Random Forest e Reti Bayesiane.\\	
+		Studio degli algoritmi di k-Means e Random Forest.\\	
 	% ------------------------ %
 	\hline \rowcolor{lighterbrown}
 		O04 & 
-		Creazione di un'interfaccia comune per gli algoritmi di Machine Learning analizzati.\\	
+		Adattamento delle varie librerie in modo da renderle uniformi.\\	
 	% ------------------------ %
 	\hline \rowcolor{lightbrown}
 		O05 & 
-		Implementazione previsione in Java.\\	
+		Creazione di un'interfaccia comune per gli algoritmi di Machine Learning analizzati.\\	
 	% ------------------------ %
 	\hline \rowcolor{lighterbrown}
 		O06 & 
-		Produzione di una documentazione completa come resoconto delle attività svolte e delle
-osservazioni effettuate.\\	
+		Implementazione previsione in Java.\\	
 	% ------------------------ %
 	\hline \rowcolor{lightbrown}
 		O07 & 
-		Mantenimento della riservatezza necessaria nei confronti dei materiali forniti e dei dati osservati durante lo svolgimento dello stage.\\	
+		Produzione di una documentazione completa come resoconto dei test, delle attività svolte e delle osservazioni fatte.\\	
+	% ------------------------ %
+	\hline \rowcolor{lighterbrown}
+		O07 & 
+		Mantenimento della riservatezza necessaria in merito ai materiali forniti e ai dati osservati durante lo svolgimento dello stage.\\	
 	% ------------------------ %
 	\hline
+	\caption{Obiettivi Obbligatori}\label{tab:obb-ob}
 \end{longtable}}
 
 {\renewcommand{\arraystretch}{2}
@@ -56,16 +61,17 @@ osservazioni effettuate.\\
 	% ----- Intestazione ----- %
 	\hline
 	\rowcolor{blue} \multicolumn{2}{|c|}{
-	\textbf{Desiderabili}
+	{\textcolor{white}{Desiderabili}}
 	} \\
 	% ------------------------ 
 		\endhead
 	% ------------------------ % 		
 		\hline \rowcolor{lightbrown}
 		D01 & 
-		 Per ogni algoritmo la previsione in SQL.\\	
+		Implementazione per ogni algoritmo in esame della previsione in SQL.\\	
 	% ------------------------ %
 	\hline
+	\caption{Obiettivi Desiderabili}\label{tab:des-ob}
 \end{longtable}}
 
 {\renewcommand{\arraystretch}{2}
@@ -73,36 +79,59 @@ osservazioni effettuate.\\
 	% ----- Intestazione ----- %
 	\hline
 	\rowcolor{blue} \multicolumn{2}{|c|}{
-	\textbf{Facoltativi}
+	{\textcolor{white}{Facoltativi}}
 	} \\
 	% ------------------------ 
 		\endhead
 	% ------------------------ % 		
 		\hline \rowcolor{lightbrown}
 		F01 & 
-		Reti Bayesiane + storia documentazione. \\	
+		Studio delle Reti Bayesiane con adattamento della libreria corrispondente.\\	
+	% ------------------------ %
+		\hline \rowcolor{lighterbrown}
+		F02 & 
+		Aggiunta previsione in Java nel contesto delle Reti Bayesiane. \\	
+	%------------------------ %
+	\hline \rowcolor{lightbrown}
+		F03 & 
+		Aggiunta previsione in SQL nel contesto delle Reti Bayesiane. \\	
+	% ------------------------ %
+	\hline \rowcolor{lighterbrown}
+		F04 & 
+	Produzione della documentazione contenete il resoconto di quanto fatto e i risultati ottenuti in merito alla Reti Bayesiane. \\
 	% ------------------------ %
 	\hline
+	\caption{Obiettivi Facoltativi}\label{tab:fac-ob}
 \end{longtable}}
 
 \pagebreak
 
 \section{Prodotti attesi a fine stage}
- Di seguito vengono esposti i prodotti che si attende dallo stage:
+ Di seguito vengono esposti i prodotti che si attendono dallo stage.
 {\renewcommand{\arraystretch}{2}
 \begin{longtable}{|p{13.25cm}|}
 	% ----- Intestazione ----- %
 	\hline
 	\rowcolor{blue} \multicolumn{1}{|c|}{
-	\textbf{Obbligatori}
+	\textbf{\textcolor{white}{Obbligatori}}
 	} \\
 	% ------------------------ 
 		\endhead
-	% ------------------------ % 		
+	% ------------------------ % 
 		\hline \rowcolor{lightbrown}
-		 \\	
+		 Uniformare le varie librerie relative agli algoritmi di Machine Learning.\\	
+	% ------------------------ % 
+		\hline \rowcolor{lighterbrown}
+		 Creazione di un'interfaccia comune in JavaScript per gli algoritmi analizzati.\\	
+	% ------------------------ % 
+		\hline \rowcolor{lightbrown}
+		 Implementazione della funzionalità di previsione in Java. \\	
+	% ------------------------ %
+	\hline \rowcolor{lighterbrown}
+		Produzione della documentazione relativa all'interfaccia realizzata e testing. \\	
 	% ------------------------ %
 	\hline
+	\caption{Prodotti Obbligatori}\label{tab:obb-prod}
 \end{longtable}}
 
 {\renewcommand{\arraystretch}{2}
@@ -110,15 +139,16 @@ osservazioni effettuate.\\
 	% ----- Intestazione ----- %
 	\hline
 	\rowcolor{blue} \multicolumn{1}{|c|}{
-	\textbf{Desiderabili}
+	\textbf{\textcolor{white}{Desiderabili}}
 	} \\
 	% ------------------------ 
 		\endhead
-	% ------------------------ % 		
-		\hline \rowcolor{lightbrown}
-		 \\	
+	% ------------------------ % 	
+	\hline \rowcolor{lightbrown}
+		 Implementazione della funzionalità di previsione in SQL. \\	
 	% ------------------------ %
 	\hline
+	\caption{Prodotti Desiderabili}\label{tab:des-prod}
 \end{longtable}}
 
 {\renewcommand{\arraystretch}{2}
@@ -126,15 +156,25 @@ osservazioni effettuate.\\
 	% ----- Intestazione ----- %
 	\hline
 	\rowcolor{blue} \multicolumn{1}{|c|}{
-	\textbf{Fcoltativi}
+	\textbf{\textcolor{white}{Facoltativi}}
 	} \\
 	% ------------------------ 
 		\endhead
-	% ------------------------ % 		
+	% ------------------------ % 	
 		\hline \rowcolor{lightbrown}
-		 \\	
+		 Adattamento della libreria riguardante le Reti Bayesiane.\\	
+	% ------------------------ %
+	\hline \rowcolor{lighterbrown}
+		 Predizione in Java per le Reti Bayesiane.\\	
+	% ------------------------ %
+	\hline \rowcolor{lightbrown}
+		 Predizione in SQL per le Reti Bayesiane.\\	
+	% ------------------------ %
+	\hline \rowcolor{lighterbrown}
+		 Produzione della documentazione relativa e test su quanto prodotti nell'ambito delle Reti Bayesiane.\\	
 	% ------------------------ %
 	\hline
+	\caption{Prodotti Facoltativi}\label{tab:fac-prod}
 \end{longtable}}
 
 
