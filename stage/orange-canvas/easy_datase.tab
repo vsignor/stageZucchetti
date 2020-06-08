@@ -1,0 +1,11 @@
+altezza	peso	occhi	capelli	sesso	nome
+continuous	continuous	discrete	discrete	discrete	string
+				class	meta
+1.6	52.0	blu	castani	F	Jill
+1.75	78.0	marroni	castani	M	Jack
+1.65	67.0	marroni	neri	M	Mark
+1.7	62.0	grigi	biondi	F	Ann
+1.85	89.0	blu	biondi	M	Bob
+1.9	93.0	blu	rossi	M	Tom
+1.67	56.0	marroni	castani	F	Kate
+1.64	70.0	blu	rossi	F	Mary
