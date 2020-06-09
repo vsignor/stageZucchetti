@@ -1,0 +1,22 @@
+1. prima distances e poi clustering creo sottoinsiemi: vengono messe assieme fiori della stessa specie
+
+2. per evitare di fare troppo overfitting: creare un modello sui dati di addestramento tenstandolo cosi su insieme diverso, facendolo inoltre piu' volte: cross validatio -> test e score: mi da' la precisione media
+
+3. curca roc: rapporto fra sensibilita'(veri positivi) e 1-specificita' (falsi positivi). La curva ROC è quindi il tasso dei veri positivi in funzione del tasso dei falsi positivi. In generale. Mi dice quindi quanto buono e' il metodo: piu' alto e' auc e migliore e' il metodo.
+In generale:
+- predizione: positivo e valore reale: positivo -> vero positivo
+- predizione: negativo e valore reale: positivo -> falso negativo
+- predizione: positivo e valore reale: negativo -> falso positivo
+- predizione: negativo e valore reale: negativo -> vero negativo
+
+4. La validazione incrociata (cross-validation), in particolare k-fold, è una tecnica che consiste nella suddivisione dei dati in k insiemi di uguale numerosità. Ad a ogni passo, la k-esima parte dell'insieme di dati viene usta per il test , mentre i altri insiemi per l'addestramento (1->test + 9->addestramento = 10). Così si allena il modello per ognuna delle k parti, evitando quindi problemi di sovradattamento, ma anche di campionamento asimmetrico (e quindi affetto da distorsione) del campione osservato, tipico della suddivisione dei dati in due sole parti (ossia addestramento/convalida). In altre parole, si suddivide il campione osservato in gruppi di egual numerosità, si cambianda ogni volta l'insieme k per test, e si cerca di predirlo coi gruppi non esclusi, al fine di verificare la bontà del modello di predizione utilizzato.
+
+5. PCA e' un metodo che mi permette di semplificare l'analisi e la manipolazione di dataset molto ampli sfruttando il fatto che i punti possono essere identificati da dei vettori: trasformazione dei dati in una serie di funzioni non linearmente correlate fra loro. Diamo quindi una copertura ai dati pari al 80%, cosi da ricavarne le componenti piu' significative. Su ciascuna componente si possono fare tutta una serie di consideraioni in base alla sua composizione (es. dataset wine dove per ogni componente si mostra la presenza in % di ogni sostanza -> PC1 vede una predominanza di flavonoidi)
+
+6. La media è il rapporto tra la somma dei dati numerici ed il numero dei dati; la moda è il valore che si presenta con maggiore frequenza; la mediana è il valore centrale tra i dati numerici.
+
+7.Rank: mi permette di vedere quale classe/funzionalita' e' piu' significativa dentro un dataset (maggiormene correlate), grazie all'attribuzione di un pinteggio
+
+8. Ogni problema di data mining descrive i dati con delle funzionalita' rendendo cosi il punteggio che a ciascuna di queste viene attribuita una caratteristica fondamentale
+
+9. k-Means funziona bene su dati di forma compatta ma fallisce su distribuzioni differenti (magari ne individua 2 grappoli invece di 1)
