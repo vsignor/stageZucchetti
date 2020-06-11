@@ -11,7 +11,9 @@ In generale:
 
 4. La validazione incrociata (cross-validation), in particolare k-fold, è una tecnica che consiste nella suddivisione dei dati in k insiemi di uguale numerosità. Ad a ogni passo, la k-esima parte dell'insieme di dati viene usta per il test , mentre i altri insiemi per l'addestramento (1->test + 9->addestramento = 10). Così si allena il modello per ognuna delle k parti, evitando quindi problemi di sovradattamento, ma anche di campionamento asimmetrico (e quindi affetto da distorsione) del campione osservato, tipico della suddivisione dei dati in due sole parti (ossia addestramento/convalida). In altre parole, si suddivide il campione osservato in gruppi di egual numerosità, si cambianda ogni volta l'insieme k per test, e si cerca di predirlo coi gruppi non esclusi, al fine di verificare la bontà del modello di predizione utilizzato.
 
-5. PCA e' un metodo che mi permette di semplificare l'analisi e la manipolazione di dataset molto ampli sfruttando il fatto che i punti possono essere identificati da dei vettori: trasformazione dei dati in una serie di funzioni non linearmente correlate fra loro. Diamo quindi una copertura ai dati pari al 80%, cosi da ricavarne le componenti piu' significative. Su ciascuna componente si possono fare tutta una serie di consideraioni in base alla sua composizione (es. dataset wine dove per ogni componente si mostra la presenza in % di ogni sostanza -> PC1 vede una predominanza di flavonoidi)
+5.PCA: usato quando ho database con molti dati: non e' detto che infatti tutti mi servano, molti potrebbero raccontare infatti la stessa cosa. Ecco quindi che PCA mi permette di capire se posso aggregare fra loro misure, eliminando le dimensioni inutili. Nella pratica sfrutta il fatto che i punti possono essere trasfotmati in vettori. Ciò avviene tramite una trasformazione lineare delle variabili che proietta quelle originarie in un nuovo sistema cartesiano in cui la nuova variabile con la maggiore varianza viene proiettata sul primo asse, la variabile nuova, seconda per dimensione della varianza, sul secondo asse e così via. La riduzione della complessità avviene limitandosi ad analizzare le principali, per varianza, tra le nuove variabili.
+
+Diamo quindi una copertura ai dati pari al 80%, cosi da ricavarne le componenti piu' significative. Su ciascuna componente si possono fare tutta una serie di consideraioni in base alla sua composizione (es. dataset wine dove per ogni componente si mostra la presenza in % di ogni sostanza -> PC1 vede una predominanza di flavonoidi)
 
 6. La media è il rapporto tra la somma dei dati numerici ed il numero dei dati; la moda è il valore che si presenta con maggiore frequenza; la mediana è il valore centrale tra i dati numerici.
 
@@ -20,3 +22,8 @@ In generale:
 8. Ogni problema di data mining descrive i dati con delle funzionalita' rendendo cosi il punteggio che a ciascuna di queste viene attribuita una caratteristica fondamentale
 
 9. k-Means funziona bene su dati di forma compatta ma fallisce su distribuzioni differenti (magari ne individua 2 grappoli invece di 1)
+
+10. Il valore della silhouette è una misura di quanto un oggetto sia simile al suo cluster (coesione) rispetto ad altri cluster (separazione). La silhouette varia da −1 a +1, dove un valore elevato indica che l'oggetto è ben abbinato al proprio cluster e scarsamente abbinato ai cluster vicini. Se la maggior parte degli oggetti ha un valore elevato, la configurazione del clustering è appropriata. Se molti punti hanno un valore basso o negativo, la configurazione del cluster può avere troppi o troppo pochi cluster.
+La silhouette può essere calcolata con qualsiasi metrica di distanza , come la distanza euclidea o la distanza di Manhattan.
+
+11. Mi da' l'indicazione di quanto e' coeso il punto in esame rispetto al cluster. Range fra 0-1: piu' e' grande piu' il punto e' immerso nel cluster, piu' e' basso piu' e' vicino ad un altro cluster.
