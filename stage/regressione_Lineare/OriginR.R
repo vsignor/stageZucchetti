@@ -57,7 +57,7 @@ summary(modello1)
  ceresPlots(bk) ##multivariato
  
  
- ##confronto fra modelli
+ ##confronto fra modelli anova()
  modello5<-lm(Sepal.Length ~ Petal.Length, data=iris) 
  bk ##possiede 2 regressori significativi che mi portano a rifiutare h0 (se faccio l'opposto mi dice che le -2 variabili che tolgo sono comunque significative e quindi vale sempre bk)
  
@@ -102,15 +102,13 @@ summary(modello1)
  points(Boston$lstat, valori.stimati, pch='x', col='green')  ## aggiungiamo la retta stimata ai minimi quadrati
  abline(coef(modello)[1], coef(modello)[2], lty=2, col='red', lwd=3) ## equivale a abline(beta0, beta1, lty=2, col='red')
  
- ##TRASFORMAZIONE DI MODELLI: Metodo Box Cop
- library(MASS)
  
- bk<-lm(Sepal.Length ~ Petal.Length+Petal.Width+Sepal.Width, data=iris) 
- boxcox(bk, plotit=T) ## grafico per individuare il valore di lamda
- 
- trasy<-((mortalal^0.1)-1)/0.1    ## trasformata
- bktras<-lm(trasy~Petal.Length+Petal.Width+Sepal.Width, data=iris)
- summary(bktras) 
+ ##AIC: compara modelli -> prendo quello con AIC <
+ modello7 <- lm(Sepal.Length ~ Petal.Length, data=iris)
+ modello1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width , data=iris) ##aggiungere width non dovrebbe portare contributi significativi
+ x <- c(AIC(modello7), AIC(modello1)) ##il migliore rimane comunque modello 1: infatti anche se non porta contribuiti tantissimo significativi comunque anova mi dava una *
+ delta <- x - min(x)
+ delta
  
  
  
