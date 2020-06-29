@@ -27,3 +27,5 @@ Diamo quindi una copertura ai dati pari al 80%, cosi da ricavarne le componenti 
 La silhouette può essere calcolata con qualsiasi metrica di distanza , come la distanza euclidea o la distanza di Manhattan.
 
 11. Mi da' l'indicazione di quanto e' coeso il punto in esame rispetto al cluster. Range fra 0-1: piu' e' grande piu' il punto e' immerso nel cluster, piu' e' basso piu' e' vicino ad un altro cluster.
+
+12. Nella probabilità conoscendo il processo di generazione dei dati sperimentali (modello probabilistico), siamo in grado di valutare la probabilità dei diversi possibili risultati di un esperimento.  Nella statistica invece il processo di generazione dei dati sperimentali non è noto in modo completo (il processo in questione è, in definitiva, l'oggetto di indagine) e le tecniche statistiche si prefiggono di indurre le caratteristiche di tale processo sulla base dell'osservazione dei dati sperimentali da esso generati. --> non si sa come si genrano i risultati: osservo
