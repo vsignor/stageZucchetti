@@ -30,37 +30,36 @@ test = iris[-sp, c("Petal.Length", "Petal.Width", "Species")]
 ##Piu' lo metto grande e piu' diminuisce il numero di vettori di supporto
 
 svm.model.linear <- svm(Species ~ ., data=train, kernel="linear", cost = 0.1, scale = FALSE) ## addestramento
-svm.model.linear ##mi indica 48 vettori di supporto
+svm.model.linear ##mi indica 47 vettori di supporto
 
 plot(svm.model.linear, train)
 
 tab.l <- table(Prediction=predict(svm.model.linear, train), Real=train$Species) ##confusion matrix
 tab.l 
-1-sum(diag(tab.l)/sum(tab.l)) ##tasso di classificazione errata 0.02
+1-sum(diag(tab.l)/sum(tab.l)) ##tasso di classificazione errata 0.04
 
 svm.model.poly <-  svm(Species ~ ., data=train, kernel="polynomial", cost = 0.1, scale = FALSE) ## addestramento
-svm.model.poly ##11 vettori di supporto
+svm.model.poly ##12 vettori di supporto
 plot(svm.model.poly, train)
 
 tab.p <- table(Prediction=predict(svm.model.poly, train), Real=train$Species) 
 tab.p
-1-sum(diag(tab.p)/sum(tab.p)) ##tasso di classificazione errata 0.02
+1-sum(diag(tab.p)/sum(tab.p)) ##tasso di classificazione errata 0.04
 
 svm.model.rad <- svm(Species ~ ., data=train, kernel='radial')
 svm.model.rad
 plot(svm.model.rad, train)## 30
 
-tab.r <- table(Prediction=predict(svm.model.rad, train), Real=train$Species) ##confusion matrix
-tab.r
+tab.r <- table(Prediction=predict(svm.model.rad, train), Real=train$Species) ##confusion matrixtab.r
 1-sum(diag(tab.r)/sum(tab.r)) ##tasso di classificazione errata 0.04
 
 svm.model.sig <- svm(Species ~ ., data = train, kernel = 'sigmoid')
 svm.model.sig
-plot(svm.model.sig, train)## 37
+plot(svm.model.sig, train)## 41
 
 tab.s <- table(Prediction=predict(svm.model.sig, train), Real=train$Species) ##confusion matrix
 tab.s
-1-sum(diag(tab.s)/sum(tab.s)) ##tasso di classificazione errata 0.01  ---> the best
+1-sum(diag(tab.s)/sum(tab.s)) ##tasso di classificazione errata 0.13
 
 
 ##confronto fra piu' modelli lineari
@@ -73,17 +72,17 @@ model1 = svm(formula = Species~., data = train, kernel = 'linear')
 model2 = svm(formula = Species~ Petal.Width + Petal.Length, data = train, kernel = 'linear')
 
 summary(model1) ##22
-summary(model2) ##25
+summary(model2) ##26
 
 tab.mod1 <- table(Prediction=predict(model1, train), Real=train$Species) ##confusion matrix
-tab.mod1
-1-sum(diag(tab.mod1)/sum(tab.mod1)) ##tasso di classificazione errata 0.01
+tab.mod1 
+1-sum(diag(tab.mod1)/sum(tab.mod1)) ##tasso di classificazione errata 0.04
 
 tab.mod2 <- table(Prediction=predict(model2, train), Real=train$Species) ##confusion matrix
 tab.mod2
-1-sum(diag(tab.mod2)/sum(tab.mod2)) ##tasso di classificazione errata 0.04
+1-sum(diag(tab.mod2)/sum(tab.mod2)) ##tasso di classificazione errata 0.06
 
-##entrambi sono modelli solidi, comunque il primo e\ meglio
+##entrambi sono modelli solidi, comunque il primo e' meglio
 
 
 

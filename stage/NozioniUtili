@@ -29,3 +29,20 @@ La silhouette può essere calcolata con qualsiasi metrica di distanza , come la 
 11. Mi da' l'indicazione di quanto e' coeso il punto in esame rispetto al cluster. Range fra 0-1: piu' e' grande piu' il punto e' immerso nel cluster, piu' e' basso piu' e' vicino ad un altro cluster.
 
 12. Nella probabilità conoscendo il processo di generazione dei dati sperimentali (modello probabilistico), siamo in grado di valutare la probabilità dei diversi possibili risultati di un esperimento.  Nella statistica invece il processo di generazione dei dati sperimentali non è noto in modo completo (il processo in questione è, in definitiva, l'oggetto di indagine) e le tecniche statistiche si prefiggono di indurre le caratteristiche di tale processo sulla base dell'osservazione dei dati sperimentali da esso generati. --> non si sa come si genrano i risultati: osservo
+
+13. VC-dimension: cardinalità dell'insieme più grande frantumabile da F => in generale per uno spazio a k dimensioni VC(H)=k+1.
+La dimensione VC per un classificatore lineare è almeno 3 perche' non si riesce a frammentare 4 punti.
+La VC-dimension viene usata per classificare i diversi tipi di algoritmi in base alla loro complessità. La complessità di un algoritmo di classificazione, che è direttamente correlata alla sua dimensione VC, è correlata al compromesso tra distorsione e varianza. 
+All'aumentare della complessità, si passa dal sottoadattamento a quello eccessivo; l'aggiunta di complessità è valida fino a un certo punto, dopo di che si inizia a sovraccaricare i dati di train. Un altro modo di pensare a questo è attraverso baias e la varianza. Un modello a bassa complessità sebbene abbia un basso potere espressivo è anche molto semplice, quindi ha prestazioni molto prevedibili che portano a una bassa varianza. Al contrario, un modello complesso avrà un baias inferiore poiché ha una maggiore espressività, ma avrà una varianza maggiore in quanto vi sono più parametri da ottimizzare in base ai dati di addestramento del campione.
+In generale, un modello con una dimensione VC più elevata richiederà un numero maggiore di dati di training per l'addestramento corretto, ma sarà in grado di identificare relazioni più complesse nei dati.
+Ad un certo livello di complessità del modello esisterà un equilibrio ideale tra distorsione e varianza, in corrispondenza della quale non si è né insufficienti né adatti ai propri dati. A questo punto si dovrebbe mirare a scegliere un classificatore con un livello di complessità che è appena sufficiente per il  compito di classificazione.
+"La macchina con la capacità più piccola (dimensione VC)
+è la migliore." Da notare che qui non va intesa la "capacita' min" come "semplicita'" nel n. di parametri (infatti vi possono essere modelli con tanti parametri che hanno una bassa VC e viceversa), ma come semplicita' dell'agotitmo stesso.
+
+14. Margine: è definito come la distanza tra i vettori di supporto di due classi differenti più vicini all’iperpiano. Alla metà di questa distanza viene tracciato l’iperpiano, o retta nel caso si stia lavorando a due dimensioni.
+
+15. SVM ha l’obiettivo di identificare l’iperpiano che meglio divide i vettori di supporto in classi
+NB: Se prendo punti linearmente dipendenti non posso sperare di frantumarli, quindi in genere non li considero.
+
+16. Nasce dal fatto che la bonta' di un modello si valuta in base alla sua capacita' di predire l'ignoto. Ecco che usiamo metodo di ricamionamento: Cross validation. Ciascun modello che ottengo (che poi verra' buttato), mi fornisce un errore; per trovare la bonta' del modello io faccio la media di questi errori per trovare la diffusione di giusto/sbagliato del mio modello.
+
