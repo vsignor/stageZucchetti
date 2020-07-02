@@ -21,4 +21,5 @@
 *.out
 *.app
 *.gz
-.odt#
+*.odt#
+
