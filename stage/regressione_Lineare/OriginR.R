@@ -20,6 +20,7 @@ summary(modello) ##mi da' info utili sulla regressione fatta + grafico
 
 plot(modello) 
 
+
 modello1<-lm(Sepal.Length ~ Petal.Length+Petal.Width, data=iris)  ## pw non e' significativo e R= 0.76
 summary(modello1)
  

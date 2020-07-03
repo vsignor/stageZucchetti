@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+<body>
+
+<p>
+<b>mouse click</b>: add red data point<br />
+<b>shift + mouse click</b>: add green data point<br />
+</p>
+
+<canvas id="NPGcanvas" width="500" height="500" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas></br>
+<input type="button" value="train" onclick="train()">
+<input type="button" value="sql" onclick="sql()">
+<div id="info"></div>
+<div id="sql"></div>
+
+<script src="ZMLBase.js"></script>
+<script src="ZMLLogisticRegression.js"></script>
+
+<script src="svm.js"></script>
+<script src="ZMLSvmClassifier.js"></script>
+
+
+<script>
+
+// variabili per la gestione del canvas
+var canvas = document.getElementById("NPGcanvas")
+var ctx = canvas.getContext('2d');
+var WIDTH=500,HEIGHT=500,ss=50.0
+
+// variabili per il learner
+var data=[]
+var labels=[]
+var trained=false
+//var lrn=new LogisticRegressionLearner(2)
+//var lrn=new LinearSvmLearner(2)
+//var lrn=new RbfSvmLearner(2)
+var lrn=new Pol2SvmLearner(2)
+var mdl=null
+
+function addDataPoint(x,y,c){
+  // add datapoint at location of click
+  data.push([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
+  labels.push(c);
+  trained=false
+  Redraw()
+}
+
+function mouseClick(x,y,shift){
+  addDataPoint(x,y,(shift?1:-1))
+}
+
+function eventClick(e) {    
+  //get position of cursor relative to top left of canvas
+  var x = e.pageX;
+  var y = e.pageY;;
+  var r = canvas.getBoundingClientRect();
+  x -= r.left+window.scrollX;
+  y -= r.top+window.scrollY;  
+  //call user-defined callback
+  mouseClick(x, y, e.shiftKey);
+}
+
+function drawCircle(x, y, r){
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2, true); 
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+}
+
+function Redraw(){
+  ctx.clearRect(0,0,WIDTH,HEIGHT);
+    
+  if (trained) {  
+    // draw decisions in the grid
+    var density= 4.0;
+    for(var x=0.0; x<=WIDTH; x+= density) {
+      for(var y=0.0; y<=HEIGHT; y+= density) {
+        var p = mdl.predictJS([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss])
+        ctx.fillStyle = (p==1?'rgb(150,250,150)':'rgb(250,150,150)');
+        ctx.fillRect(x-density/2-1, y-density-1, density+2, density+2);
+      }
+    }  
+  }
+  
+  // draw axes
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgb(50,50,50)';
+  ctx.lineWidth = 1;
+  ctx.moveTo(0, HEIGHT/2);
+  ctx.lineTo(WIDTH, HEIGHT/2);
+  ctx.moveTo(WIDTH/2, 0);
+  ctx.lineTo(WIDTH/2, HEIGHT);
+  ctx.stroke();
+  // draw data points
+  for(var i=0;i<data.length;i++){
+    ctx.fillStyle = (labels[i]==1?'rgb(100,200,100)':'rgb(200,100,100)');
+    drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
+  }
+}
+
+Redraw()
+
+function train(){
+  lrn.resetData()
+  for(var i=0;i<data.length;i++){
+    lrn.addData(labels[i],data[i])
+  }
+  lrn.train()
+  mdl=lrn.getModel()
+  trained=true
+  Redraw()
+}
+
+function sql(){
+  if (trained){
+    document.getElementById("sql").innerHTML=mdl.predictSQL(['CampoA','CampoB'])
+  }
+}
+
+</script>
+
+
+</body>
+</html>

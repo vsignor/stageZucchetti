@@ -1,0 +1,196 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Regression</title>
+<link href="stile.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<h1>Regressione: Lineare, Esponenziale, Polinomiale (dal 2 a 5 grado) e Knn</h1>
+<h2>Mouse click</b> add data point</h2>
+
+<h3>Algorithms:</h3>
+<input id="button_reg" type="button" value="Linear" onclick="setLearner(0)">
+<input id="button_exp" type="button" value="Exp" onclick="setLearner(1)">
+<input id="button_par" type="button" value="Square" onclick="setLearner(2)">
+<input id="button_pol3" type="button" value="Cube" onclick="setLearner(3)">
+<input id="button_pol4" type="button" value="Pol4" onclick="setLearner(4)">
+<input id="button_pol5" type="button" value="Pol5" onclick="setLearner(5)">
+<input id="button_knn"type="button" value="knn" onclick="setLearner(6)">
+</br>
+
+<canvas id="NPGcanvas" width="500" height="500" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas></br>
+<input id="button_train" type="button" value="Train" onclick="train()">
+<input id="button_sql" type="button" value="Sql" onclick="sql()">
+<input id="button_r2" type="button" value="R2" onclick="r2()">
+<input id="button_r2Aj" type="button" value="R2 Adjusted" onclick="r2_adjusted()">
+<input id="button_matrix" type="button" value="Confusion Matrix" onclick="conf_matrix()">
+
+
+<div id="info"></div>
+<div id="sql"></div>
+<div id="r2"></div>
+<div id="r2_adjusted"></div>
+<div id="conf_matrix"></div>
+
+<script src="ZMLBase.js"></script>
+<script src="LinearRegression.js"></script>
+<script src="ZMLLinearRegression.js"></script>
+
+<script>
+// variabili per la gestione del canvas
+var canvas = document.getElementById("NPGcanvas")
+var ctx = canvas.getContext('2d');
+var WIDTH=500,HEIGHT=500,ss=50.0
+
+// variabili per il learner
+var data=[]                 // valori delle x dei punti disegnati
+var values=[]               // valori delle y dei punti disegnati
+var trained=false
+
+var learners=[new LinearRegressionLearner(1), new ExpRegressionLearner(1),
+              new PolinomialRegressionLearner(2), new PolinomialRegressionLearner(3), new PolinomialRegressionLearner(4), 
+              new PolinomialRegressionLearner(5), new knnRegressionLearner(4)]
+var lrn=learners[0]
+var mdl=null
+
+function addDataPoint(x,y,c){
+  // add datapoint at location of click
+  data.push([(x-WIDTH/2)/ss]);
+  values.push(-(y-HEIGHT/2)/ss);
+  trained=false
+  Redraw()
+}
+
+function mouseClick(x,y,shift){
+  addDataPoint(x,y,(shift?1:-1))
+}
+
+function eventClick(e) {    
+  //get position of cursor relative to top left of canvas
+  var x = e.pageX;
+  var y = e.pageY;;
+  var r = canvas.getBoundingClientRect();
+  x -= r.left+window.scrollX;
+  y -= r.top+window.scrollY;  
+  //call user-defined callback
+  mouseClick(x, y, e.shiftKey);
+}
+
+function drawCircle(x, y, r){
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2, true); 
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+}
+
+
+function Redraw(){
+  ctx.clearRect(0,0,WIDTH,HEIGHT);
+      
+  if (trained) {    
+    var density= 4.0;
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgb(0,0,0)';
+    ctx.moveTo(0-density/2,(-mdl.predictJS([(0-WIDTH/2)/ss])*ss+HEIGHT/2)-density);
+    for(var x=0.0; x<=WIDTH; x+= density){
+      var p=-mdl.predictJS([(x-WIDTH/2)/ss])
+      ctx.lineTo(x-density/2, (p*ss+HEIGHT/2)-density);
+      //ctx.fillStyle = 'rgb(0,0,0)'
+      //ctx.fillRect(x-density/2, (p*ss+HEIGHT/2)-density, 2, 2);
+    }    
+    ctx.stroke();
+  }
+  // draw axes
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgb(50,50,50)';
+  ctx.lineWidth = 1;
+  ctx.moveTo(0, HEIGHT/2);
+  ctx.lineTo(WIDTH, HEIGHT/2);
+  ctx.moveTo(WIDTH/2, 0);
+  ctx.lineTo(WIDTH/2, HEIGHT);
+  ctx.stroke();
+  // draw data points
+  ctx.fillStyle = 'rgb(150,250,150)'
+  for(var i=0;i<data.length;i++){
+    //ctx.fillStyle = (labels[i]==1?'rgb(100,200,100)':'rgb(200,100,100)');
+    drawCircle(data[i][0]*ss+WIDTH/2, -values[i]*ss+HEIGHT/2, 3);
+  }
+}
+
+Redraw()
+
+function train(){
+  lrn.resetData()
+  for(var i=0;i<data.length;i++){
+    lrn.addData(values[i],data[i])
+  }
+  lrn.train()
+  mdl=lrn.getModel()
+  trained=true
+  Redraw()
+}
+
+function sql(){
+  if (trained){
+    document.getElementById("sql").innerHTML="SQL = "+mdl.predictSQL(['CampoA'])
+  }
+}
+
+function r2(){
+  var sum=0,n=values.length,i
+  // calcolo la media, che è il miglior predittore quando ho solo i valori
+  for(i=0;i<n;i++) 
+    sum+=values[i]
+  var mean=sum/n
+  // calcolo la somma dei quadrati delle differenze rispetto alla media, questo mi da una misura di quanto sbaglio usando la media come predittore
+  var m_error=0
+  for(i=0;i<n;i++)
+    m_error+= Math.pow(values[i]-mean,2)
+  // nella variabile m_error la somma degli errori rispetto alla media
+  // calcolo quanto sbaglio usando il mio sistema di regressione
+  var p_error=0
+  for(i=0;i<n;i++)
+    p_error+=Math.pow(values[i]-mdl.predictJS(data[i]),2)
+  // nella variabile p_error la somma degli errori rispetto al mio regressore
+  var r2=1-(p_error/m_error)
+  document.getElementById("r2").innerHTML="R2 = "+r2
+  return r2
+}
+
+function r2_adjusted(){
+  var R2 = r2();
+  var p = data.length, n = values.length;
+  var r2_aj = R2 - [(1-R2) / p/(n-p-1)];
+  document.getElementById("r2_adjusted").innerHTML="R2 Adjusted = "+r2_aj;
+}
+
+function conf_matrix(){
+  var n = values.length, p = 0, pred = [], diff;
+
+  for(i = 0; i < n && p < n; i++, p++) 
+    var pred = mdl.predictJS(data[i]); // faccio la predizione sui valori inseriti
+  
+    diff = n-p; // in realta' p ed n dovrebbero alla fine avere uguale dimensione 
+
+  document.getElementById("conf_matrix").innerHTML = "Veri positivi: " + p + " su " + n + "<br />" +
+                                                      "Falsi positivi: " + diff + " su " + n;
+}
+
+function setLearner(n){
+  lrn=learners[n]
+  trained=false
+  train()
+  sql()
+  r2()
+  r2_adjusted()
+  conf_matrix()
+}
+
+</script>
+
+
+</body>
+</html>
