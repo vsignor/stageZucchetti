@@ -8,7 +8,6 @@
 
 <body>
 <h1>Regressione: Lineare, Esponenziale, Polinomiale (dal 2 a 5 grado) e Knn</h1>
-<h2>Mouse click</b> add data point</h2>
 
 <div id=big_container>
 <span id=grafico>
@@ -24,7 +23,7 @@
 <input id="button_pol3" type="button" value="Cube" onclick="setLearner(3)">
 <input id="button_pol4" type="button" value="Pol4" onclick="setLearner(4)">
 <input id="button_pol5" type="button" value="Pol5" onclick="setLearner(5)">
-<input id="button_knn"type="button" value="knn" onclick="setLearner(6)"> 
+<input id="button_knn" type="button" value="knn" onclick="setLearner(6)"> 
 </div>
 
 <p>Select your actions:</p>
@@ -35,7 +34,9 @@
 <input id="button_r2Aj" type="button" value="R2 Adjusted" onclick="r2_adjusted()">
 <input id="button_rse" type="button" value="RSE" onclick="rse()">
 <input id="button_matrix" type="button" value="Confusion Matrix" onclick="conf_matrix()">
-<input id="button_F" type="button" value="Stisitica F" onclick="stisitica_F()">
+<input id="button_F" type="button" value="Stisitica F" onclick="statistica_F()">
+<input id="button_var" type="button" value="Varianza" onclick = "varianza()">
+<input id="button_cov" type="button" value="Covarianza" onclick = "covarianza()">
 </div>
 
 <div id="result">
@@ -46,11 +47,13 @@
 <div id="rse"></div>
 <div id="conf_matrix"></div>
 <div id="statistica_F"></div>
+<div id="varianza"></div>
+<div id="covarianza"></div>
+
 </div></span>
-
+<input id="button_show" type="button" value="Info" onclick = "show()">
+<div id="show"></div>
 </div>
-
-
 
 <script src="ZMLBase.js"></script>
 <script src="LinearRegression.js"></script>
@@ -64,7 +67,7 @@ var WIDTH=700,HEIGHT=650,ss=50.0
 
 // variabili per il learner
 var data=[]                 // valori delle x dei punti disegnati
-var values=[]               // valori delle y dei punti disegnati
+var values=[]               // valori delle y dei punti disegnati           
 var trained=false
 
 var learners=[new LinearRegressionLearner(1), new ExpRegressionLearner(1),
@@ -88,7 +91,7 @@ function mouseClick(x,y,shift){
 function eventClick(e) {    
   //get position of cursor relative to top left of canvas
   var x = e.pageX;
-  var y = e.pageY;;
+  var y = e.pageY;
   var r = canvas.getBoundingClientRect();
   x -= r.left+window.scrollX;
   y -= r.top+window.scrollY;  
@@ -227,8 +230,66 @@ function statistica_F(){
   var F2 = p_error;
   var F_tot = F1 / F2;
 
-  document.getElementById("statistica_F").innerHTML = "Statisitica F: "+ F_tot; 
+
+ document.getElementById("statistica_F").innerHTML = "Statistica F: "+ F_tot; 
+//document.getElementById("statistica_F").innerHTML = "Statisitica F: "+ t; 
  
+}
+
+function varianza(){  //sum(xi - media(x))^2 / n
+
+  var n = data.length;
+  var err = 0, sum = 0;
+
+  for(var i = 0; i < n; i++) 
+    sum =+ data[i];
+ 
+   var mean = sum / n;
+
+    for (var i = 0; i < n; i++) 
+    err += Math.pow(data[i] - mean, 2);
+
+   varX = err / n;
+   document.getElementById("varianza").innerHTML = "Varianza: "+ varX;
+}
+
+function covarianza(){   //sum [((yi - ym) * (xi -xm))/n ]
+
+var n = data.length;
+var sum_x = 0, sum_y = 0;
+
+
+for(var i = 0; i < n; i++){
+  sum_x =+ data[i];
+  sum_y =+ values[i];
+}
+
+ var mean_x = sum_x / n,  mean_y = sum_y / n;
+ var err_x = 0, err_y = 0;
+
+ for(var i = 0; i < n; i++) 
+  err_x =+ (data[i] - mean_x);
+
+  for(var i = 0; i < n; i++) 
+  err_y =+ (values[i] - mean_y);
+
+  var den = err_y * err_x;
+  var cov = den / n;
+
+  document.getElementById("covarianza").innerHTML = "Covarianza: "+ cov;
+}
+ 
+function show(){
+
+if (!trained) {
+  document.getElementById("show").innerHTML = "Mouse click add data point and train your model"; 
+  trained = true;
+}
+else{
+  document.getElementById("show").innerHTML = "Covarianza: Indica il tipo di relazione presente fra le due variabili x e y:"
+                                                  + " piu' e' elevata e piu' vi e' un legame di tipo lineare" + "<br />"
+                                                  + "Varianza: Misura il grado di dispersione della variabile x";
+}
 }
 
 function setLearner(n){
@@ -241,6 +302,9 @@ function setLearner(n){
   rse()
   conf_matrix()
   statistica_F()
+  varianza()
+  covarianza()
+  show();
 }
 
 </script>
