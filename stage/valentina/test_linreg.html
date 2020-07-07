@@ -30,11 +30,12 @@
 <div id="azioni">
 <input id="button_train" type="button" value="Train" onclick="train()">
 <input id="button_sql" type="button" value="Sql" onclick="sql()">
+<input id="button_rse" type="button" value="RSE" onclick="rse()">
+<input id="button_rss" type="button" value="RSS" onclick="rss()">
+<input id="button_mse" type="button" value="MSE" onclick="mse()">
 <input id="button_r2" type="button" value="R2" onclick="r2()">
 <input id="button_r2Aj" type="button" value="R2 Adjusted" onclick="r2_adjusted()">
-<input id="button_rse" type="button" value="RSE" onclick="rse()">
-<input id="button_matrix" type="button" value="Confusion Matrix" onclick="conf_matrix()">
-<input id="button_F" type="button" value="Stisitica F" onclick="statistica_F()">
+<input id="button_F" type="button" value="Statistica F" onclick="statistica_F()">
 <input id="button_var" type="button" value="Varianza" onclick = "varianza()">
 <input id="button_cov" type="button" value="Covarianza" onclick = "covarianza()">
 </div>
@@ -42,16 +43,17 @@
 <div id="result">
 <div id="info"></div>
 <div id="sql"></div>
+<div id="rse"></div>
+<div id="rss"></div>
+<div id="mse"></div>
 <div id="r2"></div>
 <div id="r2_adjusted"></div>
-<div id="rse"></div>
-<div id="conf_matrix"></div>
 <div id="statistica_F"></div>
 <div id="varianza"></div>
 <div id="covarianza"></div>
 
 </div></span>
-<input id="button_show" type="button" value="Info" onclick = "show()">
+<input id="button_show" type="button" value="Dettagli" onclick = "show()">
 <div id="show"></div>
 </div>
 
@@ -156,7 +158,7 @@ function train(){
 
 function sql(){
   if (trained){
-    document.getElementById("sql").innerHTML="SQL = "+mdl.predictSQL(['CampoA'])
+    document.getElementById("sql").innerHTML="<b>SQL =</b> "+mdl.predictSQL(['CampoA'])
   }
 }
 
@@ -177,63 +179,57 @@ function r2(){
     p_error+=Math.pow(values[i]-mdl.predictJS(data[i]),2)
   // nella variabile p_error la somma degli errori rispetto al mio regressore
   var r2=1-(p_error/m_error)
-  document.getElementById("r2").innerHTML="R2 = "+r2
+  document.getElementById("r2").innerHTML="<b>R2 =</b> "+r2
   return r2
 }
 
 function r2_adjusted(){
   var R2 = r2();
-  var p = data.length, n = values.length;
+  var p = lrn.getNumberOfPredictors(), n = values.length;
   var r2_aj = R2 - [(1-R2) / p/(n-p-1)];
 
-  document.getElementById("r2_adjusted").innerHTML="R2 Adjusted = "+r2_aj;
+  document.getElementById("r2_adjusted").innerHTML="<b>R2 Adjusted =</b> "+r2_aj;
 }
 
-function rse(){
+function rse(){ //sum sqrt [(yi - yi_pred)^2 /n-2]
   var n = values.length;
   var p_error=0;
 
   for(i = 0; i < n; i++)
-    p_error+=Math.pow(values[i]-mdl.predictJS(data[i]),2)
+    p_error =+ Math.pow(values[i]-mdl.predictJS(data[i]),2)
 
   var rse = Math.sqrt(p_error / (n-2));
-  document.getElementById("rse").innerHTML = "Residual Standard Error: "+ rse; 
+  document.getElementById("rse").innerHTML = "<b>Residual Standard Error =</b> "+ rse; 
+  return rse;
 }
 
-function conf_matrix(){
-  var n = values.length, p = 0, pred = [], diff;
+function rss(){
+  var RSE = rse();
+  n = data.length;
 
-  for(i = 0; i < n && p < n; i++, p++) 
-    var pred = mdl.predictJS(data[i]); // faccio la predizione sui valori inseriti
-  
-    diff = n-p; // in realta' p ed n dovrebbero alla fine avere uguale dimensione 
+  var rss = Math.sqrt(RSE, 2) * (n - 2);
+  document.getElementById("rss").innerHTML = "<b>Residual Sum of Square =</b> "+ rss; 
+  return rss;
+}
 
-  document.getElementById("conf_matrix").innerHTML = "Veri positivi: " + p + " su " + n + "<br />" +
-                                                      "Falsi positivi: " + diff + " su " + n;
+function mse(){
+  var RSS = rss();
+  n = data.length;
+
+  var mse = (1 / n) * RSS;
+  document.getElementById("mse").innerHTML = "<b>Mean squared error =</b> "+ mse; 
 }
 
 function statistica_F(){
-  var sum = 0;
-  var n = values.length, m_error = 0, p_error = 0;
+  var R2 = r2();
+  var p = lrn.getNumberOfPredictors(), n = values.length;
 
-  for(i=0; i < n; i++) 
-     sum += values[i];
- 
-  var mean=sum/n;
-  for(var i=0; i < n; i++)
-    m_error += Math.pow(values[i]-mean,2);
- 
-  for(var i=0; i < n; i++)
-    p_error +=  Math.pow(values[i]-mdl.predictJS(data[i]),2);    
- 
-  var F1 = m_error - p_error;
-  var F2 = p_error;
-  var F_tot = F1 / F2;
+  var F1 = R2 / (1 - R2);
+  var F2 = (n - p - 1) / p;
 
-
- document.getElementById("statistica_F").innerHTML = "Statistica F: "+ F_tot; 
-//document.getElementById("statistica_F").innerHTML = "Statisitica F: "+ t; 
+  F_tot = F1 * F2;
  
+ document.getElementById("statistica_F").innerHTML = "<b>Statistica F =</b> "+ F_tot;  
 }
 
 function varianza(){  //sum(xi - media(x))^2 / n
@@ -250,7 +246,7 @@ function varianza(){  //sum(xi - media(x))^2 / n
     err += Math.pow(data[i] - mean, 2);
 
    varX = err / n;
-   document.getElementById("varianza").innerHTML = "Varianza: "+ varX;
+   document.getElementById("varianza").innerHTML = "<b>Varianza =</b> "+ varX;
 }
 
 function covarianza(){   //sum [((yi - ym) * (xi -xm))/n ]
@@ -276,34 +272,35 @@ for(var i = 0; i < n; i++){
   var den = err_y * err_x;
   var cov = den / n;
 
-  document.getElementById("covarianza").innerHTML = "Covarianza: "+ cov;
+  document.getElementById("covarianza").innerHTML = "<b>Covarianza =</b> "+ cov;
 }
  
 function show(){
 
-if (!trained) {
-  document.getElementById("show").innerHTML = "Mouse click add data point and train your model"; 
-  trained = true;
-}
-else{
-  document.getElementById("show").innerHTML = "Covarianza: Indica il tipo di relazione presente fra le due variabili x e y:"
-                                                  + " piu' e' elevata e piu' vi e' un legame di tipo lineare" + "<br />"
-                                                  + "Varianza: Misura il grado di dispersione della variabile x";
-}
+  if (!trained) 
+    document.getElementById("show").innerHTML = "<b>Mouse click add data point, then select and train your model :-)</b>"; 
+
+  else{
+    document.getElementById("show").innerHTML = "<b> RSE, RSS e MSE sono valori collegati fra loro, indicatori dello scarto fra i valori predetti rispetto a quelli reali." +
+                                                " Molto utili per confrontare fra loro vari modelli, piu' sono bassi piu' il modello e' da ritenersi buono." + "<br/>" + "<br/>"+
+                                                "Varianza, misura il grado di dispersione della variabile x."  + "<br/>" + "<br/>" +
+                                                "Covarianza, indica il tipo di relazione presente fra le variabili x e y: piu' e' elevata e piu' il legame e' di tipo lineare. </b>";
+  }
 }
 
 function setLearner(n){
   lrn=learners[n]
   trained=false
-  train()
-  sql()
-  r2()
-  r2_adjusted()
-  rse()
-  conf_matrix()
-  statistica_F()
-  varianza()
-  covarianza()
+  train();
+  sql();
+  rse();
+  rss();
+  mse();
+  r2();
+  r2_adjusted();
+  statistica_F();
+  varianza();
+  covarianza();
   show();
 }
 

@@ -60,6 +60,10 @@ class LogisticRegressionLearner extends ZMLSupervisedLearner {
     m.B=this.B
     return m;
   }
+
+  getNumberOfPredictors(){
+    return this.nPredict;
+  }
 }
 
 class LogisticRegressionModel extends ZMLModel {

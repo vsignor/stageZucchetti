@@ -1,17 +1,59 @@
 <!doctype html>
 <html>
+
+  <head>
+    <title>Classificazione</title>
+  <link href="stile.css" rel="stylesheet" type="text/css">
+  </head>
+
 <body>
+  <h1>Classificazione: Regressione Logistica, kernel Lineare, RBF e Polinomiale </h1>
 
-<p>
-<b>mouse click</b>: add red data point<br />
-<b>shift + mouse click</b>: add green data point<br />
-</p>
+  <div id=big_container>
+  <span id=grafico>
+  <canvas id="NPGcanvas" width="700" height="650" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
+  </span>
 
-<canvas id="NPGcanvas" width="500" height="500" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas></br>
-<input type="button" value="train" onclick="train()">
-<input type="button" value="sql" onclick="sql()">
-<div id="info"></div>
-<div id="sql"></div>
+  <span id=destra>
+  <p>Select your algorithms:</p>
+  <div id="algo">
+  <input id="button_regLog" type="button" value="Reg Logistica" onclick="setLearner(0)">
+  <input id="button_kernel_Lin" type="button" value="Linear" onclick="setLearner(1)">
+  <input id="button_RBF" type="button" value="RBF" onclick="setLearner(2)">
+  <input id="button_kernel_pol2" type="button" value="Pol2" onclick="setLearner(3)">
+  </div>
+
+  <p>Select your actions:</p>
+  <div id="azioni">
+  <input id="button_train_clas" type="button" value="Train" onclick="train()">
+  <input id="button_sql_clas" type="button" value="Sql" onclick="sql()">
+  <input id="button_rse_clas" type="button" value="RSE" onclick="rse()">
+  <input id="button_rss_clas" type="button" value="RSS" onclick="rss()">
+  <input id="button_mse_clas" type="button" value="MSE" onclick="mse()">
+  <input id="button_r2_clas" type="button" value="R2" onclick="r2()">
+  <input id="button_r2Aj_clas" type="button" value="R2 Adjusted" onclick="r2_adjusted()">
+  <input id="button_var_clas" type="button" value="Varianza" onclick = "varianza()">
+  <input id="button_cov_clas" type="button" value="Covarianza" onclick = "covarianza()">
+  <input id="button_matrix_clas" type="button" value="Confusion Matrix" onclick = "conf_matrix()">
+  </div>
+
+  <div id="result_clas">
+  <div id="info"></div>
+  <div id="sql"></div>
+  <div id="rse"></div>
+  <div id="rss"></div>
+  <div id="mse"></div>
+  <div id="r2"></div>
+  <div id="r2_adjusted"></div>
+  <div id="varianza"></div>
+  <div id="covarianza"></div>
+  <div id="confusion_matrix"></div>
+  </div>
+
+</div></span>
+<input id="button_show_clas" type="button" value="Dettagli" onclick = "show()">
+<div id="show"></div>
+</div>
 
 <script src="ZMLBase.js"></script>
 <script src="ZMLLogisticRegression.js"></script>
@@ -25,16 +67,17 @@
 // variabili per la gestione del canvas
 var canvas = document.getElementById("NPGcanvas")
 var ctx = canvas.getContext('2d');
-var WIDTH=500,HEIGHT=500,ss=50.0
+var WIDTH=700,HEIGHT=650,ss=50.0
 
 // variabili per il learner
-var data=[]
-var labels=[]
+var data=[]       // valori delle x dei punti disegnati
+var labels=[]     // valori delle classi dei punti disegnati
 var trained=false
-//var lrn=new LogisticRegressionLearner(2)
-//var lrn=new LinearSvmLearner(2)
-//var lrn=new RbfSvmLearner(2)
-var lrn=new Pol2SvmLearner(2)
+
+var mdl=null
+
+var learners=[new LogisticRegressionLearner(2), new LinearSvmLearner(2), new RbfSvmLearner(2), new Pol2SvmLearner(2)]
+var lrn=learners[0]
 var mdl=null
 
 function addDataPoint(x,y,c){
@@ -52,7 +95,7 @@ function mouseClick(x,y,shift){
 function eventClick(e) {    
   //get position of cursor relative to top left of canvas
   var x = e.pageX;
-  var y = e.pageY;;
+  var y = e.pageY;
   var r = canvas.getBoundingClientRect();
   x -= r.left+window.scrollX;
   y -= r.top+window.scrollY;  
@@ -77,7 +120,7 @@ function Redraw(){
     for(var x=0.0; x<=WIDTH; x+= density) {
       for(var y=0.0; y<=HEIGHT; y+= density) {
         var p = mdl.predictJS([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss])
-        ctx.fillStyle = (p==1?'rgb(150,250,150)':'rgb(250,150,150)');
+        ctx.fillStyle = (p==1?'rgb(153, 255, 153)':'rgb(153, 204, 255)'); //colori della classificazione 
         ctx.fillRect(x-density/2-1, y-density-1, density+2, density+2);
       }
     }  
@@ -94,7 +137,7 @@ function Redraw(){
   ctx.stroke();
   // draw data points
   for(var i=0;i<data.length;i++){
-    ctx.fillStyle = (labels[i]==1?'rgb(100,200,100)':'rgb(200,100,100)');
+    ctx.fillStyle = (labels[i]==1?'rgb(102, 255, 102)':'rgb(255, 255, 51)'); //colori punti
     drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
   }
 }
@@ -116,6 +159,156 @@ function sql(){
   if (trained){
     document.getElementById("sql").innerHTML=mdl.predictSQL(['CampoA','CampoB'])
   }
+}
+
+/*function r2(){
+
+  document.write(labels);
+/*  var sum=0,n=values.length,i
+  // calcolo la media, che è il miglior predittore quando ho solo i valori
+  for(i=0;i<n;i++) 
+    sum+=values[i]
+  var mean=sum/n
+  // calcolo la somma dei quadrati delle differenze rispetto alla media, questo mi da una misura di quanto sbaglio usando la media come predittore
+  var m_error=0
+  for(i=0;i<n;i++)
+    m_error+= Math.pow(labels[i]-mean,2)
+  // nella variabile m_error la somma degli errori rispetto alla media
+  // calcolo quanto sbaglio usando il mio sistema di regressione
+  var p_error=0
+  for(i=0;i<n;i++)
+    p_error+=Math.pow(labels[i]-mdl.predictJS(data[i]),2)
+  // nella variabile p_error la somma degli errori rispetto al mio regressore
+  var r2=1-(p_error/m_error)
+  document.getElementById("r2").innerHTML="<b>R2 =</b> "+r2
+  return r2*/
+/*}
+
+function r2_adjusted(){
+  var R2 = r2();
+  var p = lrn.getNumberOfPredictors(), n = data.length;
+  var r2_aj = R2 - [(1-R2) / p/(n-p-1)];
+
+  document.getElementById("r2_adjusted").innerHTML="<b>R2 Adjusted =</b> "+r2_aj;
+}
+
+function rse(){ //sum sqrt [(yi - yi_pred)^2 /n-2]
+  var n = values.length;
+  var p_error=0;
+
+  for(i = 0; i < n; i++)
+    p_error =+ Math.pow(labels[i]-mdl.predictJS(data[i]),2)
+
+  var rse = Math.sqrt(p_error / (n-2));
+  document.getElementById("rse").innerHTML = "<b>Residual Standard Error =</b> "+ rse; 
+  return rse;
+}
+
+function rss(){
+  var RSE = rse();
+  n = data.length;
+
+  var rss = Math.sqrt(RSE, 2) * (n - 2);
+  document.getElementById("rss").innerHTML = "<b>Residual Sum of Square =</b> "+ rss; 
+  return rss;
+}
+
+function mse(){
+  var RSS = rss();
+  n = data.length;
+
+  var mse = (1 / n) * RSS;
+  document.getElementById("mse").innerHTML = "<b>Mean squared error =</b> "+ mse; 
+}
+
+function varianza(){  //sum(xi - media(x))^2 / n
+
+  var n = data.length;
+  var err = 0, sum = 0;
+
+  for(var i = 0; i < n; i++) 
+    sum =+ data[i];
+ 
+   var mean = sum / n;
+
+    for (var i = 0; i < n; i++) 
+    err += Math.pow(data[i] - mean, 2);
+
+   varX = err / n;
+   document.getElementById("varianza").innerHTML = "<b>Varianza =</b> "+ varX;
+}
+
+function covarianza(){   //sum [((yi - ym) * (xi -xm))/n ]
+
+var n = data.length;
+var sum_x = 0, sum_y = 0;
+
+
+for(var i = 0; i < n; i++){
+  sum_x =+ data[i];
+  sum_y =+ values[i];
+}
+
+ var mean_x = sum_x / n,  mean_y = sum_y / n;
+ var err_x = 0, err_y = 0;
+
+ for(var i = 0; i < n; i++) 
+  err_x =+ (data[i] - mean_x);
+
+  for(var i = 0; i < n; i++) 
+  err_y =+ (values[i] - mean_y);
+
+  var den = err_y * err_x;
+  var cov = den / n;
+
+  document.getElementById("covarianza").innerHTML = "<b>Covarianza =</b> "+ cov;
+}*/
+
+function conf_matrix(){
+
+  var veri = 0, falsi = 0;
+
+  for (var i = 0; i < data.length; i++) {
+    for (var j = 0; j < labels.length; j++) {
+      if(data[i]==labels[j])
+        veri++;
+    }
+    fasi++;
+  }
+
+  
+  document.getElementById("confusion_matrix").innerHTML = "Ho trovato " + veri + " valori giusti su " + data.length + "<br/>"+
+                                                          "Ho trovato " + falsi + " valori sbagliati su " + data.length;
+
+}
+ 
+function show(){
+
+  if (!trained) 
+    document.getElementById("show").innerHTML = "<b>Mouse click add data point, then select and train your model :-)</b>"; 
+
+  else{
+    document.getElementById("show").innerHTML = "<b> RSE, RSS e MSE sono valori collegati fra loro, indicatori dello scarto fra i valori predetti rispetto a quelli reali." +
+                                                " Molto utili per confrontare fra loro vari modelli, piu' sono bassi piu' il modello e' da ritenersi buono." + "<br/>" + "<br/>"+
+                                                "Varianza, misura il grado di dispersione della variabile x."  + "<br/>" + "<br/>" +
+                                                "Covarianza, indica il tipo di relazione presente fra le variabili x e y: piu' e' elevata e piu' il legame e' di tipo lineare. </b>";
+  }
+}
+
+function setLearner(n){
+  lrn=learners[n]
+  trained=false
+  train();
+  sql();
+  rse();
+  rss();
+  mse();
+  r2();
+  r2_adjusted();
+  varianza();
+  covarianza();
+  conf_matrix();
+  show();
 }
 
 </script>

@@ -45,8 +45,12 @@ input{
   font-weight: bold;
 }
 
-#button_train, #button_sql, #button_r2, #button_r2Aj, #button_rse, #button_matrix, #button_F, #button_var, #button_cov {
+#button_train, #button_sql,  #button_rss, #button_mse, #button_rse, #button_r2, #button_r2Aj, #button_F, #button_var, #button_cov{
   background-color: rgb(236, 132, 167);
+}
+
+#sql, #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza{
+  margin-top: 0.5em;
 }
 
 #button_show {
@@ -99,4 +103,49 @@ input{
   margin-top: 0.5em;
   font-size: 1em;
   text-align: center;
+  width: 50%;
+  float: right;
 }
+
+#button_reg:hover, #button_par:hover, #button_knn:hover, #button_exp:hover, #button_pol3:hover, #button_pol4:hover, #button_pol5:hover, #button_train:hover, #button_sql:hover,  #button_rss:hover, #button_mse:hover, #button_rse:hover, #button_r2:hover, #button_r2Aj:hover, #button_F:hover, #button_var:hover, #button_cov:hover{
+  color: antiquewhite;
+  }
+
+  #button_show:hover{
+    color: rgb(236, 42, 107);
+  }
+
+  #button_regLog, #button_kernel_Lin, #button_RBF, #button_kernel_pol2{
+    background: rgb(0, 102, 204);
+    font-weight: bold;
+  }
+  
+  #button_train_clas, #button_sql_clas, #button_rss_clas, #button_mse_clas, #button_rse_clas, #button_r2_clas,  #button_r2Aj_clas, #button_var_clas, #button_cov_clas, #button_matrix_clas{
+    background-color: rgb(102, 178, 255);
+  }
+
+  #button_kernel_Lin:hover, #button_RBF:hover, #button_kernel_pol2:hover, #button_train_clas:hover, #button_sql_clas:hover, #button_rss_clas:hover, #button_mse_clas:hover, #button_rse_clas:hover, #button_r2_clas:hover,  #button_r2Aj_clas:hover, #button_var_clas:hover, #button_cov_clas:hover, #button_matrix_clas:hover{
+    color: antiquewhite;
+  }
+
+  #result_clas{
+    margin-top: 3em;
+    font-size: medium;
+    font-family: monospace;
+    background-color:  rgba(204, 229, 255);
+    text-align: center;
+    border-radius: 0.5em;
+    padding: 10px;
+    font-family: monospace;
+    margin-top: 0.5em;
+    font-size: 1em;
+  }
+
+  #button_show_clas{
+    margin-top: 3em;
+    background-color: rgb(223, 233, 245);
+  }
+
+  #button_show_clas:hover{
+    color: rgb(0, 102, 204);
+  }

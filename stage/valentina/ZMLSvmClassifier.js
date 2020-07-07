@@ -29,6 +29,11 @@ class SvmLearner extends ZMLSupervisedLearner {
     // crea un modello specifico per il tipo di Svm
     return new SvmModel(this.nPredict,this.kernel)
   }
+
+  getNumberOfPredictors(){
+    return this.nPredict;
+  }
+
 }
 
 class SvmModel extends ZMLModel {

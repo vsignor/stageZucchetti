@@ -22,6 +22,10 @@ class LinearRegressionLearner extends ZMLLearner {
     for(var i=0;i<c.length;i++) m.coeff.push(c[i][0])
     return m;
   }
+  getNumberOfPredictors(){
+    return this.nPredict;
+  }
+
 }
 
 class LinearRegressionModel extends ZMLModel {
@@ -43,6 +47,7 @@ class LinearRegressionModel extends ZMLModel {
       r+=" + "+c[i-1]+" * ("+this.coeff[i]+")"
     return r
   }
+
 }
 
 class ExpRegressionLearner extends LinearRegressionLearner {
@@ -153,6 +158,10 @@ class knnRegressionLearner extends ZMLLearner {
     for(var i=0;i<this.data.length;i++)
       m.data.push(this.data[i])
     return m
+  }
+
+  getNumberOfPredictors(){
+    return this.data.length;
   }
 }
 
