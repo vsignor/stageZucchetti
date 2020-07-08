@@ -27,27 +27,25 @@
   <div id="azioni">
   <input id="button_train_clas" type="button" value="Train" onclick="train()">
   <input id="button_sql_clas" type="button" value="Sql" onclick="sql()">
-  <input id="button_rse_clas" type="button" value="RSE" onclick="rse()">
-  <input id="button_rss_clas" type="button" value="RSS" onclick="rss()">
-  <input id="button_mse_clas" type="button" value="MSE" onclick="mse()">
-  <input id="button_r2_clas" type="button" value="R2" onclick="r2()">
-  <input id="button_r2Aj_clas" type="button" value="R2 Adjusted" onclick="r2_adjusted()">
-  <input id="button_var_clas" type="button" value="Varianza" onclick = "varianza()">
-  <input id="button_cov_clas" type="button" value="Covarianza" onclick = "covarianza()">
   <input id="button_matrix_clas" type="button" value="Confusion Matrix" onclick = "conf_matrix()">
+  <input id="button_prob" type="button" value="Prob(Y)" onclick="prob()">
+  <input id="button_odds" type="button" value="Odds(Y)" onclick="odds()">
+  <input id="button_goodMod" type="button" value="Efficenza Modello" onclick="goodMod()">
   </div>
 
   <div id="result_clas">
   <div id="info"></div>
   <div id="sql"></div>
-  <div id="rse"></div>
-  <div id="rss"></div>
-  <div id="mse"></div>
+  <div id="confusion_matrix"></div>
+  <div id="prob"></div>
+  <div id="odds"></div>
+
+
+
   <div id="r2"></div>
   <div id="r2_adjusted"></div>
   <div id="varianza"></div>
   <div id="covarianza"></div>
-  <div id="confusion_matrix"></div>
   </div>
 
 </div></span>
@@ -73,8 +71,6 @@ var WIDTH=700,HEIGHT=650,ss=50.0
 var data=[]       // valori delle x dei punti disegnati
 var labels=[]     // valori delle classi dei punti disegnati
 var trained=false
-
-var mdl=null
 
 var learners=[new LogisticRegressionLearner(2), new LinearSvmLearner(2), new RbfSvmLearner(2), new Pol2SvmLearner(2)]
 var lrn=learners[0]
@@ -163,10 +159,9 @@ function sql(){
 
 /*function r2(){
 
-  document.write(labels);
-/*  var sum=0,n=values.length,i
+  var sum = 0, n = labels.length;
   // calcolo la media, che è il miglior predittore quando ho solo i valori
-  for(i=0;i<n;i++) 
+  for(var i = 0; i < n; i++) 
     sum+=values[i]
   var mean=sum/n
   // calcolo la somma dei quadrati delle differenze rispetto alla media, questo mi da una misura di quanto sbaglio usando la media come predittore
@@ -181,10 +176,10 @@ function sql(){
   // nella variabile p_error la somma degli errori rispetto al mio regressore
   var r2=1-(p_error/m_error)
   document.getElementById("r2").innerHTML="<b>R2 =</b> "+r2
-  return r2*/
-/*}
+  return r2
+}*/
 
-function r2_adjusted(){
+/*function r2_adjusted(){
   var R2 = r2();
   var p = lrn.getNumberOfPredictors(), n = data.length;
   var r2_aj = R2 - [(1-R2) / p/(n-p-1)];
@@ -266,48 +261,85 @@ for(var i = 0; i < n; i++){
 
 function conf_matrix(){
 
-  var veri = 0, falsi = 0;
+  var tp = 0, tn = 0, fn = 0, fp = 0;
+  var n = data.length;
 
-  for (var i = 0; i < data.length; i++) {
-    for (var j = 0; j < labels.length; j++) {
-      if(data[i]==labels[j])
-        veri++;
+  for (var i = 0; i < n; i++){
+      
+    if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali
+        if(labels[i] == 1) tp++;
+        tn++;
+      }
+
+      else{ // reali e predetti diversi
+          if(labels[i] == 1 && mdl.predictJS(data[j]) == -1) fn++;
+          fp++;
+      }
     }
-    fasi++;
-  }
 
-  
-  document.getElementById("confusion_matrix").innerHTML = "Ho trovato " + veri + " valori giusti su " + data.length + "<br/>"+
-                                                          "Ho trovato " + falsi + " valori sbagliati su " + data.length;
+    
+ document.getElementById("confusion_matrix").innerHTML = "<b>Confusion Matrix</b>" + "<br/>" +
+                                                         "+ -------------------------------------- +  <br/>" + "<br/>" +
+                                                         "<b>TRUE POSITIVE </b> " + tp + " " + "<b> FALSE NEGATIVE</b> "+ " " + fn + " <br/>" + " <br/>"+
+                                                         "<b>FALSE POSITIVE</b> " + fp + " " + "<b>TRUE NEGATIVE</b> " + " " + tn + " <br/>" +  "<br/>" +
+                                                         " + -------------------------------------- + ";
+ 
+}
+
+function prob(){
+  var n = data.length, classeA = 0, classeB = 0;
+
+  for (var i = 0; i < n; i++){
+    if (labels[i] == 1) classeA++;
+    classeB++;
+  }
+  //document.write(classeA + " " + classeB);
+
+  var probA = (classeA / n) * 100;  //probabilita in % di appartenere alle classi -1 ed 1
+  var probB = (classeB / n) * 100; 
+
+  document.getElementById("prob").innerHTML = "<b>Prob (Y = 1): </b>" + probA + "% " + " ; " + " " +
+                                              "<b> Prob (Y = -1): </b>" + probB + "% ";
+}
+
+function odds(){
+  var n = data.length, classeA = 0, classeB = 0;
+
+for (var i = 0; i < n; i++){
+  if (labels[i] == 1) classeA++;
+  classeB++;
+}
+//document.write(classeA + " " + classeB);
+
+var oddsA =  classeA / classeB; // odds: relazione fra A e B
+var oddsB =  classeB / classeA;  // odds: relazione fra B ed A
+
+document.getElementById("odds").innerHTML = "<b>Odds (Y = 1): </b>" + oddsA + " ; " +
+                                            "<b> Odds (Y = -1): </b>" + oddsB;
 
 }
  
 function show(){
 
   if (!trained) 
-    document.getElementById("show").innerHTML = "<b>Mouse click add data point, then select and train your model :-)</b>"; 
+    document.getElementById("show").innerHTML = "<b>Mouse click add data point, then select and train your model :-)</b>";
 
   else{
-    document.getElementById("show").innerHTML = "<b> RSE, RSS e MSE sono valori collegati fra loro, indicatori dello scarto fra i valori predetti rispetto a quelli reali." +
-                                                " Molto utili per confrontare fra loro vari modelli, piu' sono bassi piu' il modello e' da ritenersi buono." + "<br/>" + "<br/>"+
-                                                "Varianza, misura il grado di dispersione della variabile x."  + "<br/>" + "<br/>" +
-                                                "Covarianza, indica il tipo di relazione presente fra le variabili x e y: piu' e' elevata e piu' il legame e' di tipo lineare. </b>";
+    document.getElementById("show").innerHTML = "<b>Prob(Y) e Odds(Y) esprimono entrambi la probabilita' del verificarsi di un determinato evento" +
+                                                ": semplicemente cambia il modo in cui lo fanno. Mentre il primo e' il tradizionale rapporto fra il n. di occorrenze" +
+                                                " dell'evento col n. totale di osservazioni; il secondo si esprimere mediante il rapporto fra i " +
+                                                " due eventi stessi: classeA / classeB (o viceversa in base all'oggetto della previsione)."; 
   }
 }
 
 function setLearner(n){
   lrn=learners[n]
-  trained=false
+  trained=false;
   train();
   sql();
-  rse();
-  rss();
-  mse();
-  r2();
-  r2_adjusted();
-  varianza();
-  covarianza();
   conf_matrix();
+  prob();
+  odds();
   show();
 }
 

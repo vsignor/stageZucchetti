@@ -87,8 +87,8 @@ class LogisticRegressionModel extends ZMLModel {
     var i,predY,lambda;
     lambda = ""+this.B;
     for(i=0;i<this.nPredict;i++) 
-      lambda+=(this.Ai[i]>0?'+':'')+this.Ai[i]+'*'+c[i];
-    predY = '1/(1+exp(-('+lambda+')))';
-    return ('case when '+predY+'>0.5 then 1 else -1 end')
+      lambda+=(this.Ai[i]>0?' + ':' ')+this.Ai[i]+' * '+c[i];
+    predY = '1 / (1 + exp( -(' + lambda + ')))';
+    return ('case when ' + predY + ' > 0.5 then 1 else -1 end')
   }
 }

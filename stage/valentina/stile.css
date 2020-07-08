@@ -49,8 +49,13 @@ input{
   background-color: rgb(236, 132, 167);
 }
 
-#sql, #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza{
+#sql, #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds{
   margin-top: 0.5em;
+}
+
+#confusion_matrix{
+  margin-top: 2em;
+  margin-bottom: 2em;
 }
 
 #button_show {
@@ -120,11 +125,11 @@ input{
     font-weight: bold;
   }
   
-  #button_train_clas, #button_sql_clas, #button_rss_clas, #button_mse_clas, #button_rse_clas, #button_r2_clas,  #button_r2Aj_clas, #button_var_clas, #button_cov_clas, #button_matrix_clas{
+  #button_train_clas, #button_sql_clas, #button_matrix_clas, #button_prob, #button_odds{
     background-color: rgb(102, 178, 255);
   }
 
-  #button_kernel_Lin:hover, #button_RBF:hover, #button_kernel_pol2:hover, #button_train_clas:hover, #button_sql_clas:hover, #button_rss_clas:hover, #button_mse_clas:hover, #button_rse_clas:hover, #button_r2_clas:hover,  #button_r2Aj_clas:hover, #button_var_clas:hover, #button_cov_clas:hover, #button_matrix_clas:hover{
+  #button_kernel_Lin:hover, #button_RBF:hover, #button_kernel_pol2:hover, #button_train_clas:hover, #button_sql_clas:hover, #button_matrix_clas:hover, #button_prob:hover, #button_odds:hover{
     color: antiquewhite;
   }
 
@@ -149,3 +154,4 @@ input{
   #button_show_clas:hover{
     color: rgb(0, 102, 204);
   }
+
