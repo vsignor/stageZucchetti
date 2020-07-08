@@ -49,7 +49,7 @@ input{
   background-color: rgb(236, 132, 167);
 }
 
-#sql, #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds{
+#sql, #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod{
   margin-top: 0.5em;
 }
 
@@ -125,11 +125,11 @@ input{
     font-weight: bold;
   }
   
-  #button_train_clas, #button_sql_clas, #button_matrix_clas, #button_prob, #button_odds{
+  #button_train_clas, #button_sql_clas, #button_matrix_clas, #button_prob, #button_odds, #button_goodMod{
     background-color: rgb(102, 178, 255);
   }
 
-  #button_kernel_Lin:hover, #button_RBF:hover, #button_kernel_pol2:hover, #button_train_clas:hover, #button_sql_clas:hover, #button_matrix_clas:hover, #button_prob:hover, #button_odds:hover{
+  #button_kernel_Lin:hover, #button_RBF:hover, #button_kernel_pol2:hover, #button_train_clas:hover, #button_sql_clas:hover, #button_matrix_clas:hover, #button_prob:hover, #button_odds:hover, #button_goodMod:hover{
     color: antiquewhite;
   }
 

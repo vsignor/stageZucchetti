@@ -39,13 +39,7 @@
   <div id="confusion_matrix"></div>
   <div id="prob"></div>
   <div id="odds"></div>
-
-
-
-  <div id="r2"></div>
-  <div id="r2_adjusted"></div>
-  <div id="varianza"></div>
-  <div id="covarianza"></div>
+  <div id="goodMod"></div>
   </div>
 
 </div></span>
@@ -157,108 +151,6 @@ function sql(){
   }
 }
 
-/*function r2(){
-
-  var sum = 0, n = labels.length;
-  // calcolo la media, che è il miglior predittore quando ho solo i valori
-  for(var i = 0; i < n; i++) 
-    sum+=values[i]
-  var mean=sum/n
-  // calcolo la somma dei quadrati delle differenze rispetto alla media, questo mi da una misura di quanto sbaglio usando la media come predittore
-  var m_error=0
-  for(i=0;i<n;i++)
-    m_error+= Math.pow(labels[i]-mean,2)
-  // nella variabile m_error la somma degli errori rispetto alla media
-  // calcolo quanto sbaglio usando il mio sistema di regressione
-  var p_error=0
-  for(i=0;i<n;i++)
-    p_error+=Math.pow(labels[i]-mdl.predictJS(data[i]),2)
-  // nella variabile p_error la somma degli errori rispetto al mio regressore
-  var r2=1-(p_error/m_error)
-  document.getElementById("r2").innerHTML="<b>R2 =</b> "+r2
-  return r2
-}*/
-
-/*function r2_adjusted(){
-  var R2 = r2();
-  var p = lrn.getNumberOfPredictors(), n = data.length;
-  var r2_aj = R2 - [(1-R2) / p/(n-p-1)];
-
-  document.getElementById("r2_adjusted").innerHTML="<b>R2 Adjusted =</b> "+r2_aj;
-}
-
-function rse(){ //sum sqrt [(yi - yi_pred)^2 /n-2]
-  var n = values.length;
-  var p_error=0;
-
-  for(i = 0; i < n; i++)
-    p_error =+ Math.pow(labels[i]-mdl.predictJS(data[i]),2)
-
-  var rse = Math.sqrt(p_error / (n-2));
-  document.getElementById("rse").innerHTML = "<b>Residual Standard Error =</b> "+ rse; 
-  return rse;
-}
-
-function rss(){
-  var RSE = rse();
-  n = data.length;
-
-  var rss = Math.sqrt(RSE, 2) * (n - 2);
-  document.getElementById("rss").innerHTML = "<b>Residual Sum of Square =</b> "+ rss; 
-  return rss;
-}
-
-function mse(){
-  var RSS = rss();
-  n = data.length;
-
-  var mse = (1 / n) * RSS;
-  document.getElementById("mse").innerHTML = "<b>Mean squared error =</b> "+ mse; 
-}
-
-function varianza(){  //sum(xi - media(x))^2 / n
-
-  var n = data.length;
-  var err = 0, sum = 0;
-
-  for(var i = 0; i < n; i++) 
-    sum =+ data[i];
- 
-   var mean = sum / n;
-
-    for (var i = 0; i < n; i++) 
-    err += Math.pow(data[i] - mean, 2);
-
-   varX = err / n;
-   document.getElementById("varianza").innerHTML = "<b>Varianza =</b> "+ varX;
-}
-
-function covarianza(){   //sum [((yi - ym) * (xi -xm))/n ]
-
-var n = data.length;
-var sum_x = 0, sum_y = 0;
-
-
-for(var i = 0; i < n; i++){
-  sum_x =+ data[i];
-  sum_y =+ values[i];
-}
-
- var mean_x = sum_x / n,  mean_y = sum_y / n;
- var err_x = 0, err_y = 0;
-
- for(var i = 0; i < n; i++) 
-  err_x =+ (data[i] - mean_x);
-
-  for(var i = 0; i < n; i++) 
-  err_y =+ (values[i] - mean_y);
-
-  var den = err_y * err_x;
-  var cov = den / n;
-
-  document.getElementById("covarianza").innerHTML = "<b>Covarianza =</b> "+ cov;
-}*/
-
 function conf_matrix(){
 
   var tp = 0, tn = 0, fn = 0, fp = 0;
@@ -318,7 +210,35 @@ document.getElementById("odds").innerHTML = "<b>Odds (Y = 1): </b>" + oddsA + " 
                                             "<b> Odds (Y = -1): </b>" + oddsB;
 
 }
+
+function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er. senza mod
+                    // er. senza mod = sum [fi * ((n - fi) / n) ]  ,  dove   fi = n. casi in i
+
+  var n = data.length, err = 0;
+
+  for (var i = 0; i < n; i++){
+      
+    if (labels[i] != mdl.predictJS(data[i])) // reali e predetti diversi -> errori col modello
+       err++; 
+  }
+
+  //err. senza modello
+  var fi = 0;
+
+  for (var i = 0; i < n; i++){
+    if (labels[i] == -1) fi++;
+  }
+   // document.write(fi);
+
+    var er_NoMod = fi * [(n - fi) / n];
+   //document.write(er_NoMod);
+
+    var good = (er_NoMod - err) / er_NoMod;
+
+    document.getElementById("goodMod").innerHTML = "<b> Efficienza del modello = </b> " + good;
+}
  
+
 function show(){
 
   if (!trained) 
@@ -328,7 +248,12 @@ function show(){
     document.getElementById("show").innerHTML = "<b>Prob(Y) e Odds(Y) esprimono entrambi la probabilita' del verificarsi di un determinato evento" +
                                                 ": semplicemente cambia il modo in cui lo fanno. Mentre il primo e' il tradizionale rapporto fra il n. di occorrenze" +
                                                 " dell'evento col n. totale di osservazioni; il secondo si esprimere mediante il rapporto fra i " +
-                                                " due eventi stessi: classeA / classeB (o viceversa in base all'oggetto della previsione)."; 
+                                                " due eventi stessi: classeA / classeB (o viceversa in base all'oggetto della previsione)." + "<br/>" + "<br/>" +
+                                                "L'efficienza del modello permette di dare una valutazione circa il modello di classificazione." +  
+                                                " Tale misurazione  si basa sulla valutazione della riduzione dell’errore in percentuale : " + "<br/>" + "<br>" +
+                                                " errore senza modello + errore col modello " + "<br/>" +
+                                                " ---------------------------------------------------" + "</br>"+ 
+                                                "errore senza modello"
   }
 }
 
@@ -340,6 +265,7 @@ function setLearner(n){
   conf_matrix();
   prob();
   odds();
+  goodMod();
   show();
 }
 
