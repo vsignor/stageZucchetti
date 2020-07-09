@@ -160,9 +160,15 @@ function sql(){
   if (trained){
     document.getElementById("sql").innerHTML="<b>SQL =</b> "+mdl.predictSQL(['CampoA'])
   }
+
+  show();
 }
 
 function r2(){
+
+  if(!trained)
+    show();
+
   var sum=0,n=values.length,i
   // calcolo la media, che è il miglior predittore quando ho solo i valori
   for(i=0;i<n;i++) 
@@ -184,6 +190,10 @@ function r2(){
 }
 
 function r2_adjusted(){
+
+  if(!trained)
+    show();
+
   var R2 = r2();
   var p = lrn.getNumberOfPredictors(), n = values.length;
   var r2_aj = R2 - [(1-R2) / p/(n-p-1)];
@@ -192,6 +202,10 @@ function r2_adjusted(){
 }
 
 function rse(){ //sum sqrt [(yi - yi_pred)^2 /n-2]
+
+  if(!trained)
+    show();
+
   var n = values.length;
   var p_error=0;
 
@@ -204,6 +218,10 @@ function rse(){ //sum sqrt [(yi - yi_pred)^2 /n-2]
 }
 
 function rss(){
+
+  if(!trained)
+    show();
+
   var RSE = rse();
   n = data.length;
 
@@ -213,6 +231,10 @@ function rss(){
 }
 
 function mse(){
+
+  if(!trained)
+    show();
+
   var RSS = rss();
   n = data.length;
 
@@ -221,6 +243,10 @@ function mse(){
 }
 
 function statistica_F(){
+
+  if(!trained)
+    show();
+
   var R2 = r2();
   var p = lrn.getNumberOfPredictors(), n = values.length;
 
@@ -233,6 +259,9 @@ function statistica_F(){
 }
 
 function varianza(){  //sum(xi - media(x))^2 / n
+
+  if(!trained)
+    show();
 
   var n = data.length;
   var err = 0, sum = 0;
@@ -250,6 +279,9 @@ function varianza(){  //sum(xi - media(x))^2 / n
 }
 
 function covarianza(){   //sum [((yi - ym) * (xi -xm))/n ]
+
+  if(!trained)
+    show();
 
 var n = data.length;
 var sum_x = 0, sum_y = 0;

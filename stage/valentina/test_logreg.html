@@ -110,7 +110,7 @@ function Redraw(){
     for(var x=0.0; x<=WIDTH; x+= density) {
       for(var y=0.0; y<=HEIGHT; y+= density) {
         var p = mdl.predictJS([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss])
-        ctx.fillStyle = (p==1?'rgb(153, 255, 153)':'rgb(153, 204, 255)'); //colori della classificazione 
+        ctx.fillStyle = (p==1?'rgb(255, 204, 153)': 'rgb(229, 204, 255)'); //colori della classificazione 
         ctx.fillRect(x-density/2-1, y-density-1, density+2, density+2);
       }
     }  
@@ -127,7 +127,7 @@ function Redraw(){
   ctx.stroke();
   // draw data points
   for(var i=0;i<data.length;i++){
-    ctx.fillStyle = (labels[i]==1?'rgb(102, 255, 102)':'rgb(255, 255, 51)'); //colori punti
+    ctx.fillStyle = (labels[i]==1?'rgb(0, 153, 0)':'rgb(255, 0, 127)'); //colori punti
     drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
   }
 }
@@ -149,9 +149,13 @@ function sql(){
   if (trained){
     document.getElementById("sql").innerHTML=mdl.predictSQL(['CampoA','CampoB'])
   }
+  show();
 }
 
 function conf_matrix(){
+
+  if(!trained)
+    show();
 
   var tp = 0, tn = 0, fn = 0, fp = 0;
   var n = data.length;
@@ -169,16 +173,26 @@ function conf_matrix(){
       }
     }
 
-    
+    var acc = (tp + tn) / n;  
+    var prec = tp / (tp + fp);
+    var recall  =  tp / (tp + fn);
+
  document.getElementById("confusion_matrix").innerHTML = "<b>Confusion Matrix</b>" + "<br/>" +
                                                          "+ -------------------------------------- +  <br/>" + "<br/>" +
                                                          "<b>TRUE POSITIVE </b> " + tp + " " + "<b> FALSE NEGATIVE</b> "+ " " + fn + " <br/>" + " <br/>"+
                                                          "<b>FALSE POSITIVE</b> " + fp + " " + "<b>TRUE NEGATIVE</b> " + " " + tn + " <br/>" +  "<br/>" +
-                                                         " + -------------------------------------- + ";
- 
-}
+                                                         " + -------------------------------------- + " + "<br/>" + "<br/>" +
+                                                         "<b>Accuratezza = </b>" + acc +  "<br/>" +
+                                                         "<b>Precisione = </b>" + prec +  "<br/>" +
+                                                         "<b>Recall = </b>" + recall;
+
+}                     
 
 function prob(){
+
+  if(!trained)
+    show();
+
   var n = data.length, classeA = 0, classeB = 0;
 
   for (var i = 0; i < n; i++){
@@ -195,6 +209,10 @@ function prob(){
 }
 
 function odds(){
+
+  if(!trained)
+    show();
+
   var n = data.length, classeA = 0, classeB = 0;
 
 for (var i = 0; i < n; i++){
@@ -213,6 +231,8 @@ document.getElementById("odds").innerHTML = "<b>Odds (Y = 1): </b>" + oddsA + " 
 
 function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er. senza mod
                     // er. senza mod = sum [fi * ((n - fi) / n) ]  ,  dove   fi = n. casi in i
+  if(!trained)
+    show();
 
   var n = data.length, err = 0;
 
@@ -237,7 +257,6 @@ function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er
 
     document.getElementById("goodMod").innerHTML = "<b> Efficienza del modello = </b> " + good;
 }
- 
 
 function show(){
 

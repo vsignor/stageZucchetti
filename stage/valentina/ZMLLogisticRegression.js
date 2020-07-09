@@ -31,7 +31,7 @@ class LogisticRegressionLearner extends ZMLSupervisedLearner {
         var lambda=this.B;
         for(i=0;i<this.nPredict;i++)
           lambda+=this.Ai[i]*d.x[i];    
-        //func = A*d.x1/100+B*d.x2/100+C; <<-- devo capire questo 100
+        //func = A*d.x1/100+B*d.x2/100+C; //<<-- devo capire questo 100
         predY = 1/(1+Math.exp(-lambda));
         error = predY - (d.c==1?1:0);
         //tempA = A;
@@ -39,7 +39,7 @@ class LogisticRegressionLearner extends ZMLSupervisedLearner {
         //tempC = C;
         //A = tempA + alpha*-error*predY*(1-predY)*d.x1/100;
         //B = tempB + alpha*-error*predY*(1-predY)*d.x2/100;
-        //C = tempC + alpha*-error*predY*(1-predY)*1.0;
+       // C = tempC + alpha*-error*predY*(1-predY)*1.0;
         for(i=0;i<this.nPredict;i++)
           this.Ai[i]=this.Ai[i]+alpha*-error*predY*(1-predY)*d.x[i];
         this.B=this.B+ alpha*-error*predY*(1-predY)*1.0;
@@ -61,9 +61,9 @@ class LogisticRegressionLearner extends ZMLSupervisedLearner {
     return m;
   }
 
-  getNumberOfPredictors(){
+  /*getNumberOfPredictors(){
     return this.nPredict;
-  }
+  }*/
 }
 
 class LogisticRegressionModel extends ZMLModel {
@@ -81,6 +81,8 @@ class LogisticRegressionModel extends ZMLModel {
     for(i=0;i<this.nPredict;i++) 
       lambda+=this.Ai[i]*x[i];
     predY = 1/(1+Math.exp(-lambda));
+    //document.write(predY + " ");
+    //document.write(lamda + " ");
     return (predY>0.5?1:-1)
   }
   predictSQL(c){

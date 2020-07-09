@@ -112,7 +112,7 @@ input{
   float: right;
 }
 
-#button_reg:hover, #button_par:hover, #button_knn:hover, #button_exp:hover, #button_pol3:hover, #button_pol4:hover, #button_pol5:hover, #button_train:hover, #button_sql:hover,  #button_rss:hover, #button_mse:hover, #button_rse:hover, #button_r2:hover, #button_r2Aj:hover, #button_F:hover, #button_var:hover, #button_cov:hover{
+#button_reg:hover, #button_par:hover, #button_knn:hover, #button_exp:hover, #button_pol3:hover, #button_pol4:hover, #button_pol5:hover, #button_train:hover, #button_sql:hover,  #button_rss:hover, #button_mse:hover, #button_rse:hover, #button_r2:hover, #button_r2Aj:hover, #button_F:hover, #button_var:hover{
   color: antiquewhite;
   }
 

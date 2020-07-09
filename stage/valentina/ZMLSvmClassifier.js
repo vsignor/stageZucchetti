@@ -18,6 +18,7 @@ class SvmLearner extends ZMLSupervisedLearner {
   train(){
     // fa tutto nella getModel    
   }
+  
   getModel(){
     var svm=new svmjs.SVM()
     svm.train(this.data,this.labels,{kernel:this.kernel})
@@ -30,9 +31,9 @@ class SvmLearner extends ZMLSupervisedLearner {
     return new SvmModel(this.nPredict,this.kernel)
   }
 
-  getNumberOfPredictors(){
+ /* getNumberOfPredictors(){
     return this.nPredict;
-  }
+  }*/
 
 }
 
