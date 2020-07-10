@@ -27,6 +27,7 @@
   <div id="azioni">
   <input id="button_train_clas" type="button" value="Train" onclick="train()">
   <input id="button_sql_clas" type="button" value="Sql" onclick="sql()">
+  <input id="button_test" type="button" value="Data Test" onclick="data_test()">
   <input id="button_matrix_clas" type="button" value="Confusion Matrix" onclick = "conf_matrix()">
   <input id="button_prob" type="button" value="Prob(Y)" onclick="prob()">
   <input id="button_odds" type="button" value="Odds(Y)" onclick="odds()">
@@ -36,6 +37,7 @@
   <div id="result_clas">
   <div id="info"></div>
   <div id="sql"></div>
+  <div id="test"></div>
   <div id="confusion_matrix"></div>
   <div id="prob"></div>
   <div id="odds"></div>
@@ -65,6 +67,8 @@ var WIDTH=700,HEIGHT=650,ss=50.0
 var data=[]       // valori delle x dei punti disegnati
 var labels=[]     // valori delle classi dei punti disegnati
 var trained=false
+
+var test = [-1, 1, -1, 1, -1];
 
 var learners=[new LogisticRegressionLearner(2), new LinearSvmLearner(2), new RbfSvmLearner(2), new Pol2SvmLearner(2)]
 var lrn=learners[0]
@@ -103,7 +107,6 @@ function drawCircle(x, y, r){
 
 function Redraw(){
   ctx.clearRect(0,0,WIDTH,HEIGHT);
-    
   if (trained) {  
     // draw decisions in the grid
     var density= 4.0;
@@ -111,6 +114,10 @@ function Redraw(){
       for(var y=0.0; y<=HEIGHT; y+= density) {
         var p = mdl.predictJS([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss])
         ctx.fillStyle = (p==1?'rgb(255, 204, 153)': 'rgb(229, 204, 255)'); //colori della classificazione 
+        /*ctx.fillStyle = 'rgb(255, 204, 153)';
+        var rect = ctx.fillRect(0, 0, 50, 50);
+        ctx.fillStyle = 'rgb(229, 204, 255)';
+        var rect = ctx.fillRect(60, 0, 50, 50);*/
         ctx.fillRect(x-density/2-1, y-density-1, density+2, density+2);
       }
     }  
@@ -128,6 +135,8 @@ function Redraw(){
   // draw data points
   for(var i=0;i<data.length;i++){
     ctx.fillStyle = (labels[i]==1?'rgb(0, 153, 0)':'rgb(255, 0, 127)'); //colori punti
+     /* ctx.fillStyle = 'rgb(0, 153, 0)';
+      ctx.fillStyle = 'rgb(255, 0, 127)';*/
     drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
   }
 }
@@ -152,39 +161,59 @@ function sql(){
   show();
 }
 
+function data_test(){
+ // for (var i = 0; i < test.length; i++)
+ // document.getElementById("test").innerHTML = test[i] + " ";
+ if (trained)
+    document.getElementById("test").innerHTML = "<b>Dati di test = [-1, 1, -1, 1, -1]</b>";
+  show();
+}
+
 function conf_matrix(){
 
   if(!trained)
     show();
 
   var tp = 0, tn = 0, fn = 0, fp = 0;
-  var n = data.length;
+  //var n = data.length;
+  var n = test.length;
 
   for (var i = 0; i < n; i++){
-      
-    if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali
-        if(labels[i] == 1) tp++;
-        tn++;
+
+    //if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali  
+    if (test[i] == mdl.predictJS(test[i])){ // reali e predetti uguali
+        //if(labels[i] == 1) tp++;
+        if(test[i] == 1) tp++;
+        else tn++;
       }
 
       else{ // reali e predetti diversi
-          if(labels[i] == 1 && mdl.predictJS(data[j]) == -1) fn++;
-          fp++;
+          //if(labels[i] == 1 && mdl.predictJS(test[i]) == -1) fn++;
+          if(test[i] == 1 && mdl.predictJS(test[i]) == -1) fn++;
+          else fp++;
       }
     }
 
     var acc = (tp + tn) / n;  
     var prec = tp / (tp + fp);
     var recall  =  tp / (tp + fn);
+    var er_rate = (fp + fn) / n;  //ottimo = 0 , male = 1;
+    var spec = tn / (tn + fp);  //ottimo = 1 , male = 0;
+    var fp_rate = 1 - spec;  //ottimo = 0 , male = 1;
+    var f_score = (2 * recall * prec) / (recall + prec); //ottimo = 1 , male = 0;
 
  document.getElementById("confusion_matrix").innerHTML = "<b>Confusion Matrix</b>" + "<br/>" +
                                                          "+ -------------------------------------- +  <br/>" + "<br/>" +
                                                          "<b>TRUE POSITIVE </b> " + tp + " " + "<b> FALSE NEGATIVE</b> "+ " " + fn + " <br/>" + " <br/>"+
                                                          "<b>FALSE POSITIVE</b> " + fp + " " + "<b>TRUE NEGATIVE</b> " + " " + tn + " <br/>" +  "<br/>" +
                                                          " + -------------------------------------- + " + "<br/>" + "<br/>" +
-                                                         "<b>Accuratezza = </b>" + acc +  "<br/>" +
-                                                         "<b>Precisione = </b>" + prec +  "<br/>" +
-                                                         "<b>Recall = </b>" + recall;
+                                                         "<b>Error rate = </b>" + er_rate +  "<br/>" +  "<br/>" +
+                                                         "<b>Accuratezza = </b>" + acc +  "<br/>" + "<br/>" +
+                                                         "<b>Precisione = </b>" + prec +  "<br/>" + "<br/>" +
+                                                         "<b>Recall = </b>" + recall +  "<br/>" + "<br/>" +
+                                                         "<b>Specificita' = </b>" + spec +  "<br/>" + "<br/>" +
+                                                         "<b>False Positive rate = </b>" + fp_rate +  "<br/>" + "<br/>" +
+                                                         "<b>F - score = </b>" + f_score;
 
 }                     
 
@@ -193,11 +222,13 @@ function prob(){
   if(!trained)
     show();
 
-  var n = data.length, classeA = 0, classeB = 0;
+  //var n = data.length;
+  var n = test.length, classeA = 0, classeB = 0;
 
   for (var i = 0; i < n; i++){
-    if (labels[i] == 1) classeA++;
-    classeB++;
+  //  if (labels[i] == 1) classeA++;
+    if (test[i] == 1) classeA++;
+    else classeB++;
   }
   //document.write(classeA + " " + classeB);
 
@@ -213,10 +244,12 @@ function odds(){
   if(!trained)
     show();
 
-  var n = data.length, classeA = 0, classeB = 0;
+  //var n = data.length;
+  var n = test.length, classeA = 0, classeB = 0;
 
 for (var i = 0; i < n; i++){
-  if (labels[i] == 1) classeA++;
+ // if (labels[i] == 1) classeA++;
+ if (test[i] == 1) classeA++;
   classeB++;
 }
 //document.write(classeA + " " + classeB);
@@ -234,11 +267,13 @@ function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er
   if(!trained)
     show();
 
-  var n = data.length, err = 0;
+ // var n = data.length;
+  var n = test.length, err = 0;
 
   for (var i = 0; i < n; i++){
       
-    if (labels[i] != mdl.predictJS(data[i])) // reali e predetti diversi -> errori col modello
+    //if (labels[i] != mdl.predictJS(data[i])) // reali e predetti diversi -> errori col modello
+    if (test[i] != mdl.predictJS(test[i])) // reali e predetti diversi -> errori col modello
        err++; 
   }
 
@@ -246,7 +281,8 @@ function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er
   var fi = 0;
 
   for (var i = 0; i < n; i++){
-    if (labels[i] == -1) fi++;
+    //if (labels[i] == -1) fi++;
+    if (test[i] == -1) fi++;
   }
    // document.write(fi);
 
@@ -281,6 +317,7 @@ function setLearner(n){
   trained=false;
   train();
   sql();
+  data_test();
   conf_matrix();
   prob();
   odds();

@@ -53,6 +53,10 @@ input{
   margin-top: 0.5em;
 }
 
+#test{
+  margin-top: 1.5em;
+}
+
 #confusion_matrix{
   margin-top: 2em;
   margin-bottom: 2em;
@@ -112,7 +116,7 @@ input{
   float: right;
 }
 
-#button_reg:hover, #button_par:hover, #button_knn:hover, #button_exp:hover, #button_pol3:hover, #button_pol4:hover, #button_pol5:hover, #button_train:hover, #button_sql:hover,  #button_rss:hover, #button_mse:hover, #button_rse:hover, #button_r2:hover, #button_r2Aj:hover, #button_F:hover, #button_var:hover{
+#button_reg:hover, #button_par:hover, #button_knn:hover, #button_exp:hover, #button_pol3:hover, #button_pol4:hover, #button_pol5:hover, #button_train:hover, #button_sql:hover, #button_test:hover, #button_rss:hover, #button_mse:hover, #button_rse:hover, #button_r2:hover, #button_r2Aj:hover, #button_F:hover, #button_var:hover{
   color: antiquewhite;
   }
 
@@ -125,7 +129,7 @@ input{
     font-weight: bold;
   }
   
-  #button_train_clas, #button_sql_clas, #button_matrix_clas, #button_prob, #button_odds, #button_goodMod{
+  #button_train_clas, #button_sql_clas, #button_test, #button_matrix_clas, #button_prob, #button_odds, #button_goodMod{
     background-color: rgb(102, 178, 255);
   }
 
@@ -147,8 +151,10 @@ input{
   }
 
   #button_show_clas{
-    margin-top: 3em;
+    margin-top: 6.5em;
     background-color: rgb(223, 233, 245);
+    float: right;
+    margin-left: 1em;
   }
 
   #button_show_clas:hover{
