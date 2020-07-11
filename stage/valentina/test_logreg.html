@@ -31,6 +31,7 @@
   <input id="button_matrix_clas" type="button" value="Confusion Matrix" onclick = "conf_matrix()">
   <input id="button_prob" type="button" value="Prob(Y)" onclick="prob()">
   <input id="button_odds" type="button" value="Odds(Y)" onclick="odds()">
+  <input id="button_valMod" type="button" value="Valutazioni Modello" onclick="valMod()">
   <input id="button_goodMod" type="button" value="Efficenza Modello" onclick="goodMod()">
   </div>
 
@@ -41,6 +42,7 @@
   <div id="confusion_matrix"></div>
   <div id="prob"></div>
   <div id="odds"></div>
+  <div id="valMod"></div>
   <div id="goodMod"></div>
   </div>
 
@@ -194,27 +196,11 @@ function conf_matrix(){
       }
     }
 
-    var acc = (tp + tn) / n;  
-    var prec = tp / (tp + fp);
-    var recall  =  tp / (tp + fn);
-    var er_rate = (fp + fn) / n;  //ottimo = 0 , male = 1;
-    var spec = tn / (tn + fp);  //ottimo = 1 , male = 0;
-    var fp_rate = 1 - spec;  //ottimo = 0 , male = 1;
-    var f_score = (2 * recall * prec) / (recall + prec); //ottimo = 1 , male = 0;
-
  document.getElementById("confusion_matrix").innerHTML = "<b>Confusion Matrix</b>" + "<br/>" +
                                                          "+ -------------------------------------- +  <br/>" + "<br/>" +
                                                          "<b>TRUE POSITIVE </b> " + tp + " " + "<b> FALSE NEGATIVE</b> "+ " " + fn + " <br/>" + " <br/>"+
                                                          "<b>FALSE POSITIVE</b> " + fp + " " + "<b>TRUE NEGATIVE</b> " + " " + tn + " <br/>" +  "<br/>" +
-                                                         " + -------------------------------------- + " + "<br/>" + "<br/>" +
-                                                         "<b>Error rate = </b>" + er_rate +  "<br/>" +  "<br/>" +
-                                                         "<b>Accuratezza = </b>" + acc +  "<br/>" + "<br/>" +
-                                                         "<b>Precisione = </b>" + prec +  "<br/>" + "<br/>" +
-                                                         "<b>Recall = </b>" + recall +  "<br/>" + "<br/>" +
-                                                         "<b>Specificita' = </b>" + spec +  "<br/>" + "<br/>" +
-                                                         "<b>False Positive rate = </b>" + fp_rate +  "<br/>" + "<br/>" +
-                                                         "<b>F - score = </b>" + f_score;
-
+                                                         " + -------------------------------------- + ";
 }                     
 
 function prob(){
@@ -262,6 +248,48 @@ document.getElementById("odds").innerHTML = "<b>Odds (Y = 1): </b>" + oddsA + " 
 
 }
 
+function valMod(){
+  if (!trained)
+    show();
+
+    var tp = 0, tn = 0, fn = 0, fp = 0;
+  //var n = data.length;
+  var n = test.length;
+
+  for (var i = 0; i < n; i++){
+
+    //if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali  
+    if (test[i] == mdl.predictJS(test[i])){ // reali e predetti uguali
+        //if(labels[i] == 1) tp++;
+        if(test[i] == 1) tp++;
+        else tn++;
+      }
+
+      else{ // reali e predetti diversi
+          //if(labels[i] == 1 && mdl.predictJS(test[i]) == -1) fn++;
+          if(test[i] == 1 && mdl.predictJS(test[i]) == -1) fn++;
+          else fp++;
+      }
+    }
+
+    var er_rate = (fp + fn) / n;  //ottimo = 0 , male = 1;
+    var prec = tp / (tp + fp);
+    var acc = (tp + tn) / n;  
+    var recall  =  tp / (tp + fn);
+    var spec = tn / (tn + fp);  //ottimo = 1 , male = 0;
+    var fp_rate = 1 - spec;  //ottimo = 0 , male = 1;
+    var f_score = (2 * recall * prec) / (recall + prec); //ottimo = 1 , male = 0;
+
+ document.getElementById("valMod").innerHTML = "<br/>" + "<b>Error rate = </b>" + er_rate + " ; " +  
+                                               "<b>Precisione = </b>" + prec + " ; " +
+                                               "<b>Accuratezza = </b>" + acc + " ; " +
+                                               "<b>Recall = </b>" + recall +  "<br/>" +
+                                               "<b>Specificita' = </b>" + spec  + " ; " +
+                                               "<b>False Positive rate = </b>" + fp_rate + " ; " +
+                                                "<b>F-Score = </b>" + f_score;
+
+}                     
+
 function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er. senza mod
                     // er. senza mod = sum [fi * ((n - fi) / n) ]  ,  dove   fi = n. casi in i
   if(!trained)
@@ -300,15 +328,15 @@ function show(){
     document.getElementById("show").innerHTML = "<b>Mouse click add data point, then select and train your model :-)</b>";
 
   else{
-    document.getElementById("show").innerHTML = "<b>Prob(Y) e Odds(Y) esprimono entrambi la probabilita' del verificarsi di un determinato evento" +
-                                                ": semplicemente cambia il modo in cui lo fanno. Mentre il primo e' il tradizionale rapporto fra il n. di occorrenze" +
-                                                " dell'evento col n. totale di osservazioni; il secondo si esprimere mediante il rapporto fra i " +
-                                                " due eventi stessi: classeA / classeB (o viceversa in base all'oggetto della previsione)." + "<br/>" + "<br/>" +
-                                                "L'efficienza del modello permette di dare una valutazione circa il modello di classificazione." +  
-                                                " Tale misurazione  si basa sulla valutazione della riduzione dell’errore in percentuale : " + "<br/>" + "<br>" +
-                                                " errore senza modello + errore col modello " + "<br/>" +
-                                                " ---------------------------------------------------" + "</br>"+ 
-                                                "errore senza modello"
+    document.getElementById("show").innerHTML = "<b>"+ "Error Rate: (fp + fn) / (tp + fn + tp + tn)" + " ; " +
+                                                "Precisione: tp / (tp + fp)" + "<br/>" + "<br/>" +
+                                                "Accuratezza: (tp + tn) / (tp + fn + fp + tn)" +  " ; " +
+                                                "Recall: tp / (tp + fp)" + "<br/>" + "</br>" +
+                                                "Specificita': tn / (tn + fp)" +  " ; "  + 
+                                                "False Positive Rate: 1 - specificita'" + "<br/>" + "<br/>" + 
+                                                "F-Score: (2 * Recall * Precisione) / (Recall + Precisione)" + "</b>";
+
+                                        
   }
 }
 
@@ -321,6 +349,7 @@ function setLearner(n){
   conf_matrix();
   prob();
   odds();
+  valMod();
   goodMod();
   show();
 }
