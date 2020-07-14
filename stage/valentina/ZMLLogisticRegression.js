@@ -13,6 +13,7 @@ class LogisticRegressionLearner extends ZMLSupervisedLearner {
   }
   resetData(){
     this.data=[]
+    this.labels=[]
   }
   train(){
     // addestramento con steepest descent

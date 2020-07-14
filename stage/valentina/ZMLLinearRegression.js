@@ -146,7 +146,7 @@ class knnRegressionLearner extends ZMLLearner {
     this.data.push([y,x])
   }
   resetData(){
-    this.data=[]
+	this.data=[]
   }
   train(){
     // sort data
@@ -195,4 +195,8 @@ class knnRegressionModel extends ZMLModel {
     r=r/(ri-le+1)
     return r
   }
+
+   predictSQL(c){
+    return "No predizione in SQL"
+  }  
 }

@@ -53,16 +53,12 @@ input{
   margin-top: 0.5em;
 }
 
-#test{
-  margin-top: 1.5em;
-}
-
 #confusion_matrix{
   margin-top: 2em;
   margin-bottom: 2em;
 }
 
-#button_show {
+#button_show, #button_clean{
   margin-top: 3em;
   background-color: rgb(255, 204, 255);
 }
@@ -107,7 +103,7 @@ input{
   font-size: 1em;
 }
 
-#show{
+#show, #clean{
   font-family: monospace;
   margin-top: 0.5em;
   font-size: 1em;
@@ -116,11 +112,19 @@ input{
   float: right;
 }
 
-#button_reg:hover, #button_par:hover, #button_knn:hover, #button_exp:hover, #button_pol3:hover, #button_pol4:hover, #button_pol5:hover, #button_train:hover, #button_sql:hover, #button_test:hover, #button_rss:hover, #button_mse:hover, #button_rse:hover, #button_r2:hover, #button_r2Aj:hover, #button_F:hover, #button_var:hover{
+#clean{
+	float: right;
+	color: rgb(236, 42, 107);
+	margin-bottom: 0.5em;
+	margin-top: -2em;
+}
+
+
+#button_reg:hover, #button_par:hover, #button_knn:hover, #button_exp:hover, #button_pol3:hover, #button_pol4:hover, #button_pol5:hover, #button_train:hover, #button_sql:hover, #button_rss:hover, #button_mse:hover, #button_rse:hover, #button_r2:hover, #button_r2Aj:hover, #button_F:hover, #button_var:hover, #button_cov:hover{
   color: antiquewhite;
   }
 
-  #button_show:hover{
+  #button_show:hover, #button_clean:hover{
     color: rgb(236, 42, 107);
   }
 
@@ -150,15 +154,12 @@ input{
     font-size: 1em;
   }
 
-  #button_show_clas{
+  #button_show_clas, #button_clean_clas{
     margin-top: 3em;
     background-color: rgb(223, 233, 245);
-  /*  float: left;
-    margin-right: -10em;*/
-
   }
 
-  #button_show_clas:hover{
+  #button_show_clas:hover, #button_clean_clas:hover{
     color: rgb(0, 102, 204);
   }
 

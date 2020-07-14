@@ -54,6 +54,8 @@
 
 </div></span>
 <input id="button_show" type="button" value="Dettagli" onclick = "show()">
+<input id="button_clean" type="submit" value="Clean Desk" onclick="cleanGrafico()">
+<div id="clean"></div>
 <div id="show"></div>
 </div>
 
@@ -68,13 +70,13 @@ var ctx = canvas.getContext('2d');
 var WIDTH=700,HEIGHT=650,ss=50.0
 
 // variabili per il learner
-var data=[]                 // valori delle x dei punti disegnati
-var values=[]               // valori delle y dei punti disegnati           
-var trained=false
+var data=[];               // valori delle x dei punti disegnati
+var values=[];               // valori delle y dei punti disegnati           
+var trained=false;
 
 var learners=[new LinearRegressionLearner(1), new ExpRegressionLearner(1),
               new PolinomialRegressionLearner(2), new PolinomialRegressionLearner(3), new PolinomialRegressionLearner(4), 
-              new PolinomialRegressionLearner(5), new knnRegressionLearner(4)]
+              new PolinomialRegressionLearner(5), new knnRegressionLearner(8)]
 var lrn=learners[0]
 var mdl=null
 
@@ -109,7 +111,6 @@ function drawCircle(x, y, r){
   ctx.fill();
 }
 
-
 function Redraw(){
   ctx.clearRect(0,0,WIDTH,HEIGHT);
       
@@ -143,6 +144,11 @@ function Redraw(){
   }
 }
 
+function cleanGrafico(){
+  document.getElementById("clean").innerHTML = "<b>Press f5 and retrain your model :-)</b>"; 
+
+}
+
 Redraw()
 
 function train(){
@@ -161,7 +167,7 @@ function sql(){
     document.getElementById("sql").innerHTML="<b>SQL =</b> "+mdl.predictSQL(['CampoA'])
   }
 
-  show();
+  else show();
 }
 
 function r2(){
@@ -169,24 +175,26 @@ function r2(){
   if(!trained)
     show();
 
-  var sum=0,n=values.length,i
+  else{
+    var sum=0,n=values.length,i
   // calcolo la media, che è il miglior predittore quando ho solo i valori
-  for(i=0;i<n;i++) 
-    sum+=values[i]
-  var mean=sum/n
+    for(i=0;i<n;i++) 
+      sum+=values[i]
+    var mean=sum/n
   // calcolo la somma dei quadrati delle differenze rispetto alla media, questo mi da una misura di quanto sbaglio usando la media come predittore
-  var m_error=0
-  for(i=0;i<n;i++)
-    m_error+= Math.pow(values[i]-mean,2)
-  // nella variabile m_error la somma degli errori rispetto alla media
-  // calcolo quanto sbaglio usando il mio sistema di regressione
-  var p_error=0
-  for(i=0;i<n;i++)
-    p_error+=Math.pow(values[i]-mdl.predictJS(data[i]),2)
-  // nella variabile p_error la somma degli errori rispetto al mio regressore
-  var r2=1-(p_error/m_error)
-  document.getElementById("r2").innerHTML="<b>R2 =</b> "+r2
-  return r2
+    var m_error=0
+    for(i=0;i<n;i++)
+      m_error+= Math.pow(values[i]-mean,2)
+    // nella variabile m_error la somma degli errori rispetto alla media
+    // calcolo quanto sbaglio usando il mio sistema di regressione
+    var p_error=0
+    for(i=0;i<n;i++)
+      p_error+=Math.pow(values[i]-mdl.predictJS(data[i]),2)
+    // nella variabile p_error la somma degli errori rispetto al mio regressore
+    var r2=1-(p_error/m_error)
+    document.getElementById("r2").innerHTML="<b>R2 =</b> "+r2
+    return r2
+  }
 }
 
 function r2_adjusted(){
@@ -194,11 +202,13 @@ function r2_adjusted(){
   if(!trained)
     show();
 
-  var R2 = r2();
-  var p = lrn.getNumberOfPredictors(), n = values.length;
-  var r2_aj = R2 - [(1-R2) / p/(n-p-1)];
+  else{
+    var R2 = r2();
+    var p = lrn.getNumberOfPredictors(), n = values.length;
+    var r2_aj = R2 - [(1-R2) / p/(n-p-1)];
 
-  document.getElementById("r2_adjusted").innerHTML="<b>R2 Adjusted =</b> "+r2_aj;
+   document.getElementById("r2_adjusted").innerHTML="<b>R2 Adjusted =</b> "+r2_aj;
+  }
 }
 
 function rse(){ //sum sqrt [(yi - yi_pred)^2 /n-2]
@@ -206,15 +216,17 @@ function rse(){ //sum sqrt [(yi - yi_pred)^2 /n-2]
   if(!trained)
     show();
 
-  var n = values.length;
-  var p_error=0;
+  else{
+    var n = values.length;
+    var p_error=0;
 
-  for(i = 0; i < n; i++)
-    p_error =+ Math.pow(values[i]-mdl.predictJS(data[i]),2)
+    for(i = 0; i < n; i++)
+      p_error =+ Math.pow(values[i]-mdl.predictJS(data[i]),2)
 
-  var rse = Math.sqrt(p_error / (n-2));
-  document.getElementById("rse").innerHTML = "<b>Residual Standard Error =</b> "+ rse; 
-  return rse;
+    var rse = Math.sqrt(p_error / (n-2));
+    document.getElementById("rse").innerHTML = "<b>Residual Standard Error =</b> "+ rse; 
+   return rse;
+  }
 }
 
 function rss(){
@@ -222,12 +234,14 @@ function rss(){
   if(!trained)
     show();
 
-  var RSE = rse();
-  n = data.length;
+    else{
+    var RSE = rse();
+    n = data.length;
 
-  var rss = Math.sqrt(RSE, 2) * (n - 2);
-  document.getElementById("rss").innerHTML = "<b>Residual Sum of Square =</b> "+ rss; 
-  return rss;
+    var rss = Math.sqrt(RSE, 2) * (n - 2);
+    document.getElementById("rss").innerHTML = "<b>Residual Sum of Square =</b> "+ rss; 
+    return rss;
+  }
 }
 
 function mse(){
@@ -235,11 +249,13 @@ function mse(){
   if(!trained)
     show();
 
-  var RSS = rss();
-  n = data.length;
+  else{
+    var RSS = rss();
+    n = data.length;
 
-  var mse = (1 / n) * RSS;
-  document.getElementById("mse").innerHTML = "<b>Mean squared error =</b> "+ mse; 
+    var mse = (1 / n) * RSS;
+    document.getElementById("mse").innerHTML = "<b>Mean squared error =</b> "+ mse; 
+  }
 }
 
 function statistica_F(){
@@ -247,15 +263,17 @@ function statistica_F(){
   if(!trained)
     show();
 
-  var R2 = r2();
-  var p = lrn.getNumberOfPredictors(), n = values.length;
+    else{
+      var R2 = r2();
+    var p = lrn.getNumberOfPredictors(), n = values.length;
 
-  var F1 = R2 / (1 - R2);
-  var F2 = (n - p - 1) / p;
+    var F1 = R2 / (1 - R2);
+    var F2 = (n - p - 1) / p;
 
-  F_tot = F1 * F2;
+    F_tot = F1 * F2;
  
- document.getElementById("statistica_F").innerHTML = "<b>Statistica F =</b> "+ F_tot;  
+  document.getElementById("statistica_F").innerHTML = "<b>Statistica F =</b> "+ F_tot;  
+  } 
 }
 
 function varianza(){  //sum(xi - media(x))^2 / n
@@ -263,19 +281,21 @@ function varianza(){  //sum(xi - media(x))^2 / n
   if(!trained)
     show();
 
-  var n = data.length;
-  var err = 0, sum = 0;
+  else{
+    var n = data.length;
+    var err = 0, sum = 0;
 
-  for(var i = 0; i < n; i++) 
-    sum =+ data[i];
+    for(var i = 0; i < n; i++) 
+      sum =+ data[i];
  
-   var mean = sum / n;
+    var mean = sum / n;
 
-    for (var i = 0; i < n; i++) 
-    err += Math.pow(data[i] - mean, 2);
+      for (var i = 0; i < n; i++) 
+      err += Math.pow(data[i] - mean, 2);
 
-   varX = err / n;
-   document.getElementById("varianza").innerHTML = "<b>Varianza =</b> "+ varX;
+    varX = err / n;
+    document.getElementById("varianza").innerHTML = "<b>Varianza =</b> "+ varX;
+  }
 }
 
 function covarianza(){   //sum [((yi - ym) * (xi -xm))/n ]
@@ -283,28 +303,30 @@ function covarianza(){   //sum [((yi - ym) * (xi -xm))/n ]
   if(!trained)
     show();
 
-var n = data.length;
-var sum_x = 0, sum_y = 0;
+  else{
+    var n = data.length;
+    var sum_x = 0, sum_y = 0;
 
 
-for(var i = 0; i < n; i++){
-  sum_x =+ data[i];
-  sum_y =+ values[i];
-}
+  for(var i = 0; i < n; i++){
+    sum_x =+ data[i];
+    sum_y =+ values[i];
+  }
 
- var mean_x = sum_x / n,  mean_y = sum_y / n;
- var err_x = 0, err_y = 0;
-
- for(var i = 0; i < n; i++) 
-  err_x =+ (data[i] - mean_x);
+  var mean_x = sum_x / n,  mean_y = sum_y / n;
+  var err_x = 0, err_y = 0;
 
   for(var i = 0; i < n; i++) 
-  err_y =+ (values[i] - mean_y);
+    err_x =+ (data[i] - mean_x);
 
-  var den = err_y * err_x;
-  var cov = den / n;
+    for(var i = 0; i < n; i++) 
+    err_y =+ (values[i] - mean_y);
 
-  document.getElementById("covarianza").innerHTML = "<b>Covarianza =</b> "+ cov;
+    var den = err_y * err_x;
+    var cov = den / n;
+
+    document.getElementById("covarianza").innerHTML = "<b>Covarianza =</b> "+ cov;
+  }
 }
  
 function show(){
