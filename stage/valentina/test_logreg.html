@@ -46,7 +46,7 @@
   </div>
 
 </div></span>
-<input id="button_show_clas" type="button" value="Dettagli" onclick = "show()">
+<input id="button_show_clas" type="button" value="Details" onclick = "show()">
 <input id="button_clean_clas" type="submit" value="Clean Desk" onclick="cleanGrafico()">
 <div id="show"></div>
 </div>
@@ -177,7 +177,7 @@ function train(){
 
 function sql(){
   if (trained){
-    document.getElementById("sql").innerHTML=mdl.predictSQL(['CampoA','CampoB'])
+    document.getElementById("sql").innerHTML="<b>SQL =</b> " + mdl.predictSQL(['CampoA','CampoB'])
   }
 
   else
@@ -195,16 +195,16 @@ function conf_matrix(){
 
     for (var i = 0; i < n; i++){
 
-      if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali
+    	if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali
           if(labels[i] == 1) tp++;
           else tn++;
         }
 
-        else{ // reali e predetti diversi
-			if(labels[i] == 1 && mdl.predictJS(data[i]) == -1) fn++;
+    	else{ // reali e predetti diversi
+			if(labels[i] == 1) fn++;
             else fp++;
        }
-      }
+    }
 
   document.getElementById("confusion_matrix").innerHTML = "<b>Confusion Matrix</b>" + "<br/>" +
                                                          "+ -------------------------------------- +  <br/>" + "<br/>" +
@@ -269,16 +269,17 @@ function valMod(){
 	
     for (var i = 0; i < n; i++){
 
-      if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali  
+    	if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali  
           if(labels[i] == 1) tp++;
           else tn++;
         }
-
-        else{ // reali e predetti diversi
-            if(labels[i] == 1 && mdl.predictJS(data[i]) == -1) fn++;
+       
+    	else{ // reali e predetti diversi
+			if(labels[i] == 1) fn++;
             else fp++;
-        }
-      }
+		}
+    }
+		//console.log(n);
 
       var er_rate = (fp + fn) / n;  //ottimo = 0 , male = 1;
       var prec = tp / (tp + fp);
@@ -293,7 +294,7 @@ function valMod(){
                                                "<b>Accuratezza = </b>" + acc + " ; " +
                                                "<b>Recall = </b>" + recall +  "<br/>" +
                                                "<b>Specificita' = </b>" + spec  + " ; " +
-                                               "<b>False Positive rate = </b>" + fp_rate + " ; " +
+                                               "<b>False Positive rate = </b>" + fp_rate + "<br/>" +
                                                 "<b>F-Score = </b>" + f_score;
   }
 }                     
@@ -347,7 +348,7 @@ function show(){
                                                 "Specificita': tn / (tn + fp)" +  " ; "  + 
                                                 "False Positive Rate: 1 - specificita'" + "<br/>" + "<br/>" + 
 												"F-Score: (2 * Recall * Precisione) / (Recall + Precisione)" + "<br/>" + "<br/>" + 
-												"Efficienza modello = (err. no modello - err. con modello) / err. no modello </b>";
+												"Efficienza modello: (err. no modello - err. con modello) / err. no modello </b>";
 												 
                                         
   }

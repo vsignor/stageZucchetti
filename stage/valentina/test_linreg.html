@@ -4,6 +4,28 @@
 <head>
   <title>Regression</title>
 <link href="stile.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" language="javascript">
+	function visualizza(id){
+	  if (document.getElementById){
+		if(document.getElementById(id).style.display == 'none'){
+		  document.getElementById(id).style.display = 'block';
+		}else{
+		  document.getElementById(id).style.display = 'none';
+		}
+	  }
+	}
+	</script>
+
+<script> 
+	//Dichiaro la funzione 
+	function azione(variabile){ 
+		if(document.getElementById(variabile).style.display=='') 
+			document.getElementById(variabile).style.display='none'; 
+		else 
+			document.getElementById(variabile).style.display=''; 
+	}
+</script>
 </head>
 
 <body>
@@ -53,16 +75,18 @@
 <div id="covarianza"></div>
 
 </div></span>
-<input id="button_show" type="button" value="Dettagli" onclick = "show()">
-<input id="button_clean" type="submit" value="Clean Desk" onclick="cleanGrafico()">
-<div id="clean"></div>
+<input id="button_show" type="button" value="Details" onclick = "show()">
+
+<input id="button_clean" type="submit" value="Clean Desk" onclick="azione('clean');">
+<div id="clean" style="display:none"><b>Press f5 and retrain your model :-)</b></div>
+
 <div id="show"></div>
 </div>
 
 <script src="ZMLBase.js"></script>
 <script src="LinearRegression.js"></script>
 <script src="ZMLLinearRegression.js"></script>
-
+	
 <script>
 // variabili per la gestione del canvas
 var canvas = document.getElementById("NPGcanvas")
@@ -144,11 +168,6 @@ function Redraw(){
   }
 }
 
-function cleanGrafico(){
-  document.getElementById("clean").innerHTML = "<b>Press f5 and retrain your model :-)</b>"; 
-
-}
-
 Redraw()
 
 function train(){
@@ -164,7 +183,7 @@ function train(){
 
 function sql(){
   if (trained){
-    document.getElementById("sql").innerHTML="<b>SQL =</b> "+mdl.predictSQL(['CampoA'])
+    document.getElementById("sql").innerHTML="<b>SQL =</b> " + mdl.predictSQL(['CampoA'])
   }
 
   else show();

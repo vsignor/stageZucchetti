@@ -113,7 +113,7 @@ class Pol2SvmModel extends SvmModel {
     n.push(x[1]*x[1])
     n.push(x[0]*x[0]*x[0])
     n.push(x[1]*x[1]*x[1])
-    return this.svm.predict([n])
+	return this.svm.predict([n])
   }
 
   predictSQL(c){
