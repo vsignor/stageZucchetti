@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+
+  <head>
+    <title>Random Forest</title>
+  <link href="../stile.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+  <h1>Random Forest </h1>
+
+  <div id=big_container>
+  <span id=grafico>
+  <canvas id="NPGcanvas" width="700" height="650" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
+  </span>
+
+  <span id=destra>
+  <p>Select your algorithms:</p>
+  <div id="algo">
+  <input id="button_rf" type="button" value="Random Forest" onclick="setLearner(0)">
+  </div>
+
+  <p>Select your actions:</p>
+  <div id="azioni">
+  <input id="button_train_rf" type="button" value="Train" onclick="train()">
+  <input id="button_sql_rf" type="button" value="Sql" onclick="sql()">
+  </div>
+
+  <div id="result_rf">
+  <div id="info"></div>
+  <div id="sql"></div>
+
+</div>
+
+</div></span>
+<input id="button_show_rf" type="button" value="Details" onclick = "show()">
+<input id="button_clean_rf" type="submit" value="Clean Desk" onclick="cleanGrafico()">
+<div id="show"></div>
+
+<script src="../ZMLBase.js"></script>
+
+<script src="randomforest.js"></script>
+<script src="random_forest_vale.js"></script>
+
+
+<script>
+
+// variabili per la gestione del canvas
+var canvas = document.getElementById("NPGcanvas")
+var ctx = canvas.getContext('2d');
+var WIDTH=700,HEIGHT=650,ss=50.0
+
+// variabili per il learner
+var data=[]       // valori delle x dei punti disegnati
+var labels=[]     // valori delle classi dei punti disegnati
+
+var trained=false
+
+var learners= new RandomForestLearner(2);
+var lrn=learners[0]
+var mdl=null
+
+function addDataPoint(x,y,c){
+  // add datapoint at location of click
+  data.push([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
+  labels.push(c);
+  trained=false
+  Redraw()
+}
+
+function mouseClick(x,y,shift){
+  addDataPoint(x,y,(shift?1:-1))
+}
+
+function eventClick(e) {    
+  //get position of cursor relative to top left of canvas
+  var x = e.pageX;
+  var y = e.pageY;
+  var r = canvas.getBoundingClientRect();
+  x -= r.left+window.scrollX;
+  y -= r.top+window.scrollY;  
+  //call user-defined callback
+  mouseClick(x, y, e.shiftKey);
+}
+
+function drawCircle(x, y, r){
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2, true); 
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+}
+
+function Redraw(){
+  ctx.clearRect(0,0,WIDTH,HEIGHT);
+  if (trained) {  
+    // draw decisions in the grid
+    var density= 4.0;
+    for(var x=0.0; x<=WIDTH; x+= density) {
+      for(var y=0.0; y<=HEIGHT; y+= density) {
+        var p = mdl.predictJS([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss])
+        ctx.fillStyle = (p==1?'rgb(255, 204, 153)': 'rgb(229, 204, 255)'); //colori della classificazione 
+        ctx.fillRect(x-density/2-1, y-density-1, density+2, density+2);
+      }
+    }  
+  }
+  
+  // draw axes
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgb(50,50,50)';
+  ctx.lineWidth = 1;
+  ctx.moveTo(0, HEIGHT/2);
+  ctx.lineTo(WIDTH, HEIGHT/2);
+  ctx.moveTo(WIDTH/2, 0);
+  ctx.lineTo(WIDTH/2, HEIGHT);
+  ctx.stroke();
+  // draw data points
+  for(var i=0;i<data.length;i++){
+    ctx.fillStyle = (labels[i]==1?'rgb(0, 153, 0)':'rgb(255, 0, 127)'); //colori punti
+    drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
+  }
+}
+
+function cleanGrafico(){
+	ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
+	trained = false;
+
+	ctx.beginPath(); /*ricreo assi*/
+	ctx.strokeStyle = 'rgb(50,50,50)';
+  	ctx.lineWidth = 1;
+  	ctx.moveTo(0, HEIGHT/2);
+ 	ctx.lineTo(WIDTH, HEIGHT/2);
+  	ctx.moveTo(WIDTH/2, 0);
+  	ctx.lineTo(WIDTH/2, HEIGHT);
+  	ctx.stroke();
+
+	labels = [];  /*cancello i punti vecchi*/
+	data = [];
+	show();
+
+	train();
+  	sql();
+  	/*aggiungere metodi che faro'*/
+}
+
+Redraw()
+
+function train(){
+  lrn.resetData()
+  for(var i=0;i<data.length;i++){
+    lrn.addData(labels[i],data[i])
+  }
+  lrn.train()
+  mdl=lrn.getModel()
+  trained=true
+  Redraw()
+}
+
+function sql(){
+  if (trained){
+    document.getElementById("sql").innerHTML="<b>SQL =</b> " + mdl.predictSQL();
+  }
+
+  else
+	  show();
+}
+
+/*aggiungi qui i metodi*/
+
+
+
+
+
+
+
+function show(){
+
+  if (!trained) 
+    document.getElementById("show").innerHTML = "<b>Mouse click add data point, then select and train your model :-)</b>";
+
+  else{
+    document.getElementById("show").innerHTML = "<b>"+ "Error Rate: (fp + fn) / (tp + fn + tp + tn)" + " ; " +
+                                                "Precisione: tp / (tp + fp)" + "<br/>" + "<br/>" +
+                                                "Accuratezza: (tp + tn) / (tp + fn + fp + tn)" +  " ; " +
+                                                "Recall: tp / (tp + fn)" + "<br/>" + "</br>" +
+                                                "Specificita': tn / (tn + fp)" +  " ; "  + 
+                                                "False Positive Rate: 1 - specificita'" + "<br/>" + "<br/>" + 
+												"F-Score: (2 * Recall * Precisione) / (Recall + Precisione)" + "<br/>" + "<br/>" + 
+												"Efficienza modello: (err. no modello - err. con modello) / err. no modello </b>";
+												 
+                                        
+  }
+}
+
+function setLearner(n){
+  lrn=learners[n]
+  trained=false;
+  train();
+  sql();
+
+  show();
+}
+
+</script>
+
+
+</body>
+</html>

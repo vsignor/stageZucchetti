@@ -7,7 +7,6 @@ body, html{
 } 
  
  body{
-   /*text-align: center;*/
    font-style: normal;
  }
 
@@ -48,9 +47,12 @@ input{
 #button_train, #button_sql,  #button_rss, #button_mse, #button_rse, #button_r2, #button_r2Aj, #button_F, #button_var, #button_cov{
   background-color: rgb(236, 132, 167);
 }
-
-#sql, #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod, #valMod{
+ #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod, #valMod{
   margin-top: 0.5em;
+}
+
+#sql{
+  margin-bottom: 1.5em;
 }
 
 #confusion_matrix{
@@ -137,7 +139,7 @@ input{
     background-color: rgb(102, 178, 255);
   }
 
-  #button_kernel_Lin:hover, #button_RBF:hover, #button_kernel_pol2:hover, #button_train_clas:hover, #button_sql_clas:hover, #button_matrix_clas:hover, #button_prob:hover, #button_odds:hover, #button_valMod:hover, #button_goodMod:hover{
+  #button_regLog:hover, #button_kernel_Lin:hover, #button_RBF:hover, #button_kernel_pol2:hover, #button_train_clas:hover, #button_sql_clas:hover, #button_matrix_clas:hover, #button_prob:hover, #button_odds:hover, #button_valMod:hover, #button_goodMod:hover{
     color: antiquewhite;
   }
 
@@ -163,3 +165,94 @@ input{
     color: rgb(0, 102, 204);
   }
 
+  #options1{
+    float: fixed;
+    position: absolute;
+    bottom: 0.1em;
+    position: center;
+    margin-bottom: 5.5em;
+    margin-left: 6.5em;
+  }
+
+  #options2{
+    float: fixed;
+    position: absolute;
+    bottom: 0.1em;
+    position: center;
+    margin-bottom: 5.5em;
+    margin-left: 22.5em;
+  }
+
+.puls{
+  background-color:  rgba(204, 229, 255);
+}
+
+#t1.value, #t2.value{
+  padding: 0.5em;
+  width: 8em;
+}
+
+ .slider {  /*tengo*/
+  overflow:hidden;
+  border-radius: 0.3em;
+  margin: 0.2em;
+  height: 1em;
+  background:#CCC;
+  border:1px solid gray;
+  margin:3px 0px 0px -1px;
+  width:102px;
+  height:13px;
+  margin-left: 3.8em;
+ }
+
+ .slider div{
+  background:#666;
+  border:1px outset #666;
+  margin:0px;
+  width:2px;
+  height:13px;
+  padding:0px;
+  display:block;
+  color:#CCC;
+  position:relative;
+ }
+
+ .loptions{
+   font-family: monospace;
+   size: medium;
+   text-align: center;
+ }
+
+ #button_rf{
+    background-color: rgb(85, 151, 19);
+  }
+
+  #button_rf:hover, #button_train_rf:hover, #button_sql_rf:hover{
+    color: antiquewhite;
+  }
+
+  #button_train_rf, #button_sql_rf{
+    background-color: rgb(102, 204, 0);
+  }
+
+  #result_rf{
+    margin-top: 3em;
+    font-size: medium;
+    font-family: monospace;
+    background-color:  rgb(155, 245, 66);
+    text-align: center;
+    border-radius: 0.5em;
+    padding: 10px;
+    font-family: monospace;
+    margin-top: 0.5em;
+    font-size: 1em;
+  }
+
+  #button_show_rf, #button_clean_rf{
+    margin-top: 3em;
+    background-color:rgb(204, 255, 153);
+    }
+
+  #button_show_rf:hover, #button_clean_rf:hover{
+    color: rgb(85, 151, 19);
+  }

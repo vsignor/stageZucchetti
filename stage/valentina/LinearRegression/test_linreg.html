@@ -3,7 +3,7 @@
 
 <head>
   <title>Regression</title>
-<link href="stile.css" rel="stylesheet" type="text/css">
+<link href="../stile.css" rel="stylesheet" type="text/css">
 
 <script type="text/javascript" language="javascript">
 	function visualizza(id){
@@ -55,11 +55,11 @@
 <input id="button_rse" type="button" value="RSE" onclick="rse()">
 <input id="button_rss" type="button" value="RSS" onclick="rss()">
 <input id="button_mse" type="button" value="MSE" onclick="mse()">
+<input id="button_var" type="button" value="Varianza" onclick = "varianza()">
+<input id="button_cov" type="button" value="Covarianza" onclick = "covarianza()">
 <input id="button_r2" type="button" value="R2" onclick="r2()">
 <input id="button_r2Aj" type="button" value="R2 Adjusted" onclick="r2_adjusted()">
 <input id="button_F" type="button" value="Statistica F" onclick="statistica_F()">
-<input id="button_var" type="button" value="Varianza" onclick = "varianza()">
-<input id="button_cov" type="button" value="Covarianza" onclick = "covarianza()">
 </div>
 
 <div id="result">
@@ -68,11 +68,11 @@
 <div id="rse"></div>
 <div id="rss"></div>
 <div id="mse"></div>
+<div id="varianza"></div>
+<div id="covarianza"></div>
 <div id="r2"></div>
 <div id="r2_adjusted"></div>
 <div id="statistica_F"></div>
-<div id="varianza"></div>
-<div id="covarianza"></div>
 
 </div></span>
 <input id="button_show" type="button" value="Details" onclick = "show()">
@@ -83,7 +83,8 @@
 <div id="show"></div>
 </div>
 
-<script src="ZMLBase.js"></script>
+<script src="../ZMLBase.js"></script>
+
 <script src="LinearRegression.js"></script>
 <script src="ZMLLinearRegression.js"></script>
 	
@@ -189,47 +190,6 @@ function sql(){
   else show();
 }
 
-function r2(){
-
-  if(!trained)
-    show();
-
-  else{
-    var sum=0,n=values.length,i
-  // calcolo la media, che è il miglior predittore quando ho solo i valori
-    for(i=0;i<n;i++) 
-      sum+=values[i]
-    var mean=sum/n
-  // calcolo la somma dei quadrati delle differenze rispetto alla media, questo mi da una misura di quanto sbaglio usando la media come predittore
-    var m_error=0
-    for(i=0;i<n;i++)
-      m_error+= Math.pow(values[i]-mean,2)
-    // nella variabile m_error la somma degli errori rispetto alla media
-    // calcolo quanto sbaglio usando il mio sistema di regressione
-    var p_error=0
-    for(i=0;i<n;i++)
-      p_error+=Math.pow(values[i]-mdl.predictJS(data[i]),2)
-    // nella variabile p_error la somma degli errori rispetto al mio regressore
-    var r2=1-(p_error/m_error)
-    document.getElementById("r2").innerHTML="<b>R2 =</b> "+r2
-    return r2
-  }
-}
-
-function r2_adjusted(){
-
-  if(!trained)
-    show();
-
-  else{
-    var R2 = r2();
-    var p = lrn.getNumberOfPredictors(), n = values.length;
-    var r2_aj = R2 - [(1-R2) / p/(n-p-1)];
-
-   document.getElementById("r2_adjusted").innerHTML="<b>R2 Adjusted =</b> "+r2_aj;
-  }
-}
-
 function rse(){ //sum sqrt [(yi - yi_pred)^2 /n-2]
 
   if(!trained)
@@ -243,7 +203,7 @@ function rse(){ //sum sqrt [(yi - yi_pred)^2 /n-2]
       p_error =+ Math.pow(values[i]-mdl.predictJS(data[i]),2)
 
     var rse = Math.sqrt(p_error / (n-2));
-    document.getElementById("rse").innerHTML = "<b>Residual Standard Error =</b> "+ rse; 
+    document.getElementById("rse").innerHTML = "<b>Residual Standard Error =</b> "+ rse.toFixed(4); 
    return rse;
   }
 }
@@ -258,7 +218,7 @@ function rss(){
     n = data.length;
 
     var rss = Math.sqrt(RSE, 2) * (n - 2);
-    document.getElementById("rss").innerHTML = "<b>Residual Sum of Square =</b> "+ rss; 
+    document.getElementById("rss").innerHTML = "<b>Residual Sum of Square =</b> "+ rss.toFixed(4); 
     return rss;
   }
 }
@@ -273,26 +233,8 @@ function mse(){
     n = data.length;
 
     var mse = (1 / n) * RSS;
-    document.getElementById("mse").innerHTML = "<b>Mean squared error =</b> "+ mse; 
+    document.getElementById("mse").innerHTML = "<b>Mean squared error =</b> "+ mse.toFixed(4); 
   }
-}
-
-function statistica_F(){
-
-  if(!trained)
-    show();
-
-    else{
-      var R2 = r2();
-    var p = lrn.getNumberOfPredictors(), n = values.length;
-
-    var F1 = R2 / (1 - R2);
-    var F2 = (n - p - 1) / p;
-
-    F_tot = F1 * F2;
- 
-  document.getElementById("statistica_F").innerHTML = "<b>Statistica F =</b> "+ F_tot;  
-  } 
 }
 
 function varianza(){  //sum(xi - media(x))^2 / n
@@ -313,7 +255,7 @@ function varianza(){  //sum(xi - media(x))^2 / n
       err += Math.pow(data[i] - mean, 2);
 
     varX = err / n;
-    document.getElementById("varianza").innerHTML = "<b>Varianza =</b> "+ varX;
+    document.getElementById("varianza").innerHTML = "<b>Varianza =</b> "+ varX.toFixed(4);
   }
 }
 
@@ -344,8 +286,73 @@ function covarianza(){   //sum [((yi - ym) * (xi -xm))/n ]
     var den = err_y * err_x;
     var cov = den / n;
 
-    document.getElementById("covarianza").innerHTML = "<b>Covarianza =</b> "+ cov;
+    document.getElementById("covarianza").innerHTML = "<b>Covarianza =</b> "+ cov.toFixed(4);
   }
+}
+
+function r2(){
+
+if(!trained)
+  show();
+
+else{
+  var sum=0,n=values.length,i
+// calcolo la media, che è il miglior predittore quando ho solo i valori
+  for(i=0;i<n;i++) 
+	sum+=values[i]
+  var mean=sum/n
+// calcolo la somma dei quadrati delle differenze rispetto alla media, questo mi da una misura di quanto sbaglio usando la media come predittore
+  var m_error=0
+  for(i=0;i<n;i++)
+	m_error+= Math.pow(values[i]-mean,2)
+  // nella variabile m_error la somma degli errori rispetto alla media
+  // calcolo quanto sbaglio usando il mio sistema di regressione
+  var p_error=0
+  for(i=0;i<n;i++)
+	p_error+=Math.pow(values[i]-mdl.predictJS(data[i]),2)
+  // nella variabile p_error la somma degli errori rispetto al mio regressore
+  var r2=1-(p_error/m_error)
+  document.getElementById("r2").innerHTML="<b>R2 =</b> "+r2.toFixed(4);
+  return r2
+}
+}
+
+function r2_adjusted(){
+
+	if(!trained)
+  		show();
+
+	else{
+ 		var R2 = r2();
+	  	var p = lrn.getNumberOfPredictors(), n = values.length;
+		
+		var f1 = 1 - R2;
+		var f2 = p / (n-p-1);
+
+		//console.log(f1 + " " + f2)
+		  
+  		var r2_aj = (- f1 * f2) + R2
+
+ 	document.getElementById("r2_adjusted").innerHTML="<b>R2 Adjusted =</b> "+r2_aj.toFixed(4);
+	}
+}
+
+function statistica_F(){
+
+	if(!trained)
+ 	 show();
+
+  	else{
+	  var R2 = r2();
+	  var p = lrn.getNumberOfPredictors(), n = values.length;
+
+	  var F1 = R2 / (1 - R2);
+	  var F2 = (n - p - 1) / p;
+
+	  F_tot = F1 * F2;
+
+	document.getElementById("statistica_F").innerHTML = "<b>Statistica F =</b> "+ F_tot.toFixed(4);  
+	} 
 }
  
 function show(){
@@ -354,10 +361,13 @@ function show(){
     document.getElementById("show").innerHTML = "<b>Mouse click add data point, then select and train your model :-)</b>"; 
 
   else{
-    document.getElementById("show").innerHTML = "<b> RSE, RSS e MSE sono valori collegati fra loro, indicatori dello scarto fra i valori predetti rispetto a quelli reali." +
+    document.getElementById("show").innerHTML = "<b> RSE, RSS e MSE: valori collegati fra loro, indicatori dello scarto presente fra i valori predetti rispetto a quelli reali." +
                                                 " Molto utili per confrontare fra loro vari modelli, piu' sono bassi piu' il modello e' da ritenersi buono." + "<br/>" + "<br/>"+
-                                                "Varianza, misura il grado di dispersione della variabile x."  + "<br/>" + "<br/>" +
-                                                "Covarianza, indica il tipo di relazione presente fra le variabili x e y: piu' e' elevata e piu' il legame e' di tipo lineare. </b>";
+                                                "Varianza: misura il grado di dispersione della variabile x."  + "<br/>" + "<br/>" +
+												"Covarianza: indica il tipo di relazione presente fra le variabili x e y: piu' e' elevata e piu' il legame e' di tipo lineare." + "<br/>" + "<br/> " +
+												"R2: 1 - (devianza residua / devianza totale)" + "<br/>" + "<br/>" + 
+												"R2 aggiustato: R2 - (1 - R2) * [p / (n - p -1)]" + "<br/>" + "<br/>" +
+												"Statistica F: [R2 / (1 - R2)] * [(n - p - 1) / p]";
   }
 }
 
@@ -369,11 +379,11 @@ function setLearner(n){
   rse();
   rss();
   mse();
+  varianza();
+  covarianza();
   r2();
   r2_adjusted();
   statistica_F();
-  varianza();
-  covarianza();
   show();
 }
 

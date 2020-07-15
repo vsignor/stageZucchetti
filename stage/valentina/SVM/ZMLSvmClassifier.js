@@ -6,7 +6,6 @@ class SvmLearner extends ZMLSupervisedLearner {
     this.nPredict=nPredict
     this.data=[]   
     this.labels=[]
-    //this.testdata=[] //io
   }
   addData(c,x){
     this.data.push(x)
@@ -14,7 +13,7 @@ class SvmLearner extends ZMLSupervisedLearner {
   }
   resetData(){
     this.data=[]
-    this.labels=[]  // io
+    this.labels=[]  
     }
   train(){
     // fa tutto nella getModel    
@@ -22,7 +21,7 @@ class SvmLearner extends ZMLSupervisedLearner {
   
   getModel(){
     var svm=new svmjs.SVM()
-    //svm.train(this.data,this.labels,{kernel:this.kernel})
+    svm.train(this.data,this.labels,{kernel:this.kernel})
   //  testlabels = svm.predict(testdata); //io
     var m=this.modelFactory()
     m.svm=svm
@@ -32,11 +31,6 @@ class SvmLearner extends ZMLSupervisedLearner {
     // crea un modello specifico per il tipo di Svm
     return new SvmModel(this.nPredict,this.kernel)
   }
-
- /* getNumberOfPredictors(){
-    return this.nPredict;
-  }*/
-
 }
 
 class SvmModel extends ZMLModel {
@@ -52,7 +46,12 @@ class SvmModel extends ZMLModel {
   }
 
   predictSQL(c){
-    return "No predizione in SQL"
+    var w=this.svm.w
+    if (this.kernel!="linear") return "No predizione in SQL"
+    var r=''+this.svm.b.toFixed(4)
+    for(var i=0;i<c.length;i++)
+      r+=" + "+c[i]+' * ('+w[i].toFixed(4)+')'
+    return "case when ("+r+") > 0 then 1 else -1 end"
   }  
 }
 
@@ -88,8 +87,8 @@ class Pol2SvmLearner extends SvmLearner {
     n.push(x[0]*x[1])
     n.push(x[0]*x[0])
     n.push(x[1]*x[1])
-    n.push(x[0]*x[0]*x[0])
-    n.push(x[1]*x[1]*x[1])
+  /*  n.push(x[0]*x[0]*x[0])
+    n.push(x[1]*x[1]*x[1])*/
     super.addData(c,n)
   }
 
@@ -107,16 +106,29 @@ class Pol2SvmModel extends SvmModel {
     //  n.push(x[i]*x[i])
     n.push(x[0])
     n.push(x[1])
-    //n.push(x[0]*x[0]+x[1]*x[1])
+    //n.push(x[0]*x[0]+x[1]*x[1])  /*era per il grado */
     n.push(x[0]*x[1])
     n.push(x[0]*x[0])
     n.push(x[1]*x[1])
-    n.push(x[0]*x[0]*x[0])
-    n.push(x[1]*x[1]*x[1])
+  /*  n.push(x[0]*x[0]*x[0])    /*era per il grado */
+  /*  n.push(x[1]*x[1]*x[1])*/
 	return this.svm.predict([n])
   }
 
   predictSQL(c){
-    return "No predizione in SQL"
+    var w=this.svm.w
+    var r=""+this.svm.b.toFixed(4)
+    r+=" + "+c[0]+" * ("+w[0].toFixed(4)+")"
+    r+=" + "+c[1]+" * ("+w[1].toFixed(4)+")"
+    r+=" + "+c[0]+" * "+c[1]+" * ("+w[2].toFixed(4)+")"
+    r+=" + "+c[0]+" * "+c[0]+" * ("+w[3].toFixed(4)+")"
+    r+=" + "+c[1]+" * "+c[1]+" * ("+w[4].toFixed(4)+")"
+    return "case when ("+r+") > 0 then 1 else -1 end"
   }  
 }
+
+
+
+
+/* select codiceCliente, x, 3.52 + x * (-0.14) as prediction from clienti   */
+/* voglio fare espressioni da mettere fra select e from che siano semplici, quindi predittori semplici e che abbiano le operazioni da fare in SQL   */

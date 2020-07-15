@@ -42,9 +42,9 @@ class LinearRegressionModel extends ZMLModel {
     return r
   }
   predictSQL(c){
-    var i,r=this.coeff[0]+""
+    var i,r=this.coeff[0].toFixed(4)+""
     for(i=1;i<this.coeff.length;i++)
-      r+=" + "+c[i-1]+" * ("+this.coeff[i]+")"
+      r+=" + "+c[i-1]+" * ("+this.coeff[i].toFixed(4)+")"
     return r
   }
 
@@ -84,9 +84,9 @@ class ExpRegressionModel extends LinearRegressionModel {
     //return r;
   }
   predictSQL(c){
-    var i,r=this.coeff[0]+""
+    var i,r=this.coeff[0].toFixed(4)+""
     for(i=1;i<this.coeff.length;i++)
-      r+=" + "+c[i-1]+" * ("+this.coeff[i]+")"
+      r+=" + "+c[i-1]+" * ("+this.coeff[i].toFixed(4)+")"
     return "exp("+r+")"
     //  r+="+exp("+c[i-1]+")*("+this.coeff[i]+")"
     //return r;
@@ -128,9 +128,9 @@ class PolinomialRegressionModel extends LinearRegressionModel {
     return r; 
   }
   predictSQL(c){
-    var i,r=this.coeff[0]+""
+    var i,r=this.coeff[0].toFixed(4)+""
     for(i=1;i<=this.nDegree;i++)
-      r+=" + power ("+c[0]+","+i+") * ("+this.coeff[i]+")"
+      r+=" + power ("+c[0]+","+i+") * ("+this.coeff[i].toFixed(4)+")"
     return r
   }  
 }

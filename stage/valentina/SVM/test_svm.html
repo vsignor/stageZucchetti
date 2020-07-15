@@ -3,8 +3,9 @@
 
   <head>
     <title>Classificazione</title>
-  <link href="stile.css" rel="stylesheet" type="text/css">
-  </head>
+  <link href="../stile.css" rel="stylesheet" type="text/css">
+
+</head>
 
 <body>
   <h1>Classificazione: Regressione Logistica, kernel Lineare, RBF e Polinomiale </h1>
@@ -13,6 +14,26 @@
   <span id=grafico>
   <canvas id="NPGcanvas" width="700" height="650" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
   </span>
+
+  <div id=options1>
+   <div class="loptions"><b>C</b></div>
+  <input class="puls" type="button" onmousedown="c_value('t1', -1)" onmouseup="c_value('t1', 0)" value="-">
+  <input id="t1" type="text" name="" value="0" class="value" min="00" max=" 100" onchange="draw_slider(this.id)">
+  <input class="puls" type="button" onmousedown="c_value('t1', +1)" onmouseup="c_value('t1', 0)" value="+">
+  <br/>
+  <div id="t1_draw" class="slider">
+  <div id="t1_draw_bar" style="LEFT:50%;"></div>
+  </div></div>
+
+  <div id=options2>
+	<div class="loptions"><b>Kernel's sigma</b></div>
+   <input class="puls" type="button" onmousedown="c_value('t2', -1)" onmouseup="c_value('t2', 0)" value="-">
+   <input id="t2" type="text" name="" value="0" class="value" min="00" max=" 100" onchange="draw_slider(this.id)">
+   <input class="puls" type="button" onmousedown="c_value('t2', +1)" onmouseup="c_value('t2', 0)" value="+">
+   <br/>
+   <div id="t2_draw" class="slider">
+   <div id="t2_draw_bar" style="LEFT:50%;"></div>
+   </div></div>
 
   <span id=destra>
   <p>Select your algorithms:</p>
@@ -44,16 +65,16 @@
   <div id="valMod"></div>
   <div id="goodMod"></div>
   </div>
+</div>
 
 </div></span>
 <input id="button_show_clas" type="button" value="Details" onclick = "show()">
 <input id="button_clean_clas" type="submit" value="Clean Desk" onclick="cleanGrafico()">
 <div id="show"></div>
-</div>
 
-<script src="ZMLBase.js"></script>
+<script src="../ZMLBase.js"></script>
+
 <script src="ZMLLogisticRegression.js"></script>
-
 <script src="svm.js"></script>
 <script src="ZMLSvmClassifier.js"></script>
 
@@ -74,6 +95,36 @@ var trained=false
 var learners=[new LogisticRegressionLearner(2), new LinearSvmLearner(2), new RbfSvmLearner(2), new Pol2SvmLearner(2)]
 var lrn=learners[0]
 var mdl=null
+
+
+function c_value(o, v) {
+  if (v == 0) clearInterval(timer_c_value) ;
+  else timer_c_value = setInterval("c_value_do('" + o + "', " + v + ")", 50) ;
+}
+
+function c_value_do(o, v) {
+  min = get(o).getAttribute("min")*1 ;
+  max = get(o).getAttribute("max")*1 ;
+  val = get(o).value*1 ;
+  new_val = val + v ;
+
+  if (new_val < min) new_val = min ;
+  else if (new_val > max) new_val = max ;
+ 
+  get(o).value = new_val ;
+  draw_slider(o) ;
+}
+
+function get(o) { return document.getElementById(o) }
+
+function draw_slider(o) {
+  min = get(o).getAttribute("min")*1 ;
+  max = get(o).getAttribute("max")*1 ;
+  val = get(o).value*1 ;
+  range = max - min ;
+  new_val = (val - min)*100/range ;
+  get(o + "_draw_bar").style.left = new_val + "px" ;
+}
 
 function addDataPoint(x,y,c){
   // add datapoint at location of click
@@ -231,8 +282,8 @@ function prob(){
     var probA = (classeA / n) * 100;  //probabilita in % di appartenere alle classi -1 ed 1
     var probB = (classeB / n) * 100; 
 
-    document.getElementById("prob").innerHTML = "<b>Prob (Y = 1): </b>" + probA + "% " + " ; " + " " +
-                                              "<b> Prob (Y = -1): </b>" + probB + "% ";
+    document.getElementById("prob").innerHTML = "<b>Prob (Y = 1): </b>" + probA.toFixed(4) + "% " + " ; " + " " +
+                                              "<b> Prob (Y = -1): </b>" + probB.toFixed(4) + "% ";
   }
 }
 
@@ -254,8 +305,8 @@ function odds(){
   var oddsA =  classeA / classeB; // odds: relazione fra A e B
   var oddsB =  classeB / classeA;  // odds: relazione fra B ed A
 
-  document.getElementById("odds").innerHTML = "<b>Odds (Y = 1): </b>" + oddsA + " ; " +
-                                            "<b> Odds (Y = -1): </b>" + oddsB;
+  document.getElementById("odds").innerHTML = "<b>Odds (Y = 1): </b>" + oddsA.toFixed(4) + " ; " +
+                                            "<b> Odds (Y = -1): </b>" + oddsB.toFixed(4);
   }
 }
 
@@ -289,13 +340,13 @@ function valMod(){
       var fp_rate = 1 - spec;  //ottimo = 0 , male = 1;
       var f_score = (2 * recall * prec) / (recall + prec); //ottimo = 1 , male = 0;
 
-  document.getElementById("valMod").innerHTML = "<br/>" + "<b>Error rate = </b>" + er_rate + " ; " +  
-                                               "<b>Precisione = </b>" + prec + " ; " +
-                                               "<b>Accuratezza = </b>" + acc + " ; " +
-                                               "<b>Recall = </b>" + recall +  "<br/>" +
-                                               "<b>Specificita' = </b>" + spec  + " ; " +
-                                               "<b>False Positive rate = </b>" + fp_rate + "<br/>" +
-                                                "<b>F-Score = </b>" + f_score;
+  document.getElementById("valMod").innerHTML = "<br/>" + "<b>Error rate = </b>" + er_rate.toFixed(4) + " ; " +  
+                                               "<b>Precisione = </b>" + prec.toFixed(4) + " ; " +
+                                               "<b>Accuratezza = </b>" + acc.toFixed(4) + " ; " +
+                                               "<b>Recall = </b>" + recall.toFixed(4) +  "<br/>" +
+                                               "<b>Specificita' = </b>" + spec.toFixed(4)  + " ; " +
+                                               "<b>False Positive rate = </b>" + fp_rate.toFixed(4) + " ; " +
+                                                "<b>F-Score = </b>" + f_score.toFixed(4);
   }
 }                     
 
@@ -331,7 +382,7 @@ function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er
   // document.write(er_NoMod1 + " + " + er_NoMod2 + " = " + er_NoMod);
     var good = (er_NoMod - err) / er_NoMod;
 
-    document.getElementById("goodMod").innerHTML = "<b> Efficienza del modello = </b> " + good;
+    document.getElementById("goodMod").innerHTML = "<b> Efficienza del modello = </b> " + good.toFixed(4);
   }
 }
 
