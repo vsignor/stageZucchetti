@@ -60,6 +60,9 @@ class ExpRegressionLearner extends LinearRegressionLearner {
     this.reg.push({x:[1].concat(x),y:[Math.log(y)]})
     //this.reg.push({x:[1].concat([Math.exp(x)]),y:[y]})
   }
+  resetData(){
+    super.resetData();
+  }
   getModel(){
     this.train()
     var m=new ExpRegressionModel()
@@ -104,6 +107,9 @@ class PolinomialRegressionLearner extends LinearRegressionLearner {
     for(var i=1;i<=this.nDegree;i++)
       xx.push(Math.pow(x[0],i))
     this.reg.push({x:xx,y:[y]})
+  }
+  resetData(){
+    super.resetData();
   }
   getModel(){
     this.train()
@@ -166,14 +172,15 @@ class knnRegressionLearner extends ZMLLearner {
 }
 
 class knnRegressionModel extends ZMLModel {
-  constructor(n){
+  constructor(){
     super()
     this.nn=n
     this.learner="knnRegression"
     this.data=[]
   }
   predictJS(x){
-    var min_d=Math.abs(x[0]-this.data[0][1][0]),p=0,d,r
+    var min_d=Math.abs(x[0]-this.data[0][1][0]);
+    var p=0,d,r;
     for(var i=1;i<this.data.length;i++){
       d=Math.abs(x[0]-this.data[i][1][0])
       if (d<min_d) {

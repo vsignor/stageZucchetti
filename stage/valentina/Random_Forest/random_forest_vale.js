@@ -9,16 +9,16 @@ class BaseClassifier extends ZMLSupervisedLearner{
   addData(c,x){
     this.data.push(x)
     this.labels.push(c)
-    super.addData()
+  //  super.addData()
   }
   resetData(){
     this.data=[]
     this.labels=[]
-    super.resetData()
+    //super.resetData()
   }
   train(){
     // fa tutto nella getModel    
-    super.train()
+    //super.train()
   }
 }
 
@@ -31,7 +31,7 @@ class RandomForestLearner extends BaseClassifier {
     // Random Forest di Karpathy
     var rf=new forestjs.RandomForest({type:1}) //{numTrees:25,maxDepth:10})
     rf.train(this.data,this.labels)
-    var m=new RandomForestKModel(this.nPredict)
+    var m=new RandomForestModel(this.nPredict)
     m.rf=rf
     return m;
   }

@@ -28,7 +28,7 @@
   <div id=options2>
 	<div class="loptions"><b>Kernel's sigma</b></div>
    <input class="puls" type="button" onmousedown="c_value('t2', -1)" onmouseup="c_value('t2', 0)" value="-">
-   <input id="t2" type="text" name="" value="0" class="value" min="00" max=" 100" onchange="draw_slider(this.id)">
+   <input id="t2" type="text" name="" value="0" class="value" min="00" max=" 100" onchange="draw_slider(this.id)"> 
    <input class="puls" type="button" onmousedown="c_value('t2', +1)" onmouseup="c_value('t2', 0)" value="+">
    <br/>
    <div id="t2_draw" class="slider">
@@ -69,6 +69,7 @@
 
 </div></span>
 <input id="button_show_clas" type="button" value="Details" onclick = "show()">
+<input id="button_removeAdd_clas" type="submit" value="Remove Point" onclick="removeDataPoint()">
 <input id="button_clean_clas" type="submit" value="Clean Desk" onclick="cleanGrafico()">
 <div id="show"></div>
 
@@ -97,15 +98,15 @@ var lrn=learners[0]
 var mdl=null
 
 
-function c_value(o, v) {
+function c_value(o, v) {  // quando premo + o -
   if (v == 0) clearInterval(timer_c_value) ;
   else timer_c_value = setInterval("c_value_do('" + o + "', " + v + ")", 50) ;
 }
 
-function c_value_do(o, v) {
-  min = get(o).getAttribute("min")*1 ;
+function c_value_do(o, v) { //  controlla la velocità di scorrimento della barra (altrimenti reagirebbe in modo troppo repentino)
+  min = get(o).getAttribute("min")*1 ; 
   max = get(o).getAttribute("max")*1 ;
-  val = get(o).value*1 ;
+  val = get(o).value*1 ; // converte il valore del campo input da testo a numero
   new_val = val + v ;
 
   if (new_val < min) new_val = min ;
@@ -117,7 +118,7 @@ function c_value_do(o, v) {
 
 function get(o) { return document.getElementById(o) }
 
-function draw_slider(o) {
+function draw_slider(o) { // sposta la barretta verso destra o sinistra
   min = get(o).getAttribute("min")*1 ;
   max = get(o).getAttribute("max")*1 ;
   val = get(o).value*1 ;
@@ -130,6 +131,14 @@ function addDataPoint(x,y,c){
   // add datapoint at location of click
   data.push([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
   labels.push(c);
+  trained=false
+  Redraw()
+}
+
+function removeDataPoint(x,y,c) {
+  // remove datapoint at location of click
+  data.pop([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
+  labels.pop(c);  // delete last element: coda della lista
   trained=false
   Redraw()
 }
@@ -205,12 +214,12 @@ function cleanGrafico(){
 	show();
 
 	train();
-  	sql();
-  	conf_matrix();
-  	prob();
+  sql();
+  conf_matrix();
+  prob();
  	odds();
-  	valMod();
-  	goodMod();
+  valMod();
+  goodMod();
 }
 
 Redraw()
@@ -398,8 +407,8 @@ function show(){
                                                 "Recall: tp / (tp + fn)" + "<br/>" + "</br>" +
                                                 "Specificita': tn / (tn + fp)" +  " ; "  + 
                                                 "False Positive Rate: 1 - specificita'" + "<br/>" + "<br/>" + 
-												"F-Score: (2 * Recall * Precisione) / (Recall + Precisione)" + "<br/>" + "<br/>" + 
-												"Efficienza modello: (err. no modello - err. con modello) / err. no modello </b>";
+												                        "F-Score: (2 * Recall * Precisione) / (Recall + Precisione)" + "<br/>" + "<br/>" + 
+												                        "Efficienza modello: (err. no modello - err. con modello) / err. no modello </b>";
 												 
                                         
   }

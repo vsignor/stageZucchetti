@@ -76,10 +76,12 @@
 
 </div></span>
 <input id="button_show" type="button" value="Details" onclick = "show()">
+<input id="button_removeAdd" type="submit" value="Remove Point" onclick="removeDataPoint()">
 
 <input id="button_clean" type="submit" value="Clean Desk" onclick="azione('clean');">
 <div id="clean" style="display:none"><b>Press f5 and retrain your model :-)</b></div>
 
+<input id="button_clean" type="submit" value="Clean Desk" onclick="cleanGrafico()">
 <div id="show"></div>
 </div>
 
@@ -101,7 +103,7 @@ var trained=false;
 
 var learners=[new LinearRegressionLearner(1), new ExpRegressionLearner(1),
               new PolinomialRegressionLearner(2), new PolinomialRegressionLearner(3), new PolinomialRegressionLearner(4), 
-              new PolinomialRegressionLearner(5), new knnRegressionLearner(8)]
+              new PolinomialRegressionLearner(5), new knnRegressionLearner(8)];
 var lrn=learners[0]
 var mdl=null
 
@@ -109,6 +111,14 @@ function addDataPoint(x,y,c){
   // add datapoint at location of click
   data.push([(x-WIDTH/2)/ss]);
   values.push(-(y-HEIGHT/2)/ss);
+  trained=false
+  Redraw()
+}
+
+function removeDataPoint(x,y,c) {
+  // remove datapoint at location of click
+  data.pop([(x-WIDTH/2)/ss]);
+  values.pop(-(y-HEIGHT/2)/ss); // delete last element: coda della lista
   trained=false
   Redraw()
 }
@@ -170,6 +180,31 @@ function Redraw(){
 }
 
 Redraw()
+
+/*function cleanGrafico(){
+	/*ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
+	/*trained = false;
+
+	ctx.beginPath(); /*ricreo assi*/
+/*	ctx.strokeStyle = 'rgb(50,50,50)';
+  	ctx.lineWidth = 1;
+  	ctx.moveTo(0, HEIGHT/2);
+ 	ctx.lineTo(WIDTH, HEIGHT/2);
+  	ctx.moveTo(WIDTH/2, 0);
+  	ctx.lineTo(WIDTH/2, HEIGHT);
+  	ctx.stroke();*/
+
+	/*removeDataPoint();
+	/*show();
+
+	train();
+  sql();*/
+  /*conf_matrix();
+   prob();
+ 	odds();
+  valMod();
+  goodMod();*/
+//}
 
 function train(){
   lrn.resetData()

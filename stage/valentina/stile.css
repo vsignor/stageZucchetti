@@ -47,7 +47,7 @@ input{
 #button_train, #button_sql,  #button_rss, #button_mse, #button_rse, #button_r2, #button_r2Aj, #button_F, #button_var, #button_cov{
   background-color: rgb(236, 132, 167);
 }
- #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod, #valMod{
+ #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod, #valMod,  #prob_rf, #odds_rf, #goodMod_rf, #valMod_rf{
   margin-top: 0.5em;
 }
 
@@ -60,7 +60,12 @@ input{
   margin-bottom: 1.5em;
 }
 
-#button_show, #button_clean{
+#confusion_matrix_rf{
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+#button_show, #button_clean, #button_removeAdd{
   margin-top: 3em;
   background-color: rgb(255, 204, 255);
 }
@@ -118,7 +123,7 @@ input{
 	float: right;
 	color: rgb(236, 42, 107);
 	margin-bottom: 0.5em;
-  margin-top: -2em;
+  margin-top: 1em;
 }
 
 
@@ -126,7 +131,7 @@ input{
   color: antiquewhite;
   }
 
-  #button_show:hover, #button_clean:hover{
+  #button_show:hover, #button_clean:hover, #button_removeAdd:hover{
     color: rgb(236, 42, 107);
   }
 
@@ -135,7 +140,7 @@ input{
     font-weight: bold;
   }
   
-  #button_train_clas, #button_sql_clas, #button_test, #button_matrix_clas, #button_prob, #button_odds, #button_valMod, #button_goodMod{
+  #button_train_clas, #button_sql_clas, #button_matrix_clas, #button_prob, #button_odds, #button_valMod, #button_goodMod{
     background-color: rgb(102, 178, 255);
   }
 
@@ -156,12 +161,12 @@ input{
     font-size: 1em;
   }
 
-  #button_show_clas, #button_clean_clas{
+  #button_show_clas, #button_clean_clas, #button_removeAdd_clas{
     margin-top: 3em;
     background-color: rgb(223, 233, 245);
   }
 
-  #button_show_clas:hover, #button_clean_clas:hover{
+  #button_show_clas:hover, #button_clean_clas:hover, #button_removeAdd_clas:hover{
     color: rgb(0, 102, 204);
   }
 
@@ -224,15 +229,20 @@ input{
  }
 
  #button_rf{
-    background-color: rgb(85, 151, 19);
+    background-color: rgb(89, 172, 6);
+    margin: 0.2em;
+    font-size: 1.1em;
+    font-family: monospace;
+    padding: 10px 12px;
+    border-radius: 0.5em;
   }
 
-  #button_rf:hover, #button_train_rf:hover, #button_sql_rf:hover{
+  #button_rf:hover, #button_train_rf:hover, #button_sql_rf:hover, #button_matrix_rf:hover, #button_prob_rf:hover, #button_odds_rf:hover, #button_valMod_rf:hover, #button_goodMod_rf:hover{
     color: antiquewhite;
   }
 
-  #button_train_rf, #button_sql_rf{
-    background-color: rgb(102, 204, 0);
+  #button_train_rf, #button_sql_rf,  #button_matrix_rf, #button_prob_rf, #button_odds_rf, #button_valMod_rf, #button_goodMod_rf{
+    background-color: rgb(114, 223, 6);
   }
 
   #result_rf{
@@ -248,11 +258,43 @@ input{
     font-size: 1em;
   }
 
-  #button_show_rf, #button_clean_rf{
+  #button_show_rf, #button_clean_rf, #button_removeAdd_rf{
     margin-top: 3em;
     background-color:rgb(204, 255, 153);
     }
 
-  #button_show_rf:hover, #button_clean_rf:hover{
-    color: rgb(85, 151, 19);
+  #button_show_rf:hover, #button_clean_rf:hover, #button_removeAdd_rf:hover{
+    color: rgb(89, 172, 6);
   }
+
+.selectTree {
+    position: relative;
+    display: inline-block;
+}
+
+.selectTree-content {
+    display: none;
+    position: absolute;
+    background-color: rgb(204, 255, 153);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px  rgb(204, 255, 153);
+  }
+
+.selectTree-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.selectTree-content a:hover {
+  background-color: rgb(89, 172, 6);
+}
+
+.selectTree:hover .selectTree-content {
+    display: block;
+}
+
+.button_rf:hover{
+  color: antiquewhite;
+}
