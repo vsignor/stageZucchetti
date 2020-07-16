@@ -20,6 +20,10 @@ class BaseClassifier extends ZMLSupervisedLearner{
     // fa tutto nella getModel    
     //super.train()
   }
+
+  getNumberOfPredictors(){
+    return this.nPredict;
+  }
 }
 
 // Random forest usando la libreria di Karpathy 

@@ -20,15 +20,15 @@
   <div id="algo">
 
   <div class="selectTree">
-    <button id="button_rf"> Random Forest</button>
+    <button id="button_rf">Random Forest</button>
     <div class="selectTree-content">
     <a href="#" onclick="setLearner(0)" class="button_rf">10 Trees</a>
     <a href="#" onclick="setLearner(1)" class="button_rf">50 Trees</a>
     <a href="#" onclick="setLearner(2)" class="button_rf">100 Trees</a>
-    <a href="#" onclick="setLearner(4)" class="button_rf">200 Trees</a>
-    <a href="#" onclick="setLearner(5)" class="button_rf">500 Trees</a>
+    <a href="#" onclick="setLearner(3)" class="button_rf">200 Trees</a>
+    <a href="#" onclick="setLearner(4)" class="button_rf">500 Trees</a>
     <a href="#" onclick="setLearner(5)" class="button_rf">1000 Trees</a>
-    <a href="#" onclick="setLearner(5)" class="button_rf">10000 Trees</a>
+    <a href="#" onclick="setLearner(6)" class="button_rf">10000 Trees</a>
     </div>
   </div>
   
@@ -38,6 +38,7 @@
   <div id="azioni">
   <input id="button_train_rf" type="button" value="Train" onclick="train()">
   <input id="button_sql_rf" type="button" value="Sql" onclick="sql()">
+  <input id="button_nTrees_rf" type="button" value="Trees" onclick="nTrees()">
   <input id="button_matrix_rf" type="button" value="Confusion Matrix" onclick = "conf_matrix()">
   <input id="button_prob_rf" type="button" value="Prob(Y)" onclick="prob()">
   <input id="button_odds_rf" type="button" value="Odds(Y)" onclick="odds()">
@@ -48,6 +49,7 @@
   <div id="result_rf">
   <div id="info"></div>
   <div id="sql"></div>
+  <div id="ntrees"></div>
 
   <div id="confusion_matrix_rf"></div>
   <div id="prob_rf"></div>
@@ -176,6 +178,7 @@ function cleanGrafico(){
 
 	train();
   sql();
+  nTrees();
   conf_matrix();
    prob();
  	odds();
@@ -197,12 +200,19 @@ function train(){
 }
 
 function sql(){
-  if (trained){
+  if (trained)
     document.getElementById("sql").innerHTML="<b>SQL =</b> " + mdl.predictSQL();
-  }
 
   else
 	  show();
+}
+
+function nTrees(){
+  if (trained)
+    document.getElementById("ntrees").innerHTML="<b>Alberi: </b>" + lrn.getNumberOfPredictors();
+
+    else
+	    show();
 }
 
 function conf_matrix(){
@@ -380,6 +390,7 @@ function setLearner(n){
   trained=false;
   train();
   sql();
+  nTrees();
   conf_matrix();
   prob();
   odds();

@@ -229,7 +229,7 @@ input{
  }
 
  #button_rf{
-    background-color: rgb(89, 172, 6);
+    background-color: rgb(79, 153, 6);
     margin: 0.2em;
     font-size: 1.1em;
     font-family: monospace;
@@ -237,11 +237,11 @@ input{
     border-radius: 0.5em;
   }
 
-  #button_rf:hover, #button_train_rf:hover, #button_sql_rf:hover, #button_matrix_rf:hover, #button_prob_rf:hover, #button_odds_rf:hover, #button_valMod_rf:hover, #button_goodMod_rf:hover{
+  #button_rf:hover, #button_train_rf:hover, #button_sql_rf:hover, #button_nTrees_rf:hover, #button_matrix_rf:hover, #button_prob_rf:hover, #button_odds_rf:hover, #button_valMod_rf:hover, #button_goodMod_rf:hover{
     color: antiquewhite;
   }
 
-  #button_train_rf, #button_sql_rf,  #button_matrix_rf, #button_prob_rf, #button_odds_rf, #button_valMod_rf, #button_goodMod_rf{
+  #button_train_rf, #button_sql_rf, #button_nTrees_rf, #button_matrix_rf, #button_prob_rf, #button_odds_rf, #button_valMod_rf, #button_goodMod_rf{
     background-color: rgb(114, 223, 6);
   }
 
@@ -264,7 +264,7 @@ input{
     }
 
   #button_show_rf:hover, #button_clean_rf:hover, #button_removeAdd_rf:hover{
-    color: rgb(89, 172, 6);
+    color: rgb(79, 153, 6);
   }
 
 .selectTree {
@@ -288,7 +288,7 @@ input{
 }
 
 .selectTree-content a:hover {
-  background-color: rgb(89, 172, 6);
+  background-color: rgb(79, 153, 6);
 }
 
 .selectTree:hover .selectTree-content {
