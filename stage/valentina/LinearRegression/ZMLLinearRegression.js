@@ -26,6 +26,9 @@ class LinearRegressionLearner extends ZMLLearner {
     return this.nPredict;
   }
 
+  getAlgorithm(){
+    return this.algorithm;
+  }
 }
 
 class LinearRegressionModel extends ZMLModel {
@@ -71,6 +74,7 @@ class ExpRegressionLearner extends LinearRegressionLearner {
     for(var i=0;i<c.length;i++) m.coeff.push(c[i][0])
     return m;
   }
+  
 }
 
 class ExpRegressionModel extends LinearRegressionModel {
@@ -119,6 +123,7 @@ class PolinomialRegressionLearner extends LinearRegressionLearner {
     for(var i=0;i<c.length;i++) m.coeff.push(c[i][0])
     return m;
   }
+
 }
 
 class PolinomialRegressionModel extends LinearRegressionModel {
@@ -143,7 +148,7 @@ class PolinomialRegressionModel extends LinearRegressionModel {
 
 class knnRegressionLearner extends ZMLLearner {
   constructor(n){
-    super()
+    super();
     this.nn=n
     this.algorithm="knnRegression"
     this.data=[]
@@ -165,14 +170,16 @@ class knnRegressionLearner extends ZMLLearner {
       m.data.push(this.data[i])
     return m
   }
-
   getNumberOfPredictors(){
     return this.data.length;
+  }
+  getAlgorithm(){
+    return this.algorithm;
   }
 }
 
 class knnRegressionModel extends ZMLModel {
-  constructor(){
+  constructor(n){
     super()
     this.nn=n
     this.learner="knnRegression"

@@ -5,7 +5,7 @@
   <title>Regression</title>
 <link href="../stile.css" rel="stylesheet" type="text/css">
 
-<script type="text/javascript" language="javascript">
+<!--<script type="text/javascript" language="javascript">
 	function visualizza(id){
 	  if (document.getElementById){
 		if(document.getElementById(id).style.display == 'none'){
@@ -26,7 +26,7 @@
 			document.getElementById(variabile).style.display=''; 
 	}
 </script>
-</head>
+</head>  -->
 
 <body>
 <h1>Regressione: Lineare, Esponenziale, Polinomiale (dal 2 a 5 grado) e Knn</h1>
@@ -78,10 +78,9 @@
 <input id="button_show" type="button" value="Details" onclick = "show()">
 <input id="button_removeAdd" type="submit" value="Remove Point" onclick="removeDataPoint()">
 
-<input id="button_clean" type="submit" value="Clean Desk" onclick="azione('clean');">
-<div id="clean" style="display:none"><b>Press f5 and retrain your model :-)</b></div>
-
 <input id="button_clean" type="submit" value="Clean Desk" onclick="cleanGrafico()">
+<span id="clean"></span>
+
 <div id="show"></div>
 </div>
 
@@ -181,30 +180,43 @@ function Redraw(){
 
 Redraw()
 
-/*function cleanGrafico(){
-	/*ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
-	/*trained = false;
+function cleanGrafico(){
 
-	ctx.beginPath(); /*ricreo assi*/
-/*	ctx.strokeStyle = 'rgb(50,50,50)';
+  var a = lrn.getAlgorithm();
+ // console.log(a);
+
+  if(a != "knnRegression"){
+	  ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
+	  trained = false;
+
+	  ctx.beginPath(); /*ricreo assi*/
+    ctx.strokeStyle = 'rgb(50,50,50)';
   	ctx.lineWidth = 1;
   	ctx.moveTo(0, HEIGHT/2);
- 	ctx.lineTo(WIDTH, HEIGHT/2);
+ 	  ctx.lineTo(WIDTH, HEIGHT/2);
   	ctx.moveTo(WIDTH/2, 0);
   	ctx.lineTo(WIDTH/2, HEIGHT);
-  	ctx.stroke();*/
+  	ctx.stroke()
 
-	/*removeDataPoint();
-	/*show();
+    data = [];
+    values = [];
 
-	train();
-  sql();*/
-  /*conf_matrix();
-   prob();
- 	odds();
-  valMod();
-  goodMod();*/
-//}
+
+	  train();
+    sql();
+    rse();
+    rss();
+    mse();
+    varianza();
+    covarianza();
+    r2();
+    r2_adjusted();
+    statistica_F();
+    }
+    
+    else 
+      document.getElementById("clean").innerHTML= "<b>Press f5 and retrain your model :-)</b>";
+  }
 
 function train(){
   lrn.resetData()

@@ -23,12 +23,9 @@
     <button id="button_rf">Random Forest</button>
     <div class="selectTree-content">
     <a href="#" onclick="setLearner(0)" class="button_rf">10 Trees</a>
-    <a href="#" onclick="setLearner(1)" class="button_rf">50 Trees</a>
-    <a href="#" onclick="setLearner(2)" class="button_rf">100 Trees</a>
-    <a href="#" onclick="setLearner(3)" class="button_rf">200 Trees</a>
-    <a href="#" onclick="setLearner(4)" class="button_rf">500 Trees</a>
-    <a href="#" onclick="setLearner(5)" class="button_rf">1000 Trees</a>
-    <a href="#" onclick="setLearner(6)" class="button_rf">10000 Trees</a>
+    <a href="#" onclick="setLearner(1)" class="button_rf">25 Trees</a>
+    <a href="#" onclick="setLearner(2)" class="button_rf">50 Trees</a>
+    <a href="#" onclick="setLearner(3)" class="button_rf">100 Trees</a>
     </div>
   </div>
   
@@ -44,6 +41,7 @@
   <input id="button_odds_rf" type="button" value="Odds(Y)" onclick="odds()">
   <input id="button_valMod_rf" type="button" value="Valutazioni Modello" onclick="valMod()">
   <input id="button_goodMod_rf" type="button" value="Efficenza Modello" onclick="goodMod()">
+  <input id="button_classErr_rf" type="button" value="Prob classificazione errata" onclick="class_err()">
   </div>
 
   <div id="result_rf">
@@ -56,6 +54,7 @@
   <div id="odds_rf"></div>
   <div id="valMod_rf"></div>
   <div id="goodMod_rf"></div>
+  <div id="class_err_rf"></div>
 
 </div>
 
@@ -84,8 +83,7 @@ var labels=[]     // valori delle classi dei punti disegnati
 
 var trained=false
 
-var learners= [new RandomForestLearner(10), new RandomForestLearner(50), new RandomForestLearner(100), new RandomForestLearner(200), 
-                new RandomForestLearner(500), new RandomForestLearner(1000), new RandomForestLearner(10000)];
+var learners= [new RandomForestLearner(10), new RandomForestLearner(25), new RandomForestLearner(50), new RandomForestLearner(100)];
 
 var lrn=learners[0]
 var mdl=null
@@ -184,6 +182,7 @@ function cleanGrafico(){
  	odds();
   valMod();
   goodMod();
+  class_err();
 }
 
 Redraw()
@@ -327,7 +326,8 @@ function valMod(){
                                                    "<b>Specificita' = </b>" + spec.toFixed(4)  + " ; " +
                                                    "<b>False Positive rate = </b>" + fp_rate.toFixed(4) + " ; " +
                                                   "<b>F-Score = </b>" + f_score.toFixed(4);
-  }
+  return acc;
+}
 }                     
 
 function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er. senza mod
@@ -366,6 +366,14 @@ function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er
   }
 }
 
+function class_err(){
+  var acc = valMod();
+
+  var er = 1 - acc ;
+  document.getElementById("class_err_rf").innerHTML = "<b> Probabilita' classificazione errata = </b> " + er.toFixed(4);
+
+}
+
 function show(){
 
   if (!trained) 
@@ -379,7 +387,8 @@ function show(){
                                                 "Specificita': tn / (tn + fp)" +  " ; "  + 
                                                 "False Positive Rate: 1 - specificita'" + "<br/>" + "<br/>" + 
 												                        "F-Score: (2 * Recall * Precisione) / (Recall + Precisione)" + "<br/>" + "<br/>" + 
-												                        "Efficienza modello: (err. no modello - err. con modello) / err. no modello </b>";
+                                                "Efficienza modello: (err. no modello - err. con modello) / err. no modello" +  "<br/>" + "<br/>" + 
+                                                "Probabilita' classificazione errata: 1 - Accuratezza </b>";
 												 
                                         
   }
@@ -396,6 +405,7 @@ function setLearner(n){
   odds();
   valMod();
   goodMod();
+  class_err();
   show();
 }
 

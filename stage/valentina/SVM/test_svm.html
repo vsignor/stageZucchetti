@@ -18,7 +18,7 @@
   <div id=options1>
    <div class="loptions"><b>C</b></div>
   <input class="puls" type="button" onmousedown="c_value('t1', -1)" onmouseup="c_value('t1', 0)" value="-">
-  <input id="t1" type="text" name="" value="0" class="value" min="00" max=" 100" onchange="draw_slider(this.id)">
+  <input id="t1" type="text" name="" value="1.0" class="value" min="0.01" max=" 100.0" onchange="draw_slider(this.id)">
   <input class="puls" type="button" onmousedown="c_value('t1', +1)" onmouseup="c_value('t1', 0)" value="+">
   <br/>
   <div id="t1_draw" class="slider">
@@ -28,7 +28,7 @@
   <div id=options2>
 	<div class="loptions"><b>Kernel's sigma</b></div>
    <input class="puls" type="button" onmousedown="c_value('t2', -1)" onmouseup="c_value('t2', 0)" value="-">
-   <input id="t2" type="text" name="" value="0" class="value" min="00" max=" 100" onchange="draw_slider(this.id)"> 
+   <input id="t2" type="text" name="" value="1.0" class="value" min="0.01" max=" 100.0" onchange="draw_slider(this.id)"> 
    <input class="puls" type="button" onmousedown="c_value('t2', +1)" onmouseup="c_value('t2', 0)" value="+">
    <br/>
    <div id="t2_draw" class="slider">
@@ -53,6 +53,7 @@
   <input id="button_odds" type="button" value="Odds(Y)" onclick="odds()">
   <input id="button_valMod" type="button" value="Valutazioni Modello" onclick="valMod()">
   <input id="button_goodMod" type="button" value="Efficenza Modello" onclick="goodMod()">
+  <input id="button_classErr_clas" type="button" value="Prob classificazione errata" onclick="class_err()">
   </div>
 
   <div id="result_clas">
@@ -64,6 +65,7 @@
   <div id="odds"></div>
   <div id="valMod"></div>
   <div id="goodMod"></div>
+  <div id="class_err_clas"></div>
   </div>
 </div>
 
@@ -220,6 +222,7 @@ function cleanGrafico(){
  	odds();
   valMod();
   goodMod();
+  class_err();
 }
 
 Redraw()
@@ -356,7 +359,8 @@ function valMod(){
                                                "<b>Specificita' = </b>" + spec.toFixed(4)  + " ; " +
                                                "<b>False Positive rate = </b>" + fp_rate.toFixed(4) + " ; " +
                                                 "<b>F-Score = </b>" + f_score.toFixed(4);
-  }
+  return acc;
+}
 }                     
 
 function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er. senza mod
@@ -395,6 +399,14 @@ function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er
   }
 }
 
+function class_err(){
+  var acc = valMod();
+
+  var er = 1 - acc ;
+  document.getElementById("class_err_clas").innerHTML = "<b> Probabilita' classificazione errata = </b> " + er.toFixed(4);
+
+}
+
 function show(){
 
   if (!trained) 
@@ -408,7 +420,8 @@ function show(){
                                                 "Specificita': tn / (tn + fp)" +  " ; "  + 
                                                 "False Positive Rate: 1 - specificita'" + "<br/>" + "<br/>" + 
 												                        "F-Score: (2 * Recall * Precisione) / (Recall + Precisione)" + "<br/>" + "<br/>" + 
-												                        "Efficienza modello: (err. no modello - err. con modello) / err. no modello </b>";
+                                                "Efficienza modello: (err. no modello - err. con modello) / err. no modello " + "<br/>" + "<br/>" + 
+                                                "Probabilita' classificazione errata: 1 - Accuratezza </b>";
 												 
                                         
   }
@@ -424,6 +437,7 @@ function setLearner(n){
   odds();
   valMod();
   goodMod();
+  class_err()
   show();
 }
 

@@ -47,7 +47,7 @@ input{
 #button_train, #button_sql,  #button_rss, #button_mse, #button_rse, #button_r2, #button_r2Aj, #button_F, #button_var, #button_cov{
   background-color: rgb(236, 132, 167);
 }
- #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod, #valMod,  #prob_rf, #odds_rf, #goodMod_rf, #valMod_rf{
+ #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod, #valMod,  #prob_rf, #odds_rf, #goodMod_rf, #valMod_rf, #class_err_clas, #class_err_rf{
   margin-top: 0.5em;
 }
 
@@ -66,7 +66,7 @@ input{
 }
 
 #button_show, #button_clean, #button_removeAdd{
-  margin-top: 3em;
+  margin-top: 1em;
   background-color: rgb(255, 204, 255);
 }
 
@@ -98,15 +98,12 @@ input{
 }
 
 #result{
-  margin-top: 3em;
-  font-size: medium;
-  font-family: monospace;
   background-color:  rgba(255, 204, 204);
   text-align: center;
   border-radius: 0.5em;
   padding: 10px;
   font-family: monospace;
-  margin-top: 0.5em;
+  margin-top: -0.5em;
   font-size: 1em;
 }
 
@@ -120,10 +117,9 @@ input{
 }
 
 #clean{
-	float: right;
 	color: rgb(236, 42, 107);
-	margin-bottom: 0.5em;
-  margin-top: 1em;
+  margin-top: -2.3em;
+  margin-right: -8em;
 }
 
 
@@ -140,29 +136,26 @@ input{
     font-weight: bold;
   }
   
-  #button_train_clas, #button_sql_clas, #button_matrix_clas, #button_prob, #button_odds, #button_valMod, #button_goodMod{
+  #button_train_clas, #button_sql_clas, #button_matrix_clas, #button_prob, #button_odds, #button_valMod, #button_goodMod, #button_classErr_clas{
     background-color: rgb(102, 178, 255);
   }
 
-  #button_regLog:hover, #button_kernel_Lin:hover, #button_RBF:hover, #button_kernel_pol2:hover, #button_train_clas:hover, #button_sql_clas:hover, #button_matrix_clas:hover, #button_prob:hover, #button_odds:hover, #button_valMod:hover, #button_goodMod:hover{
+  #button_regLog:hover, #button_kernel_Lin:hover, #button_RBF:hover, #button_kernel_pol2:hover, #button_train_clas:hover, #button_sql_clas:hover, #button_matrix_clas:hover, #button_prob:hover, #button_odds:hover, #button_valMod:hover, #button_goodMod:hover, #button_classErr_clas:hover{
     color: antiquewhite;
   }
 
   #result_clas{
-    margin-top: 3em;
-    font-size: medium;
-    font-family: monospace;
     background-color:  rgba(204, 229, 255);
     text-align: center;
     border-radius: 0.5em;
     padding: 10px;
     font-family: monospace;
-    margin-top: 0.5em;
+    margin-top: -0.5em;
     font-size: 1em;
   }
 
   #button_show_clas, #button_clean_clas, #button_removeAdd_clas{
-    margin-top: 3em;
+    margin-top: 1em;
     background-color: rgb(223, 233, 245);
   }
 
@@ -237,29 +230,26 @@ input{
     border-radius: 0.5em;
   }
 
-  #button_rf:hover, #button_train_rf:hover, #button_sql_rf:hover, #button_nTrees_rf:hover, #button_matrix_rf:hover, #button_prob_rf:hover, #button_odds_rf:hover, #button_valMod_rf:hover, #button_goodMod_rf:hover{
+  #button_rf:hover, #button_train_rf:hover, #button_sql_rf:hover, #button_nTrees_rf:hover, #button_matrix_rf:hover, #button_prob_rf:hover, #button_odds_rf:hover, #button_valMod_rf:hover, #button_goodMod_rf:hover, #button_classErr_rf:hover{
     color: antiquewhite;
   }
 
-  #button_train_rf, #button_sql_rf, #button_nTrees_rf, #button_matrix_rf, #button_prob_rf, #button_odds_rf, #button_valMod_rf, #button_goodMod_rf{
+  #button_train_rf, #button_sql_rf, #button_nTrees_rf, #button_matrix_rf, #button_prob_rf, #button_odds_rf, #button_valMod_rf, #button_goodMod_rf, #button_classErr_rf{
     background-color: rgb(114, 223, 6);
   }
 
   #result_rf{
-    margin-top: 3em;
-    font-size: medium;
-    font-family: monospace;
-    background-color:  rgb(155, 245, 66);
+    background-color: rgb(155, 245, 66);
     text-align: center;
     border-radius: 0.5em;
     padding: 10px;
     font-family: monospace;
-    margin-top: 0.5em;
+    margin-top: -0.5em;
     font-size: 1em;
   }
 
   #button_show_rf, #button_clean_rf, #button_removeAdd_rf{
-    margin-top: 3em;
+    margin-top: 1em;
     background-color:rgb(204, 255, 153);
     }
 
