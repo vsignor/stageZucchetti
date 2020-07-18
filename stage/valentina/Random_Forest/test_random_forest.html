@@ -11,9 +11,9 @@
   <h1>Random Forest </h1>
 
   <div id=big_container>
-  <span id=grafico>
-  <canvas id="NPGcanvas" width="700" height="650" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
-  </span>
+  <span id=grafico>  <!-- 550 500-->
+  <canvas id="NPGcanvas" width="700em" height="650em" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
+  </span> 
 
   <span id=destra>
   <p>Select your algorithms:</p>
@@ -55,14 +55,15 @@
   <div id="valMod_rf"></div>
   <div id="goodMod_rf"></div>
   <div id="class_err_rf"></div>
-
 </div>
 
-</div></span>
 <input id="button_show_rf" type="button" value="Details" onclick = "show()">
 <input id="button_removeAdd_rf" type="submit" value="Remove Point" onclick="removeDataPoint()">
 <input id="button_clean_rf" type="submit" value="Clean Desk" onclick="cleanGrafico()">
+
+
 <div id="show"></div>
+<span></div>
 
 <script src="../ZMLBase.js"></script>
 
@@ -75,7 +76,7 @@
 // variabili per la gestione del canvas
 var canvas = document.getElementById("NPGcanvas")
 var ctx = canvas.getContext('2d');
-var WIDTH=700,HEIGHT=650,ss=50.0
+var WIDTH=700,HEIGHT=650,ss=50.0 //<!-- 550 500-->
 
 // variabili per il learner
 var data=[]       // valori delle x dei punti disegnati

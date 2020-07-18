@@ -32,8 +32,8 @@
 <h1>Regressione: Lineare, Esponenziale, Polinomiale (dal 2 a 5 grado) e Knn</h1>
 
 <div id=big_container>
-<span id=grafico>
-  <canvas id="NPGcanvas" width="700" height="650" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
+<span id=grafico>    <!-- 550 500-->
+  <canvas id="NPGcanvas" width="700em" height="650em" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
 </span>
 
 <span id=destra>
@@ -73,16 +73,16 @@
 <div id="r2"></div>
 <div id="r2_adjusted"></div>
 <div id="statistica_F"></div>
+</div>
 
-</div></span>
 <input id="button_show" type="button" value="Details" onclick = "show()">
 <input id="button_removeAdd" type="submit" value="Remove Point" onclick="removeDataPoint()">
 
 <input id="button_clean" type="submit" value="Clean Desk" onclick="cleanGrafico()">
-<span id="clean"></span>
+<span id="clean"> </span>
 
 <div id="show"></div>
-</div>
+</span></div>
 
 <script src="../ZMLBase.js"></script>
 
@@ -93,7 +93,7 @@
 // variabili per la gestione del canvas
 var canvas = document.getElementById("NPGcanvas")
 var ctx = canvas.getContext('2d');
-var WIDTH=700,HEIGHT=650,ss=50.0
+var WIDTH=700,HEIGHT=650,ss=50.0  //<!-- 550 500-->
 
 // variabili per il learner
 var data=[];               // valori delle x dei punti disegnati
