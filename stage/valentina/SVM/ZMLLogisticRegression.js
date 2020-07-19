@@ -61,6 +61,9 @@ class LogisticRegressionLearner extends ZMLSupervisedLearner {
     m.B=this.B
     return m;
   }
+  cleanGrafico(){
+    /*vedi htm*/    
+  }
 
   /*getNumberOfPredictors(){
     return this.nPredict;

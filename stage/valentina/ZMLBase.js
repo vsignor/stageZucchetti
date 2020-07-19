@@ -5,6 +5,7 @@ class ZMLLearner {
     this.trainDate=null
   }
   addData(){throw new Error('not implemented.')}
+  resetData(){throw new Error('not implemented.')}
   addDataBlock(){throw new Error('not implemented.')}
   trainFromVQR(){throw new Error('not implemented.')}
   trainFromCSV(){throw new Error('not implemented.')}
@@ -17,6 +18,7 @@ class ZMLLearner {
   saveModelFile(){throw new Error('not implemented.')}
   saveLearnerFile(){throw new Error('not implemented.')}
   readLearnerFile(){throw new Error('not implemented.')}
+  cleanGrafico(){throw new Error('not implemented.')}
 }
 
 class ZMLModel {
@@ -33,12 +35,16 @@ class ZMLModel {
 
 class ZMLSupervisedLearner extends ZMLLearner {
   addData(y,x){throw new Error('not implemented.')}
+  resetData(){throw new Error('not implemented.')}
+  cleanGrafico(){throw new Error('not implemented.')}
 }
 
 // da fare: regressione lineare, SVM, Regressione Logistica, Random Forest
 
 class ZMLUnsupervisedLearner extends ZMLLearner {
   addData(x){throw new Error('not implemented.')}
+  resetData(){throw new Error('not implemented.')}
+  cleanGrafico(){throw new Error('not implemented.')}
 }
 
 // da fare: k-means, Abc 

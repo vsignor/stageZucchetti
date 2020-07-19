@@ -18,7 +18,9 @@ class SvmLearner extends ZMLSupervisedLearner {
   train(){
     // fa tutto nella getModel    
   }
-  
+  cleanGrafico(){
+    /*vedi htm*/    
+  }
   getModel(){
     var svm=new svmjs.SVM()
     svm.train(this.data,this.labels,{kernel:this.kernel})
@@ -44,7 +46,6 @@ class SvmModel extends ZMLModel {
   predictJS(x){
     return this.svm.predict([x])  // mi dice se il dato x che segno nel grafico appartiene alla classe 1 o -1
   }
-
   predictSQL(c){
     var w=this.svm.w
     if (this.kernel!="linear") return "No predizione in SQL"
@@ -74,7 +75,6 @@ class Pol2SvmLearner extends SvmLearner {
     super(nPredict*2,"linear")
     this.algorithm="Svm(pol2)"
   }
-
   addData(c,x){
     var n=[]
     //for(var i=0;i<this.nPredict;i++)
@@ -91,7 +91,6 @@ class Pol2SvmLearner extends SvmLearner {
     n.push(x[1]*x[1]*x[1])*/
     super.addData(c,n)
   }
-
   modelFactory(){
     return new Pol2SvmModel()
   }
@@ -114,7 +113,6 @@ class Pol2SvmModel extends SvmModel {
   /*  n.push(x[1]*x[1]*x[1])*/
 	return this.svm.predict([n])
   }
-
   predictSQL(c){
     var w=this.svm.w
     var r=""+this.svm.b.toFixed(4)

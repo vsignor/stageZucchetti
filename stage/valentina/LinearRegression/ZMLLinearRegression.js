@@ -14,6 +14,9 @@ class LinearRegressionLearner extends ZMLLearner {
   train(){
     this.reg.calculateCoefficients()
   }
+  cleanGrafico(){
+    /*vedi htm*/    
+  }
   getModel(){
     this.train()
     var m=new LinearRegressionModel(this.nPredict)
@@ -25,7 +28,6 @@ class LinearRegressionLearner extends ZMLLearner {
   getNumberOfPredictors(){
     return this.nPredict;
   }
-
   getAlgorithm(){
     return this.algorithm;
   }
@@ -163,6 +165,9 @@ class knnRegressionLearner extends ZMLLearner {
     // sort data
     this.data.sort(function(a,b){return a[1][0]-b[1][0];})
   }
+  cleanGrafico(){
+    /*vedi htm*/    
+  }
   getModel(){
     this.train()
     var m=new knnRegressionModel(this.nn)
@@ -209,7 +214,6 @@ class knnRegressionModel extends ZMLModel {
     r=r/(ri-le+1)
     return r
   }
-
    predictSQL(c){
     return "No predizione in SQL"
   }  

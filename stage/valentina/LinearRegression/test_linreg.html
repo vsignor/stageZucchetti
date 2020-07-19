@@ -212,12 +212,12 @@ function cleanGrafico(){
     r2();
     r2_adjusted();
     statistica_F();
-    }
-    
-    else 
-      document.getElementById("clean").innerHTML= "<b>Press f5 and retrain your model :-)</b>";
   }
 
+  else 
+    document.getElementById("clean").innerHTML= "<b>Press f5 and retrain your model :-)</b>";
+}
+    
 function train(){
   lrn.resetData()
   for(var i=0;i<data.length;i++){
@@ -227,6 +227,8 @@ function train(){
   mdl=lrn.getModel()
   trained=true
   Redraw()
+
+  document.getElementById("clean").innerHTML= " " ; // mi cancella la scritta f5 se prima ero in knn e ora no
 }
 
 function sql(){
