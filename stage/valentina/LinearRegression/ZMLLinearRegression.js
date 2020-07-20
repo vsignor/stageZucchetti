@@ -14,9 +14,6 @@ class LinearRegressionLearner extends ZMLLearner {
   train(){
     this.reg.calculateCoefficients()
   }
-  cleanGrafico(){
-    /*vedi htm*/    
-  }
   getModel(){
     this.train()
     var m=new LinearRegressionModel(this.nPredict)
@@ -164,9 +161,6 @@ class knnRegressionLearner extends ZMLLearner {
   train(){
     // sort data
     this.data.sort(function(a,b){return a[1][0]-b[1][0];})
-  }
-  cleanGrafico(){
-    /*vedi htm*/    
   }
   getModel(){
     this.train()

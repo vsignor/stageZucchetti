@@ -20,9 +20,6 @@ class BaseClassifier extends ZMLSupervisedLearner{
     // fa tutto nella getModel    
     //super.train()
   }
-  cleanGrafico(){
-    /*vedi htm*/    
-  }
   getNumberOfPredictors(){
     return this.nPredict;
   }

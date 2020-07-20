@@ -18,9 +18,6 @@ class SvmLearner extends ZMLSupervisedLearner {
   train(){
     // fa tutto nella getModel    
   }
-  cleanGrafico(){
-    /*vedi htm*/    
-  }
   getModel(){
     var svm=new svmjs.SVM()
     svm.train(this.data,this.labels,{kernel:this.kernel})
