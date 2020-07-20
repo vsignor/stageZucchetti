@@ -1,106 +1,91 @@
 <!doctype html>
 <html>
 
-  <head>
-    <title>Random Forest</title>
-  <link href="../stile.css" rel="stylesheet" type="text/css">
-
-</head>
+<head>
+  <title>Clustering</title>
+<link href="../stile.css" rel="stylesheet" type="text/css">
 
 <body>
-  <h1>Random Forest </h1>
+<h1>Clustering: K-Means, DBSCAN, OPTICS</h1>
 
-  <div id=big_container>
-  <span id=grafico>  <!-- 550 500-->
+<div id=big_container>
+<span id=grafico>    <!-- 550 500-->
   <canvas id="NPGcanvas" width="700" height="650" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
-  </span> 
+</span>
 
-  <span id=destra>
-  <p>Select your algorithms:</p>
-  <div id="algo">
-
-  <div class="selectTree">
-    <button id="button_rf">Random Forest</button>
-    <div class="selectTree-content">
-    <a href="#" onclick="setLearner(0)" class="button_rf">10 Trees</a>
-    <a href="#" onclick="setLearner(1)" class="button_rf">25 Trees</a>
-    <a href="#" onclick="setLearner(2)" class="button_rf">50 Trees</a>
-    <a href="#" onclick="setLearner(3)" class="button_rf">100 Trees</a>
-    </div>
-  </div>
-  
-  </div>
-
-  <p>Select your actions:</p>
-  <div id="azioni">
-  <input id="button_train_rf" type="button" value="Train" onclick="train()">
-  <input id="button_sql_rf" type="button" value="Sql" onclick="sql()">
-  <input id="button_nTrees_rf" type="button" value="Trees" onclick="nTrees()">
-  <input id="button_matrix_rf" type="button" value="Confusion Matrix" onclick = "conf_matrix()">
-  <input id="button_prob_rf" type="button" value="Prob(Y)" onclick="prob()">
-  <input id="button_odds_rf" type="button" value="Odds(Y)" onclick="odds()">
-  <input id="button_valMod_rf" type="button" value="Valutazioni Modello" onclick="valMod()">
-  <input id="button_goodMod_rf" type="button" value="Efficenza Modello" onclick="goodMod()">
-  <input id="button_classErr_rf" type="button" value="Prob classificazione errata" onclick="class_err()">
-  </div>
-
-  <div id="result_rf">
-  <div id="info"></div>
-  <div id="sql"></div>
-  <div id="ntrees"></div>
-
-  <div id="confusion_matrix_rf"></div>
-  <div id="prob_rf"></div>
-  <div id="odds_rf"></div>
-  <div id="valMod_rf"></div>
-  <div id="goodMod_rf"></div>
-  <div id="class_err_rf"></div>
+<span id=destra>
+<p>Select your algorithms:</p>
+<div id="algo">
+<input id="button_kmeans" type="button" value="K-Means" onclick="setLearner(0)">
+<input id="button_DBSCAN" type="button" value="DBSCAN" onclick="setLearner(1)">
+<input id="button_OPTICS" type="button" value="OPTICS" onclick="setLearner(2)">
 </div>
 
-<input id="button_show_rf" type="button" value="Details" onclick = "show()">
-<input id="button_removeAdd_rf" type="submit" value="Remove Point" onclick="removeDataPoint()">
-<input id="button_clean_rf" type="submit" value="Clean Desk" onclick="cleanGrafico()">
+<p>Select your actions:</p>
+<div id="azioni">
+<input id="button_train_km" type="button" value="Train" onclick="train()">
+<input id="button_sql_km" type="button" value="Sql" onclick="sql()">
+<input id="button_ncluster_km" type="button" value="Cluster" onclick="nCluster()">
+<input id="button_matrix_km" type="button" value="Confusion Matrix" onclick = "conf_matrix()">
+<!--<input id="button_prob_km" type="button" value="Prob(Y)" onclick="prob()">
+<input id="button_odds_km" type="button" value="Odds(Y)" onclick="odds()">  -->
+<input id="button_valMod_km" type="button" value="Valutazioni Modello" onclick="valMod()">
+<input id="button_goodMod_km" type="button" value="Efficenza Modello" onclick="goodMod()">
+<input id="button_classErr_km" type="button" value="Prob classificazione errata" onclick="class_err()">
+</div>
 
+<div id="result_km">
+<div id="info"></div>
+<div id="sql"></div>
+<div id="ncluster"></div>
+
+<div id="confusion_matrix_km"></div>
+<div id="prob_km"></div>
+<!--<div id="odds_km"></div>
+<div id="valMod_km"></div> -->
+<div id="goodMod_km"></div>
+<div id="class_err_km"></div>
+</div>
+
+<input id="button_show_km" type="button" value="Details" onclick = "show()">
+<input id="button_removeAdd_km" type="submit" value="Remove Point" onclick="removeDataPoint()">
+<input id="button_clean_km" type="submit" value="Clean Desk" onclick="cleanGrafico()">
 
 <div id="show"></div>
-<span></div>
+</span></div>
 
 <script src="../ZMLBase.js"></script>
 
-<script src="randomforest.js"></script>
-<script src="random_forest_vale.js"></script>
-
-
+<script src="clustering.js"></script>
+<script src="clustering_vale.js"></script>
+	
 <script>
-
 // variabili per la gestione del canvas
 var canvas = document.getElementById("NPGcanvas")
 var ctx = canvas.getContext('2d');
-var WIDTH=700,HEIGHT=650,ss=50.0 //<!-- 550 500-->
+var WIDTH=700,HEIGHT=650,ss=50.0  //<!-- 550 500-->
 
 // variabili per il learner
-var data=[]       // valori delle x dei punti disegnati
-var labels=[]     // valori delle classi dei punti disegnati
+var data=[];               // valori delle x dei punti disegnati
+var values=[];               // valori delle y dei punti disegnati           
+var trained=false;
 
-var trained=false
-
-var learners= [new RandomForestLearner(10), new RandomForestLearner(25), new RandomForestLearner(50), new RandomForestLearner(100)];
-
+var learners=[new KmeansLearner(3), new DbscanLearner(3), new OptionsLearner(3)];
 var lrn=learners[0]
 var mdl=null
 
 function addDataPoint(x,y,c){
   // add datapoint at location of click
-  data.push([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
-  labels.push(c);
+  data.push([(x-WIDTH/2)/ss]);
+  values.push(-(y-HEIGHT/2)/ss);
   trained=false
   Redraw()
 }
 
-  function removeDataPoint(x,y,c) {
+function removeDataPoint(x,y,c) {
   // remove datapoint at location of click
-  data.pop([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
-  labels.pop(c);  // delete last element: coda della lista
+  data.pop([(x-WIDTH/2)/ss]);
+  values.pop(-(y-HEIGHT/2)/ss); // delete last element: coda della lista
   trained=false
   Redraw()
 }
@@ -130,20 +115,23 @@ function drawCircle(x, y, r){
 
 function Redraw(){
   ctx.clearRect(0,0,WIDTH,HEIGHT);
-  if (trained) {  
-    // draw decisions in the grid
-    var density= 4.0;
-    for(var x=0.0; x<=WIDTH; x+= density) {
-      for(var y=0.0; y<=HEIGHT; y+= density) {
-        var p = mdl.predictJS([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss])
-        ctx.fillStyle = (p==1?'rgb(204, 204, 255)': 'rgb(255, 204, 255)'); //colori della classificazione 
-        ctx.fillRect(x-density/2-1, y-density-1, density+2, density+2);
-      }
-    }  
+      
+  if (trained) {    // clustering
+    for(var i=0;i<data.length;i++){
+      var p = mdl.predictJS([(x-WIDTH/2)/ss]); // predizione
+      if (p == 1)  
+        ctx.fillStyle = 'rgb(0, 128, 255)';
+      else if (p == 2)  
+        ctx.fillStyle = 'rgb(255, 255, 0)';
+      else 
+        ctx.fillStyle = 'rgb(153, 0, 153)';
+       
+    drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);  
+    }    
+
   }
   
-  // draw axes
-  ctx.beginPath();
+  ctx.beginPath();   // draw axes
   ctx.strokeStyle = 'rgb(50,50,50)';
   ctx.lineWidth = 1;
   ctx.moveTo(0, HEIGHT/2);
@@ -151,39 +139,48 @@ function Redraw(){
   ctx.moveTo(WIDTH/2, 0);
   ctx.lineTo(WIDTH/2, HEIGHT);
   ctx.stroke();
-  // draw data points
+  
+  ctx.fillStyle = 'rgb(255, 153, 255)' // draw data points
   for(var i=0;i<data.length;i++){
-    ctx.fillStyle = (labels[i]==1?'rgb(0, 128, 255)':'rgb(255, 255, 0)'); //colori punti
-    drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
+    drawCircle(data[i][0]*ss+WIDTH/2, -values[i]*ss+HEIGHT/2, 3);
   }
 }
 
-function cleanGrafico(){
-	ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
-	trained = false;
+Redraw()
 
-	ctx.beginPath(); /*ricreo assi*/
-	ctx.strokeStyle = 'rgb(50,50,50)';
+function cleanGrafico(){
+
+  var a = lrn.getAlgorithm();
+ // console.log(a);
+
+  if(a != "knnRegression"){
+	  ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
+	  trained = false;
+
+	  ctx.beginPath(); /*ricreo assi*/
+    ctx.strokeStyle = 'rgb(50,50,50)';
   	ctx.lineWidth = 1;
   	ctx.moveTo(0, HEIGHT/2);
- 	ctx.lineTo(WIDTH, HEIGHT/2);
+ 	  ctx.lineTo(WIDTH, HEIGHT/2);
   	ctx.moveTo(WIDTH/2, 0);
   	ctx.lineTo(WIDTH/2, HEIGHT);
-  	ctx.stroke();
+  	ctx.stroke()
 
-	labels = [];  /*cancello i punti vecchi*/
-	data = [];
-	show();
+    data = [];
+    values = [];
+    show();
 
-	train();
-  sql();
-  nTrees();
-  conf_matrix();
-   prob();
- 	odds();
-  valMod();
-  goodMod();
-  class_err();
+	  train();
+    sql();
+    train();
+    sql();
+    nCluster();
+    conf_matrix();
+    prob();
+ 	  odds();
+    valMod();
+    goodMod();
+    class_err();
 }
 
 Redraw()
@@ -207,9 +204,9 @@ function sql(){
 	  show();
 }
 
-function nTrees(){
+function nCluster(){
   if (trained)
-    document.getElementById("ntrees").innerHTML="<b>Alberi: </b>" + lrn.getNumberOfPredictors();
+    document.getElementById("ncluster").innerHTML="<b>Alberi: </b>" + lrn.getNumberOfPredictors();
 
     else
 	    show();
@@ -400,7 +397,7 @@ function setLearner(n){
   trained=false;
   train();
   sql();
-  nTrees();
+  nCluster();
   conf_matrix();
   prob();
   odds();

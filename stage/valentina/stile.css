@@ -274,6 +274,44 @@ input{
   color: antiquewhite;
 }
 
+#button_kmeans, #button_DBSCAN, #button_OPTICS{
+  background:  rgb(255, 72, 0);
+  font-weight: bold;
+}
+
+#button_kmeans:hover, #button_DBSCAN:hover, #button_OPTICS:hover{
+  color: antiquewhite;
+}
+
+#button_train_km, #button_sql_km, #button_ncluster_km, #button_matrix_km, #button_prob_km, #button_odds_km, #button_valMod_km, #button_goodMod_km, #button_classErr_km{
+  background-color: rgb(255,140,0);
+}
+
+#button_train_cl:hover, #button_sql_cl:hover, #button_ncluster_km:hover, #button_matrix_km:hover, #button_prob_km:hover, #button_odds_km:hover, #button_valMod_km:hover, #button_goodMod_km:hover, #button_classErr_km:hover{
+  color: antiquewhite;
+}
+
+#result_km{
+  background-color: rgba(255, 166, 0, 0.63);
+  text-align: center;
+  border-radius: 0.5em;
+  padding: 10px;
+  font-family: monospace;
+  margin-top: -0.5em;
+  font-size: 1em;
+}
+
+#button_show_km, #button_clean_km, #button_removeAdd_km{
+  margin-top: 1em;
+  background-color: rgba(255, 166, 0, 0.493);
+  }
+
+#button_show_km:hover, #button_clean_km:hover, #button_removeAdd_km:hover{
+  color: rgb(255, 102, 0);
+}
+
+
+
 @media screen and (min-width: 1421px) {   /*pc bea*/
 
   body, html{

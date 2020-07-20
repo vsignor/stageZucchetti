@@ -33,7 +33,7 @@
 
 <div id=big_container>
 <span id=grafico>    <!-- 550 500-->
-  <canvas id="NPGcanvas" width="700em" height="650em" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
+  <canvas id="NPGcanvas" width="700" height="650" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
 </span>
 
 <span id=destra>
@@ -151,7 +151,7 @@ function Redraw(){
   if (trained) {    
     var density= 4.0;
     ctx.beginPath();
-    ctx.strokeStyle = 'rgb(236, 42, 107)';
+    ctx.strokeStyle = 'rgb(236, 42, 107)';  // linea 
     ctx.moveTo(0-density/2,(-mdl.predictJS([(0-WIDTH/2)/ss])*ss+HEIGHT/2)-density);
     for(var x=0.0; x<=WIDTH; x+= density){
       var p=-mdl.predictJS([(x-WIDTH/2)/ss])
