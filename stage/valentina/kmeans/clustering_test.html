@@ -1,3 +1,19 @@
+<!-- <script src="clustering.js">
+var dataset = [
+  [1,1],[0,1],[1,0],
+  [10,10],[10,13],[13,13],
+  [54,54],[55,55],[89,89],[57,55]
+];
+
+var clustering = ('density-clustering');
+var kmeans = new KMEANS();
+// parameters: 3 - number of clusters
+var clusters = kmeans.run(dataset, 3);
+console.log(clusters);
+
+</script>   -->
+
+
 <!doctype html>
 <html>
 
@@ -70,7 +86,7 @@ var data=[];               // valori delle x dei punti disegnati
 var values=[];               // valori delle y dei punti disegnati           
 var trained=false;
 
-var learners=[new KmeansLearner(3), new DbscanLearner(3), new OptionsLearner(3)];
+var learners=[new KmeansLearner(3), new DbscanLearner(3), new OpticsLearner(3)];
 var lrn=learners[0]
 var mdl=null
 
@@ -120,11 +136,11 @@ function Redraw(){
     for(var i=0;i<data.length;i++){
       var p = mdl.predictJS([(x-WIDTH/2)/ss]); // predizione
       if (p == 1)  
-        ctx.fillStyle = 'rgb(0, 128, 255)';
+        ctx.fillStyle = 'rgb(255, 51, 51)';  //rosso
       else if (p == 2)  
-        ctx.fillStyle = 'rgb(255, 255, 0)';
+        ctx.fillStyle = 'rgb(51, 153, 255)';  //azzurro 
       else 
-        ctx.fillStyle = 'rgb(153, 0, 153)';
+        ctx.fillStyle = 'rgb(153, 255, 51)';   //verde
        
     drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);  
     }    
@@ -150,37 +166,32 @@ Redraw()
 
 function cleanGrafico(){
 
-  var a = lrn.getAlgorithm();
- // console.log(a);
+  ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
+	trained = false;
 
-  if(a != "knnRegression"){
-	  ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
-	  trained = false;
+	ctx.beginPath(); /*ricreo assi*/
+	ctx.strokeStyle = 'rgb(50,50,50)';
+  ctx.lineWidth = 1;
+  ctx.moveTo(0, HEIGHT/2);
+  ctx.lineTo(WIDTH, HEIGHT/2);
+  ctx.moveTo(WIDTH/2, 0);
+  ctx.lineTo(WIDTH/2, HEIGHT);
+  ctx.stroke();
 
-	  ctx.beginPath(); /*ricreo assi*/
-    ctx.strokeStyle = 'rgb(50,50,50)';
-  	ctx.lineWidth = 1;
-  	ctx.moveTo(0, HEIGHT/2);
- 	  ctx.lineTo(WIDTH, HEIGHT/2);
-  	ctx.moveTo(WIDTH/2, 0);
-  	ctx.lineTo(WIDTH/2, HEIGHT);
-  	ctx.stroke()
+	labels = [];  /*cancello i punti vecchi*/
+	data = [];
+	show();
 
-    data = [];
-    values = [];
-    show();
 
-	  train();
-    sql();
-    train();
-    sql();
-    nCluster();
-    conf_matrix();
-    prob();
- 	  odds();
-    valMod();
-    goodMod();
-    class_err();
+  train();
+  sql();
+  nCluster();
+  conf_matrix();
+  prob();
+ 	odds();
+  valMod();
+  goodMod();
+  class_err();
 }
 
 Redraw()
@@ -206,7 +217,7 @@ function sql(){
 
 function nCluster(){
   if (trained)
-    document.getElementById("ncluster").innerHTML="<b>Alberi: </b>" + lrn.getNumberOfPredictors();
+    document.getElementById("ncluster").innerHTML="<b>Cluster: </b>" + lrn.getNumberOfluster();
 
     else
 	    show();
