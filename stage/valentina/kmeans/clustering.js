@@ -329,7 +329,7 @@ KMEANS.prototype.run = function(dataset, k) {
         this.centroids[centroidId] = mean;
       } else {
         // if cluster is empty, generate new random centroid
-        this.centroids[centroidId] = this.randomCentroid();
+        this.centroids[centroidId] = this.randomCentroid(); 
         change = true;
       }
     }

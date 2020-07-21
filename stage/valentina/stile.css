@@ -37,7 +37,7 @@ input{
 #button_train, #button_sql,  #button_rss, #button_mse, #button_rse, #button_r2, #button_r2Aj, #button_F, #button_var, #button_cov{
   background-color: rgb(236, 132, 167);
 }
- #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod, #valMod,  #prob_rf, #odds_rf, #goodMod_rf, #valMod_rf, #class_err_clas, #class_err_rf{
+ #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod, #valMod,  #prob_rf, #odds_rf, #goodMod_rf, #valMod_rf, #class_err_clas, #class_err_rf, #goodMod_km, #valMod_km, #class_err_km, #coesione, #silhouette{
   margin-top: 0.5em;
 }
 
@@ -45,12 +45,7 @@ input{
   margin-bottom: 1.5em;
 }
 
-#confusion_matrix{
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
-}
-
-#confusion_matrix_rf{
+#confusion_matrix, #confusion_matrix_rf, #confusion_matrix_km{
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -283,11 +278,11 @@ input{
   color: antiquewhite;
 }
 
-#button_train_km, #button_sql_km, #button_ncluster_km, #button_matrix_km, #button_prob_km, #button_odds_km, #button_valMod_km, #button_goodMod_km, #button_classErr_km{
+#button_train_km, #button_sql_km, #button_ncluster_km, #button_matrix_km, #button_coesione, #button_silhouette, #button_valMod_km, #button_goodMod_km, #button_classErr_km{
   background-color: rgb(255,140,0);
 }
 
-#button_train_cl:hover, #button_sql_cl:hover, #button_ncluster_km:hover, #button_matrix_km:hover, #button_prob_km:hover, #button_odds_km:hover, #button_valMod_km:hover, #button_goodMod_km:hover, #button_classErr_km:hover{
+#button_train_km:hover, #button_sql_km:hover, #button_ncluster_km:hover, #button_matrix_km:hover, #button_coesione:hover, #button_silhouette:hover, #button_valMod_km:hover, #button_goodMod_km:hover, #button_classErr_km:hover{
   color: antiquewhite;
 }
 
@@ -311,7 +306,6 @@ input{
 }
 
 
-
 @media screen and (min-width: 1421px) {   /*pc bea*/
 
   body, html{
@@ -332,7 +326,7 @@ input{
     max-width: 100%;
     max-height: 100%;
     margin-top: 2em;
-  }*/
+  }
   
   #grafico{
     width: 50%;
@@ -346,7 +340,6 @@ input{
     margin-top: 2em;
   }
 
-      
   #options1{
       margin-bottom: 5.5em;
       margin-left: 6.5em;
@@ -356,115 +349,6 @@ input{
       margin-bottom: 5.5em;
       margin-left: 22.5em;
     }
-  
-  .puls{
-    background-color:  rgba(204, 229, 255);
-  }
-  
-  #t1.value, #t2.value{
-    padding: 0.5em;
-    width: 8em;
-  }
-  
-   .slider {  /*tengo*/
-    overflow:hidden;
-    border-radius: 0.3em;
-    margin: 0.2em;
-    height: 1em;
-    background:#CCC;
-    border:1px solid gray;
-    margin:3px 0px 0px -1px;
-    width:102px;
-    height:13px;
-    margin-left: 3.8em;
-   }
-  
-   .slider div{
-    background:#666;
-    border:1px outset #666;
-    margin:0px;
-    width:2px;
-    height:13px;
-    padding:0px;
-    display:block;
-    color:#CCC;
-    position:relative;
-   }
-  
-   .loptions{
-     font-family: monospace;
-     size: medium;
-     text-align: center;
-   }
-  
-   #button_rf{
-      background-color: rgb(79, 153, 6);
-      margin: 0.2em;
-      font-size: 1.1em;
-      font-family: monospace;
-      padding: 10px 12px;
-      border-radius: 0.5em;
-    }
-  
-    #button_rf:hover, #button_train_rf:hover, #button_sql_rf:hover, #button_nTrees_rf:hover, #button_matrix_rf:hover, #button_prob_rf:hover, #button_odds_rf:hover, #button_valMod_rf:hover, #button_goodMod_rf:hover, #button_classErr_rf:hover{
-      color: antiquewhite;
-    }
-  
-    #button_train_rf, #button_sql_rf, #button_nTrees_rf, #button_matrix_rf, #button_prob_rf, #button_odds_rf, #button_valMod_rf, #button_goodMod_rf, #button_classErr_rf{
-      background-color: rgb(114, 223, 6);
-    }
-  
-    #result_rf{
-      background-color: rgb(155, 245, 66);
-      text-align: center;
-      border-radius: 0.5em;
-      padding: 10px;
-      font-family: monospace;
-      margin-top: -0.5em;
-      font-size: 1em;
-    }
-  
-    #button_show_rf, #button_clean_rf, #button_removeAdd_rf{
-      margin-top: 1em;
-      background-color:rgb(204, 255, 153);
-      }
-  
-    #button_show_rf:hover, #button_clean_rf:hover, #button_removeAdd_rf:hover{
-      color: rgb(79, 153, 6);
-    }
-  
-  .selectTree {
-      position: relative;
-      display: inline-block;
-  }
-  
-  .selectTree-content {
-      display: none;
-      position: absolute;
-      background-color: rgb(204, 255, 153);
-      min-width: 160px;
-      box-shadow: 0px 8px 16px 0px  rgb(204, 255, 153);
-    }
-  
-  .selectTree-content a {
-      color: black;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-  }
-  
-  .selectTree-content a:hover {
-    background-color: rgb(79, 153, 6);
-  }
-  
-  .selectTree:hover .selectTree-content {
-      display: block;
-  }
-  
-  .button_rf:hover{
-    color: antiquewhite;
-  }
-
 }
 
 

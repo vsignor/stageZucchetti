@@ -1,5 +1,5 @@
 class BaseClassifier extends ZMLUnsupervisedLearner{
-  constructor(k,alg){
+  constructor(k ,alg){
     super();
     this.k=k  // n. cluster
     this.algorithm=alg
@@ -29,6 +29,10 @@ class KmeansLearner extends BaseClassifier {
   }
   getModel(){
     var kmeans = new KMEANS();
+    kmeans.run(this.data,this.k)
+    var m=new KmeansModel(this.k)
+    m.kmeans=kmeans
+    return m;
   }
 }
 
@@ -40,7 +44,8 @@ class KmeansModel extends ZMLModel {
     this.dbscan=null
   }
   predictJS(x){
-    var clusters = kmeans.run(data, this.k)
+    var p = this.kmeans.assign(x)  
+    console.log(p)
   }
 
   predictSQL(c){
@@ -50,10 +55,14 @@ class KmeansModel extends ZMLModel {
 
 class DbscanLearner extends BaseClassifier {
   constructor(k){
-    super(k, "K-means");
+    super(k, "Dbscan");
   }
   getModel(){
     var dbscan = new DBSCAN();
+    dbscan.run(this.data,this.k)
+    var m=new DbscanModel(this.k)
+    m.dbscan= dbscan
+    return m;
   }
 }
 
@@ -65,7 +74,7 @@ class DbscanModel extends ZMLModel {
     this.dbscan=null
   }
   predictJS(x){
-    var clusters = dbscan.run(data, this.k)
+    var p = this.dbscan.assign(x)  
   }
 
   predictSQL(c){
@@ -79,6 +88,10 @@ class OpticsLearner extends BaseClassifier {
   }
   getModel(){
     var optics = new OPTICS();
+    optics.run(this.data,this.k)
+    var m=new OpticsModel(this.k)
+    m.optics=optics
+    return m;
   }
 }
 
@@ -90,7 +103,7 @@ class OpticsModel extends ZMLModel {
     this.optics=null
   }
   predictJS(x){
-    var clusters = optics.run(data, this.k)
+    var p = this.optics.assign(x)  
   }
 
   predictSQL(c){
