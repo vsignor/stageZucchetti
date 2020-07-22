@@ -9,16 +9,15 @@ class BaseClassifier extends ZMLSupervisedLearner{
   addData(c,x){
     this.data.push(x)
     this.labels.push(c)
-  //  super.addData()
+    super.addData()
   }
   resetData(){
     this.data=[]
     this.labels=[]
-    //super.resetData()
+    super.resetData()
   }
   train(){
     // fa tutto nella getModel    
-    //super.train()
   }
   getNumberOfPredictors(){
     return this.nPredict;

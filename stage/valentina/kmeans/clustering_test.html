@@ -33,8 +33,8 @@ console.log(clusters);
 <p>Select your algorithms:</p>
 <div id="algo">
 <input id="button_kmeans" type="button" value="K-Means" onclick="setLearner(0)">
-<input id="button_DBSCAN" type="button" value="DBSCAN" onclick="setLearner(1)">
-<input id="button_OPTICS" type="button" value="OPTICS" onclick="setLearner(2)">
+<!--<input id="button_DBSCAN" type="button" value="DBSCAN" onclick="setLearner(1)">
+<input id="button_OPTICS" type="button" value="OPTICS" onclick="setLearner(2)">  -->
 </div>
 
 <p>Select your actions:</p>
@@ -73,7 +73,7 @@ console.log(clusters);
 <script src="../ZMLBase.js"></script>
 
 <script src="clustering.js"></script>
-<script src="clustering_vale.js"></script>
+<script src="ZMLClustering.js"></script>
 	
 <script>
 // variabili per la gestione del canvas
@@ -82,26 +82,24 @@ var ctx = canvas.getContext('2d');
 var WIDTH=700,HEIGHT=650,ss=50.0  //<!-- 550 500-->
 
 // variabili per il learner
-var data=[];               // valori delle x dei punti disegnati
-var labels=[];             // centroide a cui viene assegnato il punto     
+var data=[];               // valori delle x dei punti disegnati      
 var trained=false;
 
-var learners=[new KmeansLearner(3), new DbscanLearner(3), new OpticsLearner(3)];
+var learners=[new KmeansLearner(3), /*new DbscanLearner(3), new OpticsLearner(3)*/];
 var lrn=learners[0]
 var mdl=null
 
-function addDataPoint(x,y,c){
+function addDataPoint(x,y){
   // add datapoint at location of click
   data.push([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
-  labels.push(c);
   trained=false
   Redraw()
 }
 
-function removeDataPoint(x,y,c) {
+function removeDataPoint(x,y) {
   // remove datapoint at location of click
   data.pop([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
-  labels.pop(c);// delete last element: coda della lista
+
   trained=false
   Redraw()
 }
@@ -132,23 +130,7 @@ function drawCircle(x, y, r){
 function Redraw(){
   ctx.clearRect(0,0,WIDTH,HEIGHT);
       
-  if (trained) {    // clustering
-    for(var i=0;i<data.length;i++){
-      var p = labels[i]; // predizione
-      //console.log(p);
-      if (p == -1)  
-        ctx.fillStyle = 'rgb(51, 153, 255)';  //blu
-      else if (p == 1)  
-        ctx.fillStyle = 'rgb(255, 51, 51)';  //rosso
-      else 
-        ctx.fillStyle = 'rgb(153, 255, 51)';   //verde
-       
-    drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);  
-    }    
-
-  }
-  
-  ctx.beginPath();   // draw axes
+   ctx.beginPath();   // draw axes
   ctx.strokeStyle = 'rgb(50,50,50)';
   ctx.lineWidth = 1;
   ctx.moveTo(0, HEIGHT/2);
@@ -159,6 +141,27 @@ function Redraw(){
   
   ctx.fillStyle = 'rgb(255, 153, 255)' // draw data points
   for(var i=0;i<data.length;i++){
+      if(trained) {
+      switch(mdl.clusterJS(i)){
+        case -1:ctx.fillStyle = 'rgb(75,75,75)';break;
+        case 0:ctx.fillStyle = 'rgb(250,100,100)';break;
+        case 1:ctx.fillStyle = 'rgb(100,250,100)';break;
+        case 2:ctx.fillStyle = 'rgb(100,100,250)';break;
+        case 3:ctx.fillStyle = 'rgb(250,250,100)';break;
+        case 4:ctx.fillStyle = 'rgb(100,250,250)';break;
+        case 5:ctx.fillStyle = 'rgb(250,100,250)';break;
+        case 6:ctx.fillStyle = 'rgb(250,50,50)';break;
+        case 7:ctx.fillStyle = 'rgb(50,250,50)';break;
+        case 8:ctx.fillStyle = 'rgb(50,50,250)';break;
+        case 9:ctx.fillStyle = 'rgb(250,0,0)';break;
+        case 10:ctx.fillStyle = 'rgb(0,250,0)';break;
+        case 11:ctx.fillStyle = 'rgb(0,0,250)';break;
+        case 12:ctx.fillStyle = 'rgb(250,250,0)';break;
+        case 13:ctx.fillStyle = 'rgb(0,250,250)';break;
+        case 14:ctx.fillStyle = 'rgb(250,0,250)';break;
+      }
+      // get color for cluster
+    }
     drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
   }
 }
@@ -179,7 +182,7 @@ function cleanGrafico(){
   ctx.lineTo(WIDTH/2, HEIGHT);
   ctx.stroke();
 
-	labels = [];  /*cancello i punti vecchi*/
+	centroidId = [];  /*cancello i punti vecchi*/
 	data = [];
 	show();
 
@@ -200,7 +203,7 @@ Redraw()
 function train(){
   lrn.resetData()
   for(var i=0;i<data.length;i++){
-    lrn.addData(labels[i],data[i])
+    lrn.addData(data[i])
   }
   lrn.train()
   mdl=lrn.getModel()
@@ -230,7 +233,7 @@ function nCluster(){   // CRITERIO RUKE OF THUMB: k = rad( n.oss / 2)
 	    show();
 }
 
-function conf_matrix(){
+/*function conf_matrix(){
 
   if(!trained)
     show();
@@ -241,13 +244,13 @@ function conf_matrix(){
 
     for (var i = 0; i < n; i++){
 
-    	if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali
-          if(labels[i] == 1) tp++;
+    	if (centroidId[i] == mdl.predictJS(data[i])){ // reali e predetti uguali
+          if(centroidId[i] == 1) tp++;
           else tn++;
         }
 
     	else{ // reali e predetti diversi
-			if(labels[i] == 1) fn++;
+			if(centroidId[i] == 1) fn++;
             else fp++;
        }
     }
@@ -291,13 +294,13 @@ function valMod(){
 	
     for (var i = 0; i < n; i++){
 
-    	if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali  
-          if(labels[i] == 1) tp++;
+    	if (centroidId[i] == mdl.predictJS(data[i])){ // reali e predetti uguali  
+          if(centroidId[i] == 1) tp++;
           else tn++;
         }
        
     	else{ // reali e predetti diversi
-			if(labels[i] == 1) fn++;
+			if(centroidId[i] == 1) fn++;
             else fp++;
 		}
     }
@@ -332,7 +335,7 @@ function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er
 
     for (var i = 0; i < n; i++){
 
-      if (labels[i] != mdl.predictJS(data[i])) // reali e predetti diversi -> errori col modello
+      if (centroidId[i] != mdl.predictJS(data[i])) // reali e predetti diversi -> errori col modello
          err++; 
 	}
 	
@@ -342,7 +345,7 @@ function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er
     var np = 0, nn = 0; // #casi in 1 e in -1
 
     for (var i = 0; i < n; i++){
-	  if (labels[i] == 1) np++;
+	  if (centroidId[i] == 1) np++;
 	  else nn++;
     }
      //console.log(np)
@@ -391,7 +394,7 @@ function show(){
                                         
     }
   }
-}
+}*/
 
 function setLearner(n){
   lrn=learners[n]
@@ -399,13 +402,13 @@ function setLearner(n){
   train();
   sql();
   nCluster();
-  conf_matrix();
+ /* conf_matrix();
   coesione();
   silhouette();
   valMod();
   goodMod();
   class_err();
-  show();
+  show();*/
 }
 
 </script>

@@ -1,4 +1,4 @@
-class LinearRegressionLearner extends ZMLLearner {
+class LinearRegressionLearner extends ZMLSupervisedLearner{
   constructor(nPredict){
     super();
     this.algorithm="LinearRegression";
@@ -145,7 +145,7 @@ class PolinomialRegressionModel extends LinearRegressionModel {
   }  
 }
 
-class knnRegressionLearner extends ZMLLearner {
+class knnRegressionLearner extends  ZMLSupervisedLearner{
   constructor(n){
     super();
     this.nn=n

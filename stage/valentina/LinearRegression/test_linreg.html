@@ -152,10 +152,10 @@ function Redraw(){
     var density= 4.0;
     ctx.beginPath();
     ctx.strokeStyle = 'rgb(236, 42, 107)';  // linea 
-    ctx.moveTo(0-density/2,(-mdl.predictJS([(0-WIDTH/2)/ss])*ss+HEIGHT/2)-density);
+    ctx.moveTo(0-density/2,(-mdl.predictJS([(0-WIDTH/2)/ss])*ss+HEIGHT/2)-density); // mi poiziono
     for(var x=0.0; x<=WIDTH; x+= density){
       var p=-mdl.predictJS([(x-WIDTH/2)/ss])
-      ctx.lineTo(x-density/2, (p*ss+HEIGHT/2)-density);
+      ctx.lineTo(x-density/2, (p*ss+HEIGHT/2)-density); // disegno linea 
       //ctx.fillStyle = 'rgb(0,0,0)'
       //ctx.fillRect(x-density/2, (p*ss+HEIGHT/2)-density, 2, 2);
     }    

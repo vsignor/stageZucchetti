@@ -4,14 +4,13 @@ class ZMLLearner {
     this.algorithm=''
     this.trainDate=null
   }
-  addData(){throw new Error('not implemented.')}
-  resetData(){throw new Error('not implemented.')}
+  addData(){this.trainDate=null;}
+  resetData(){this.trainDate=null;}
   addDataBlock(){throw new Error('not implemented.')}
   trainFromVQR(){throw new Error('not implemented.')}
   trainFromCSV(){throw new Error('not implemented.')}
-  resetData(){throw new Error('not implemented.')}
   // ---
-  train(){throw new Error('not implemented.')}
+  train(){this.trainDate=new Date();}
   retrain(){throw new Error('not implemented.')}
   //
   getModel(){throw new Error('not implemented.')}
@@ -33,15 +32,15 @@ class ZMLModel {
 }
 
 class ZMLSupervisedLearner extends ZMLLearner {
-  addData(y,x){throw new Error('not implemented.')}
-  resetData(){throw new Error('not implemented.')}
+  addData(y,x){super.addData()}
+  resetData(y,x){super.resetData()}
 }
 
 // da fare: regressione lineare, SVM, Regressione Logistica, Random Forest
 
 class ZMLUnsupervisedLearner extends ZMLLearner {
-  addData(x){throw new Error('not implemented.')}
-  resetData(){throw new Error('not implemented.')}
+  addData(x){super.addData()}
+  resetData(){super.resetData()}
 }
 
 // da fare: k-means, Abc 

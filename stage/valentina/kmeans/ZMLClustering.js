@@ -1,18 +1,18 @@
 class BaseClassifier extends ZMLUnsupervisedLearner{
-  constructor(k ,alg){
+  constructor(k, alg){
     super();
     this.k=k  // n. cluster
     this.algorithm=alg
     this.data=[]   
-    this.lebels=[]
   }  
-  addData(c,x){
+  addData(x){
+    super.addData()
     this.data.push(x)
-    this.labels.push(c)
   }
+  
   resetData(){
+    super.resetData()
     this.data=[]
-    this.labels=[]
   }
   train(){
     // fa tutto nella getModel    
@@ -27,26 +27,53 @@ class KmeansLearner extends BaseClassifier {
   constructor(k){
     super(k, "K-means");
   }
-  getModel(){
+  getModel(){   
     var kmeans = new KMEANS();
-    kmeans.run(this.data,this.k)
+    var clusters=[];
+    var km = kmeans.run(this.data,this.k)
     var m=new KmeansModel(this.k)
+    for(var c=0;c<km.length;c++){
+      var cc=km[c]
+      for(var i=0;i<cc.length;i++)
+        clusters[cc[i]]=c
+    }
+    for(var i=0;i<km.noise.length;i++)
+      clusters[dbs.noise[i]]=-1;
     m.kmeans=kmeans
+    m.clusters = clusters;
     return m;
   }
 }
+
+/*getModel(){
+  var dbs=new DBSCAN()
+  var clusters=[],dbsr=dbs.run(this.data,0.7,2)
+  var m=new dbscanModel()
+  for(var c=0;c<dbsr.length;c++){
+    var cc=dbsr[c]
+    for(var i=0;i<cc.length;i++)
+      clusters[cc[i]]=c
+  }
+  for(var i=0;i<dbs.noise.length;i++)
+    clusters[dbs.noise[i]]=-1;
+  m.clusters=clusters
+  return m
+}*/
 
 class KmeansModel extends ZMLModel {
   constructor(k){
     super()
     this.learner="K-means"
     this.k=k
-    this.dbscan=null
+    this.kmeans=null
   }
   predictJS(x){
-    var p = this.kmeans.assign(x)  
-    console.log(p)
   }
+
+  clusterJS(i){
+    return this.kmeans.clusters[i];
+  }
+
 
   predictSQL(c){
     return "No predizione in SQL"
