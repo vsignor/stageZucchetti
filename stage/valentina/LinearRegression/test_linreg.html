@@ -5,7 +5,7 @@
   <title>Regression</title>
 <link href="../stile.css" rel="stylesheet" type="text/css">
 
-<!--<script type="text/javascript" language="javascript">
+<script type="text/javascript" language="javascript">
 	function visualizza(id){
 	  if (document.getElementById){
 		if(document.getElementById(id).style.display == 'none'){
@@ -26,7 +26,7 @@
 			document.getElementById(variabile).style.display=''; 
 	}
 </script>
-</head>  -->
+</head> 
 
 <body>
 <h1>Regressione: Lineare, Esponenziale, Polinomiale (dal 2 a 5 grado) e Knn</h1>
@@ -76,10 +76,14 @@
 </div>
 
 <input id="button_show" type="button" value="Details" onclick = "show()">
-<input id="button_removeAdd" type="submit" value="Remove Point" onclick="removeDataPoint()">
+<input id="button_removeAdd" type="submit" value="Remove Point" onclick="removeDataPointBotton()">
 
 <input id="button_clean" type="submit" value="Clean Desk" onclick="cleanGrafico()">
 <span id="clean"> </span>
+
+<input id="button_commands" type="button" value="Commands" onclick = "azione('commands')">
+<div id="commands" style="display:none;"><br/>For add green data point: mouse click. <br/> <br/>
+                                              For delete data point: ciltr + mouse click or the appropriate button.<br/> <br/></div>
 
 <div id="show"></div>
 </span></div>
@@ -106,7 +110,7 @@ var learners=[new LinearRegressionLearner(1), new ExpRegressionLearner(1),
 var lrn=learners[0]
 var mdl=null
 
-function addDataPoint(x,y,c){
+function addDataPoint(x,y){
   // add datapoint at location of click
   data.push([(x-WIDTH/2)/ss]);
   values.push(-(y-HEIGHT/2)/ss);
@@ -114,7 +118,7 @@ function addDataPoint(x,y,c){
   Redraw()
 }
 
-function removeDataPoint(x,y,c) {
+function removeDataPointBotton(x,y) {
   // remove datapoint at location of click
   data.pop([(x-WIDTH/2)/ss]);
   values.pop(-(y-HEIGHT/2)/ss); // delete last element: coda della lista
@@ -122,8 +126,26 @@ function removeDataPoint(x,y,c) {
   Redraw()
 }
 
-function mouseClick(x,y,shift){
-  addDataPoint(x,y,(shift?1:-1))
+function removeDataPoint(x,y){  //rimozione punti mouse
+  var j=-1,d
+  for(var i=0;i<data.length;i++){
+    d=Math.abs(data[i][0]*ss+WIDTH/2-x)+Math.abs((values[i]*ss-HEIGHT/2)+y)
+    if (d<3)
+      j=i;
+  }
+  if (j!=-1) {
+    data.splice(j,1) //aggiunge/rimuove gli elementi da/verso un array e restituisce gli elementi rimossi.
+    values.splice(j,1) 
+    trained=false
+    Redraw()
+  }
+}
+
+function mouseClick(x,y,shift,ctrl){
+  if (ctrl)
+    removeDataPoint(x,y);
+  else
+    addDataPoint(x,y);
 }
 
 function eventClick(e) {    
@@ -134,7 +156,7 @@ function eventClick(e) {
   x -= r.left+window.scrollX;
   y -= r.top+window.scrollY;  
   //call user-defined callback
-  mouseClick(x, y, e.shiftKey);
+  mouseClick(x, y, e.shiftKey, e.ctrlKey);
 }
 
 function drawCircle(x, y, r){
@@ -171,7 +193,7 @@ function Redraw(){
   ctx.lineTo(WIDTH/2, HEIGHT);
   ctx.stroke();
   // draw data points
-  ctx.fillStyle = 'rgb(150,250,150)'
+  ctx.fillStyle = 'rgb(102, 204, 0)'
   for(var i=0;i<data.length;i++){
     //ctx.fillStyle = (labels[i]==1?'rgb(100,200,100)':'rgb(200,100,100)');
     drawCircle(data[i][0]*ss+WIDTH/2, -values[i]*ss+HEIGHT/2, 3);
@@ -215,7 +237,7 @@ function cleanGrafico(){
   }
 
   else 
-    document.getElementById("clean").innerHTML= "<b>Press f5 and retrain your model :-)</b>";
+    document.getElementById("clean").innerHTML= "<b>Press f5 and retrain your model :-) </b>";
 }
     
 function train(){
@@ -407,7 +429,7 @@ function statistica_F(){
 function show(){
 
   if (!trained) 
-    document.getElementById("show").innerHTML = "<b>Mouse click add data point, then select and train your model :-)</b>"; 
+  document.getElementById("show").innerHTML = "<br/>" + "<br/>" + "<b>Insert the points in the graph and select trees's number and train your model :-) </b>"
 
   else{
     document.getElementById("show").innerHTML = "<b> RSE, RSS e MSE: valori collegati fra loro, indicatori dello scarto presente fra i valori predetti rispetto a quelli reali." +

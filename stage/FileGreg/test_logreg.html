@@ -1,0 +1,250 @@
+<!doctype html>
+<html>
+<body>
+
+<p>
+<b>mouse click</b>: add red data point<br />
+<b>shift + mouse click</b>: add green data point<br />
+<b>ctrl + mouse click</b>: delete data point<br />
+</p>
+
+<input type="button" value="LR" onclick="setLearner(0)">
+<input type="button" value="SvmLin" onclick="setLearner(1)">
+<input type="button" value="SvmRbf" onclick="setLearner(2)">
+<input type="button" value="SvmPol2" onclick="setLearner(3)">
+<input type="button" value="SvmPol3" onclick="setLearner(4)">
+<input type="button" value="RF" onclick="setLearner(5)">
+<input type="button" value="rbf" onclick="setLearner(6)">
+<input type="button" value="knn(3)" onclick="setLearner(7)">
+<input type="button" value="knn(12)" onclick="setLearner(8)">
+<input type="button" value="NN" onclick="setLearner(9)">
+<input type="button" value="RFk" onclick="setLearner(10)">
+<input type="button" value="DT" onclick="setLearner(11)">
+<input type="button" value="NBg" onclick="setLearner(12)">
+<input type="button" value="NBm" onclick="setLearner(13)">
+<input type="button" value="FFN([5])" onclick="setLearner(14)">
+<input type="button" value="FFN([5,2])" onclick="setLearner(15)">
+<input type="button" value="FFN([10])" onclick="setLearner(16)">
+<input type="button" value="FFN([10],relu)" onclick="setLearner(17)">
+<input type="button" value="SvmPol2Norm" onclick="setLearner(18)">
+<input type="button" value="SvmPol2Bari" onclick="setLearner(19)">
+<input type="button" value="SvmPol2Ker" onclick="setLearner(20)">
+<input type="button" value="SvmPol3Ker" onclick="setLearner(21)">
+<input type="button" value="knnG(3)" onclick="setLearner(22)">
+<input type="button" value="knnG(12)" onclick="setLearner(23)">
+<input type="button" value="LDA" onclick="setLearner(24)">
+<input type="button" value="QDA" onclick="setLearner(25)">
+<input type="button" value="smote" onclick="setLearner(26)">
+</br>
+
+<canvas id="NPGcanvas" width="500" height="500" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas></br>
+<input type="button" value="train" onclick="train()">
+<input type="button" value="sql" onclick="sql()">
+<div id="info"></div>
+<div id="sql"></div>
+
+<script src="svm.js"></script>
+<script src="randomforest.js"></script>
+<script src="ml.min.js"></script>
+<script src="kdTree.js"></script>
+<script src="convnet-min.js"></script>
+
+<!--<script src="math.min.js"></script>-->
+<script src="numeric.min.js"></script>
+<script src="pw-lda.js"></script>
+
+<script src="smote.js"></script>
+
+<script src="ZMLBase.js"></script>
+<script src="ZMLLogisticRegression.js"></script>
+<script src="ZMLSvmClassifier.js"></script>
+<script src="ZMLRandomForestClassifier.js"></script>
+<script src="ZMLNeuralNet.js"></script>
+
+<script>
+
+// variabili per la gestione del canvas
+var canvas = document.getElementById("NPGcanvas")
+var ctx = canvas.getContext('2d');
+const WIDTH=500;
+const HEIGHT=500;
+const ss=50;
+const ux = WIDTH/ss/2;
+const uy = HEIGHT/ss/2;
+const Ox=WIDTH/2;  //origine dell'ascissa
+const Oy=HEIGHT/2; //origine dell'ordinata
+const u=20; //unità di misura in px
+
+// variabili per il learner
+var data=[]
+var labels=[]
+var trained=false
+
+var learners=[new LogisticRegressionLearner(2),
+              new LinearSvmLearner(2),new RbfSvmLearner(2),new Pol2SvmLearner(2),new Pol3SvmLearner(2),
+              new RandomForestLearner(2),new rbfLearner(2),
+              new knnLearner(2,3),new knnLearner(2,12),
+              new NNLearner(2),
+              new RandomForestKLearner(2),
+              new DecisionTreeLearner(2),
+              new NaiveBayesLearner(2,"Gauss"),new NaiveBayesLearner(2,"Multinomial"),
+              new FeedForwardNetworkLearner(2,[5]),new FeedForwardNetworkLearner(2,[5,2]),new FeedForwardNetworkLearner(2,[10]),new FeedForwardNetworkLearner(2,[10],"relu"),
+              new Pol2NormSvmLearner(2),new Pol2BariSvmLearner(2), new PolinomialKernelSvmLearner(2,2), new PolinomialKernelSvmLearner(2,3),
+              new knnGLearner(2,3),new knnGLearner(2,12),
+              new LDALearner(2), new QDALearner(2),
+              new SmoteLearner()]
+              
+var lrn=learners[0]              
+var mdl=null
+
+function addDataPoint(x,y,c){
+  // add datapoint at location of click
+  data.push([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
+  labels.push(c);
+  trained=false
+  Redraw()
+}
+
+function removeDataPoint(x,y){
+  var j=-1,d
+  for(var i=0;i<data.length;i++){
+    d=Math.abs(data[i][0]*ss+WIDTH/2-x)+Math.abs(data[i][1]*ss+HEIGHT/2-y)
+    if (d<3)
+      j=i;
+  }
+  if (j!=-1) {
+    data.splice(j,1)
+    labels.splice(j,1)
+    trained=false
+    Redraw()
+  }
+}
+
+function mouseClick(x,y,shift,ctrl){
+  if (ctrl)
+    removeDataPoint(x,y);
+  else
+    addDataPoint(x,y,(shift?1:-1));
+}
+
+function eventClick(e) {    
+  //get position of cursor relative to top left of canvas
+  var x = e.pageX;
+  var y = e.pageY;;
+  var r = canvas.getBoundingClientRect();
+  x -= r.left+window.scrollX;
+  y -= r.top+window.scrollY;  
+  //call user-defined callback
+  mouseClick(x, y, e.shiftKey, e.ctrlKey);
+}
+
+function drawCircle(x, y, r){
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2, true); 
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+}
+
+function Redraw(){
+  ctx.clearRect(0,0,WIDTH,HEIGHT);
+    
+  if (trained && mdl) {  
+    // draw decisions in the grid
+    var density= 4.0;
+    for(var x=0.0; x<=WIDTH; x+= density) {
+      for(var y=0.0; y<=HEIGHT; y+= density) {
+        var p = mdl.predictJS([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss])
+        ctx.fillStyle = (p==1?'rgb(150,250,150)':'rgb(250,150,150)');
+        ctx.fillRect(x-density/2-1, y-density-1, density+2, density+2);
+      }
+    }  
+  }
+  
+  // draw axes
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgb(50,50,50)';
+  ctx.lineWidth = 1;
+  //disegna asse x
+  ctx.moveTo(0,Oy);  // punto di partenza
+  ctx.lineTo(WIDTH,Oy);  //asse x
+  //disegna punta asse x
+  ctx.moveTo(WIDTH-10,Oy-4);  //punta asse x
+  ctx.lineTo(WIDTH-10,Oy+4);
+  ctx.lineTo(WIDTH,Oy);
+  ctx.lineTo(WIDTH-10,Oy-4); //fine punta asse x
+  //disegna asse y
+  ctx.moveTo(Ox,10);  //coordinate punto di partenza
+  ctx.lineTo(Ox,HEIGHT);  //asse y
+  //disegna punta asse y
+  ctx.moveTo(Ox-4,10);  //punta asse y
+  ctx.lineTo(Ox+4,10);
+  ctx.lineTo(Ox,2);
+  ctx.lineTo(Ox-4,10); //fine punta asse y
+
+  ctx.fill() //riempimento frecce
+  ctx.fillStyle="rgb(0,0,0)"
+  
+  // write x, y, O, u
+  ctx.fillText('x',WIDTH-20,Oy-10)
+  ctx.fillText('y',Ox+5,20)
+  ctx.fillText('O',Ox+2,Oy+10)
+
+  // scrivi unità assi
+  for(var i=1;i<ux;i++){
+    drawIndex(i);
+  }
+
+  ctx.stroke();  //disegna
+
+  // draw data points
+  ctx.fillStyle = 'rgb(150,250,150)'
+  for(var i=0;i<data.length;i++){
+    ctx.fillStyle = (labels[i]==1?'rgb(100,200,100)':'rgb(200,100,100)');
+    drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
+  }
+}
+
+function drawIndex(n){
+  ctx.moveTo(WIDTH-(Ox+(n*ss)),Oy-5);  //segmento unità di misura
+  ctx.lineTo(WIDTH-(Ox+(n*ss)),Oy+5);
+  ctx.moveTo(Ox+(n*ss),Oy-5);  //segmento unità di misura
+  ctx.lineTo(Ox+(n*ss),Oy+5);
+  ctx.fillText(n,Ox+(n*ss)-3,Oy+18);
+  ctx.moveTo(Ox-5,HEIGHT-(Oy+(n*ss)));  //segmento unità di misura
+  ctx.lineTo(Ox+5,HEIGHT-(Oy+(n*ss))); 
+  ctx.moveTo(Ox-5,Oy+(n*ss));  //segmento unità di misura
+  ctx.lineTo(Ox+5,Oy+(n*ss));
+  ctx.fillText(n,Ox-20,HEIGHT-(Oy+(n*ss))+3);
+}
+
+Redraw()
+
+function train(){
+  lrn.resetData()
+  for(var i=0;i<data.length;i++){
+    lrn.addData(labels[i],data[i])
+  }
+  lrn.train()
+  mdl=lrn.getModel()
+  trained=true
+  Redraw()
+}
+
+function sql(){
+  if (trained){
+    document.getElementById("sql").innerHTML="SQL="+mdl.predictSQL(['CampoA','CampoB'])
+  }
+}
+
+function setLearner(n){
+  lrn=learners[n]
+  trained=false
+  train()
+}
+
+</script>
+
+
+</body>
+</html>

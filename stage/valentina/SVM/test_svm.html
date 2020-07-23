@@ -5,6 +5,27 @@
     <title>Classification</title>
   <link href="../stile.css" rel="stylesheet" type="text/css">
 
+  <script type="text/javascript" language="javascript">
+	function visualizza(id){
+	  if (document.getElementById){
+		if(document.getElementById(id).style.display == 'none'){
+		  document.getElementById(id).style.display = 'block';
+		}else{
+		  document.getElementById(id).style.display = 'none';
+		}
+	  }
+	}
+	</script>
+
+<script> 
+	//Dichiaro la funzione 
+	function azione(variabile){ 
+		if(document.getElementById(variabile).style.display=='') 
+			document.getElementById(variabile).style.display='none'; 
+		else 
+			document.getElementById(variabile).style.display=''; 
+	}
+</script>
 </head>
 
 <body>
@@ -68,8 +89,15 @@
   </div>
 
   <input id="button_show_clas" type="button" value="Details" onclick = "show()">
-  <input id="button_removeAdd_clas" type="submit" value="Remove Point" onclick="removeDataPoint()">
+  <input id="button_removeAdd_clas" type="submit" value="Remove Point" onclick="removeDataPointBotton()">
   <input id="button_clean_clas" type="submit" value="Clean Desk" onclick="cleanGrafico()">
+
+  <input id="button_commands_clas" type="button" value="Commands" onclick = "azione('commands_clas')">
+  <div id="commands_clas" style="display:none;"><br/>For add fuchsia data point: mouse click. <br/> <br/>
+                               For add green data point: shift + mouse click.  <br/> <br/>
+                               For delete data point: ciltr + mouse click or the appropriate button.<br/> <br/></div>
+
+  
 
 <div id="show"></div>
 </span></div>
@@ -136,16 +164,33 @@ function addDataPoint(x,y,c){
   Redraw()
 }
 
-function removeDataPoint(x,y,c) {
+function removeDataPointBotton(x,y,c) { //rimozione punti bottone
   // remove datapoint at location of click
   data.pop([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
-  labels.pop(c);  // delete last element: coda della lista
+  labels.pop(c);
   trained=false
   Redraw()
 }
 
-function mouseClick(x,y,shift){
-  addDataPoint(x,y,(shift?1:-1))
+function removeDataPoint(x,y){  //rimozione punti mouse
+  var j=-1,d
+  for(var i=0;i<data.length;i++){
+    d=Math.abs(data[i][0]*ss+WIDTH/2-x)+Math.abs(data[i][1]*ss+HEIGHT/2-y)
+    if (d<3)
+      j=i;
+  }
+  if (j!=-1) {
+    data.splice(j,1)
+    trained=false
+    Redraw()
+  }
+}
+
+function mouseClick(x,y,shift,ctrl){
+  if (ctrl)
+    removeDataPoint(x,y);
+  else
+    addDataPoint(x,y,(shift?1:-1));   //tasto dx e sx
 }
 
 function eventClick(e) {    
@@ -156,7 +201,7 @@ function eventClick(e) {
   x -= r.left+window.scrollX;
   y -= r.top+window.scrollY;  
   //call user-defined callback
-  mouseClick(x, y, e.shiftKey);
+  mouseClick(x, y, e.shiftKey, e.ctrlKey);
 }
 
 function drawCircle(x, y, r){
@@ -409,7 +454,7 @@ function class_err(){
 function show(){
 
   if (!trained) 
-    document.getElementById("show").innerHTML = "<b>Mouse click add data point, then select and train your model :-)</b>";
+  document.getElementById("show").innerHTML = "<br/>" + "<br/>" + "<b>Insert the points in the graph and select trees's number and train your model :-) </b>"
 
   else{
     document.getElementById("show").innerHTML = "<b>"+ "Error Rate: (fp + fn) / (tp + fn + tp + tn)" + " ; " +

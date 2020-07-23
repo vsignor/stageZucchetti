@@ -1,0 +1,242 @@
+<!doctype html>
+<html>
+<body>
+Test regressione (lineare, polinomiale, esponenziale e knn).<br>
+
+<p>
+<b>mouse click</b> add data point<br />
+<b>ctrl + mouse click</b>: delete data point<br />
+</p>
+
+<input type="button" value="LR" onclick="setLearner(0)">
+<input type="button" value="Exp" onclick="setLearner(1)">
+<input type="button" value="Par" onclick="setLearner(2)">
+<input type="button" value="Cub" onclick="setLearner(3)">
+<input type="button" value="P5" onclick="setLearner(4)">
+<input type="button" value="knn(6)" onclick="setLearner(5)">
+<input type="button" value="knn(12)" onclick="setLearner(6)">
+<input type="button" value="rbf" onclick="setLearner(7)">
+<input type="button" value="???" onclick="setLearner(8)">
+<input type="button" value="ThS" onclick="setLearner(9)">
+<input type="button" value="???" onclick="setLearner(10)">
+</br>
+
+<canvas id="NPGcanvas" width="500" height="500" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas></br>
+<input type="button" value="train" onclick="train()">
+<input type="button" value="sql" onclick="sql()">
+<input type="button" value="R2" onclick="r2()">
+
+<div id="info"></div>
+<div id="sql"></div>
+<div id="r2"></div>
+
+<script src="ml.js"></script>
+<script src="ZMLBase.js"></script>
+<script src="LinearRegression.js"></script>
+<script src="ZMLLinearRegression.js"></script>
+
+<script>
+
+// variabili per la gestione del canvas
+var canvas = document.getElementById("NPGcanvas")
+var ctx = canvas.getContext('2d');
+const WIDTH=500;
+const HEIGHT=500;
+const ss=50;
+const ux = WIDTH/ss/2;
+const uy = HEIGHT/ss/2;
+const Ox=WIDTH/2;  //origine dell'ascissa
+const Oy=HEIGHT/2; //origine dell'ordinata
+const u=20; //unità di misura in px
+
+// variabili per il learner
+var data=[]                 // valori delle x dei punti disegnati
+var values=[]               // valori delle y dei punti disegnati
+var trained=false
+
+var learners=[new LinearRegressionLearner(1),new ExpRegressionLearner(1),
+              new PolinomialRegressionLearner(2),new PolinomialRegressionLearner(3),new PolinomialRegressionLearner(5),
+              new knnRegressionLearner(6),new knnRegressionLearner(12),
+              new rbfRegressionLearner(),
+              new BrokenLineRegressionLearner(0),
+              new TheilSenRegression(),
+              new GPRegression()]
+              
+var lrn=learners[0]
+var mdl=null
+
+function addDataPoint(x,y,c){
+  // add datapoint at location of click
+  data.push([(x-WIDTH/2)/ss]);
+  values.push(-(y-HEIGHT/2)/ss);
+  trained=false
+  Redraw()
+}
+
+function removeDataPoint(x,y){
+  var j=-1,d
+  for(var i=0;i<data.length;i++){
+    d=Math.abs(data[i][0]*ss+WIDTH/2-x)+Math.abs((values[i]*ss-HEIGHT/2)+y)
+    if (d<3)
+      j=i;
+  }
+  if (j!=-1) {
+    data.splice(j,1)
+    values.splice(j,1)
+    trained=false
+    Redraw()
+  }
+}
+
+function mouseClick(x,y,shift,ctrl){
+  if (ctrl)
+    removeDataPoint(x,y);
+  else
+    addDataPoint(x,y,(shift?1:-1));
+}
+
+function eventClick(e) {    
+  //get position of cursor relative to top left of canvas
+  var x = e.pageX;
+  var y = e.pageY;;
+  var r = canvas.getBoundingClientRect();
+  x -= r.left+window.scrollX;
+  y -= r.top+window.scrollY;  
+  //call user-defined callback
+  mouseClick(x, y, e.shiftKey, e.ctrlKey);
+}
+
+function drawCircle(x, y, r){
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2, true); 
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+}
+
+
+function Redraw(){
+  ctx.clearRect(0,0,WIDTH,HEIGHT);
+      
+  if (trained) {    
+    var density= 4.0;
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgb(0,0,0)';
+    ctx.moveTo(0-density/2,(-mdl.predictJS([(0-WIDTH/2)/ss])*ss+HEIGHT/2)-density+2);
+    for(var x=0.0; x<=WIDTH; x+= density){
+      var p=-mdl.predictJS([(x-WIDTH/2)/ss])
+      ctx.lineTo(x-density/2, (p*ss+HEIGHT/2)-density+2);
+      //ctx.fillStyle = 'rgb(0,0,0)'
+      //ctx.fillRect(x-density/2, (p*ss+HEIGHT/2)-density, 2, 2);
+    }    
+    ctx.stroke();
+  }
+  // draw axes
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgb(50,50,50)';
+  ctx.lineWidth = 1;
+
+  //disegna asse x
+  ctx.moveTo(0,Oy);  // punto di partenza
+  ctx.lineTo(WIDTH,Oy);  //asse x
+  //disegna punta asse x
+  ctx.moveTo(WIDTH-10,Oy-4);  //punta asse x
+  ctx.lineTo(WIDTH-10,Oy+4);
+  ctx.lineTo(WIDTH,Oy);
+  ctx.lineTo(WIDTH-10,Oy-4); //fine punta asse x
+  //disegna asse y
+  ctx.moveTo(Ox,10);  //coordinate punto di partenza
+  ctx.lineTo(Ox,HEIGHT);  //asse y
+  //disegna punta asse y
+  ctx.moveTo(Ox-4,10);  //punta asse y
+  ctx.lineTo(Ox+4,10);
+  ctx.lineTo(Ox,2);
+  ctx.lineTo(Ox-4,10); //fine punta asse y
+
+  ctx.fill() //riempimento frecce
+  ctx.fillStyle="rgb(0,0,0)"
+  
+  // write x, y, O, u
+  ctx.fillText('x',WIDTH-20,Oy-10)
+  ctx.fillText('y',Ox+5,20)
+  ctx.fillText('O',Ox+2,Oy+10)
+
+  // scrivi unità assi
+  for(var i=1;i<ux;i++){
+    drawIndex(i);
+  }
+
+  ctx.stroke();  //disegna
+
+  // draw data points
+  ctx.fillStyle = 'rgb(150,250,150)'
+  for(var i=0;i<data.length;i++){
+    //ctx.fillStyle = (labels[i]==1?'rgb(100,200,100)':'rgb(200,100,100)');
+    drawCircle(data[i][0]*ss+WIDTH/2, -values[i]*ss+HEIGHT/2, 3);
+  }
+}
+
+function drawIndex(n){
+  ctx.moveTo(WIDTH-(Ox+(n*ss)),Oy-5);  //segmento unità di misura
+  ctx.lineTo(WIDTH-(Ox+(n*ss)),Oy+5);
+  ctx.moveTo(Ox+(n*ss),Oy-5);  //segmento unità di misura
+  ctx.lineTo(Ox+(n*ss),Oy+5);
+  ctx.fillText(n,Ox+(n*ss)-3,Oy+18);
+  ctx.moveTo(Ox-5,HEIGHT-(Oy+(n*ss)));  //segmento unità di misura
+  ctx.lineTo(Ox+5,HEIGHT-(Oy+(n*ss))); 
+  ctx.moveTo(Ox-5,Oy+(n*ss));  //segmento unità di misura
+  ctx.lineTo(Ox+5,Oy+(n*ss));
+  ctx.fillText(n,Ox-20,HEIGHT-(Oy+(n*ss))+3);
+}
+
+Redraw()
+
+function train(){
+  lrn.resetData()
+  for(var i=0;i<data.length;i++){
+    lrn.addData(values[i],data[i])
+  }
+  lrn.train()
+  mdl=lrn.getModel()
+  trained=true
+  Redraw()
+}
+
+function sql(){
+  if (trained){
+    document.getElementById("sql").innerHTML="SQL="+mdl.predictSQL(['CampoA'])
+  }
+}
+
+function r2(){
+  var sum=0,n=values.length,i
+  // calcolo la media, che Ã¨ il miglior predittore quando ho solo i valori
+  for(i=0;i<n;i++) 
+    sum+=values[i]
+  var mean=sum/n
+  // calcolo la somma dei quadrati delle differenze rispetto alla media, questo mi da una misura di quanto sbaglio usando la media come predittore
+  var m_error=0
+  for(i=0;i<n;i++)
+    m_error+= Math.pow(values[i]-mean,2)
+  // nella variabile m_error la somma degli errori rispetto alla media
+  // calcolo quanto sbaglio usando il mio sistema di regressione
+  var p_error=0
+  for(i=0;i<n;i++)
+    p_error+=Math.pow(values[i]-mdl.predictJS(data[i]),2)
+  // nella variabile p_error la somma degli errori rispetto al mio regressore
+  var r2=1-(p_error/m_error)
+  document.getElementById("r2").innerHTML="R2="+r2.toFixed(2)
+}
+
+function setLearner(n){
+  lrn=learners[n]
+  trained=false
+  train()
+  r2()
+}
+
+</script>
+
+
+</body>
+</html>
