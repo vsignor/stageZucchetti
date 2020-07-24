@@ -114,7 +114,15 @@
 // variabili per la gestione del canvas
 var canvas = document.getElementById("NPGcanvas")
 var ctx = canvas.getContext('2d');
-var  WIDTH=700,HEIGHT=650,ss=50.0   //<!-- 550 500-->
+const WIDTH=700;
+const HEIGHT=650;
+const ss=50.0;  //<!-- 550 500-->
+
+const ux = WIDTH/ss/2;
+const uy = HEIGHT/ss/2;
+const Ox=WIDTH/2;  //origine dell'ascissa
+const Oy=HEIGHT/2; //origine dell'ordinata
+const u=20; //unita' di misura in px
 
 // variabili per il learner
 var data=[]       // valori delle x dei punti disegnati
@@ -230,17 +238,60 @@ function Redraw(){
   ctx.beginPath();
   ctx.strokeStyle = 'rgb(50,50,50)';
   ctx.lineWidth = 1;
-  ctx.moveTo(0, HEIGHT/2);
-  ctx.lineTo(WIDTH, HEIGHT/2);
-  ctx.moveTo(WIDTH/2, 0);
-  ctx.lineTo(WIDTH/2, HEIGHT);
-  ctx.stroke();
+  
+   //disegna asse x
+   ctx.moveTo(0,Oy);  // punto di partenza
+  ctx.lineTo(WIDTH,Oy);  //asse x
+  //disegna punta asse x
+  ctx.moveTo(WIDTH-10,Oy-4);  //punta asse x
+  ctx.lineTo(WIDTH-10,Oy+4);
+  ctx.lineTo(WIDTH,Oy);
+  ctx.lineTo(WIDTH-10,Oy-4); //fine punta asse x
+  //disegna asse y
+  ctx.moveTo(Ox,10);  //coordinate punto di partenza
+  ctx.lineTo(Ox,HEIGHT);  //asse y
+  //disegna punta asse y
+  ctx.moveTo(Ox-4,10);  //punta asse y
+  ctx.lineTo(Ox+4,10);
+  ctx.lineTo(Ox,2);
+  ctx.lineTo(Ox-4,10); //fine punta asse y
+
+  //ctx.fill() //riempimento frecce
+  ctx.fillStyle="rgb(0,0,0)"
+  
+  // write x, y, O, u
+  ctx.fillText('x',WIDTH-20,Oy-10)
+  ctx.fillText('y',Ox+5,20)
+  ctx.fillText('O',Ox+2,Oy+10)
+
+  // scrivi unita' assi
+  for(var i=1;i<ux;i++){
+    drawIndex(i);
+  }
+
+  ctx.stroke();  //disegna
+
   // draw data points
   for(var i=0;i<data.length;i++){
     ctx.fillStyle = (labels[i]==1?'rgb(0, 153, 0)':'rgb(255, 0, 127)'); //colori punti
     drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
   }
 }
+
+function drawIndex(n){
+  ctx.moveTo(WIDTH-(Ox+(n*ss)),Oy-5);  //segmento unita' di misura
+  ctx.lineTo(WIDTH-(Ox+(n*ss)),Oy+5);
+  ctx.moveTo(Ox+(n*ss),Oy-5);  //segmento unita' di misura
+  ctx.lineTo(Ox+(n*ss),Oy+5);
+  ctx.fillText(n,Ox+(n*ss)-3,Oy+18);
+  ctx.moveTo(Ox-5,HEIGHT-(Oy+(n*ss)));  //segmento unita' di misura
+  ctx.lineTo(Ox+5,HEIGHT-(Oy+(n*ss))); 
+  ctx.moveTo(Ox-5,Oy+(n*ss));  //segmento unita' di misura
+  ctx.lineTo(Ox+5,Oy+(n*ss));
+  ctx.fillText(n,Ox-20,HEIGHT-(Oy+(n*ss))+3);
+}
+
+Redraw()
 
 function cleanGrafico(){
 	ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
@@ -268,8 +319,6 @@ function cleanGrafico(){
   goodMod();
   class_err();
 }
-
-Redraw()
 
 function train(){
   lrn.resetData()

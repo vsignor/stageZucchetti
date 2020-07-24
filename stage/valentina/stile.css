@@ -101,7 +101,7 @@ input{
 #clean{
 	color: rgb(236, 42, 107);
   margin-bottom: 3.3em;
-  /*margin-left: 1.5em;*/
+  margin-left: 4em;
 }
 
 #button_reg:hover, #button_par:hover, #button_knn:hover, #button_exp:hover, #button_pol3:hover, #button_pol4:hover, #button_pol5:hover, #button_train:hover, #button_sql:hover, #button_rss:hover, #button_mse:hover, #button_rse:hover, #button_r2:hover, #button_r2Aj:hover, #button_F:hover, #button_var:hover, #button_cov:hover{
@@ -113,6 +113,10 @@ input{
     background-color: rgb(255, 204, 255);
   }
 
+  #button_commands{
+    float: right;
+  }
+
   #button_show:hover, #button_clean:hover, #button_removeAdd:hover,  #button_commands:hover{
     color: rgb(236, 42, 107);
   }
@@ -120,7 +124,7 @@ input{
   #commands{
     color: rgb(236, 42, 107);
     font-weight: bold;
-  }
+    }
   
   #button_regLog, #button_kernel_Lin, #button_RBF, #button_kernel_pol2{
     background: rgb(0, 102, 204);
@@ -148,6 +152,10 @@ input{
   #button_show_clas, #button_commands_clas, #button_clean_clas, #button_removeAdd_clas{
     margin-top: 1em;
     background-color: rgb(223, 233, 245);
+  }
+
+  #button_commands_clas{
+    float: right;
   }
 
   #button_show_clas:hover, #button_commands_clas:hover, #button_clean_clas:hover, #button_removeAdd_clas:hover{
@@ -246,7 +254,11 @@ input{
   #button_show_rf, #button_clean_rf, #button_removeAdd_rf,  #button_commands_rf{
     margin-top: 1em;
     background-color:rgb(204, 255, 153);
-    }
+  }
+
+  #button_commands_rf{
+    float: right;
+  }
 
   #button_show_rf:hover, #button_clean_rf:hover, #button_removeAdd_rf:hover,  #button_commands_rf:hover{
     color: rgb(79, 153, 6);
@@ -289,13 +301,51 @@ input{
   color: antiquewhite;
 }
 
-#button_kmeans3, #button_kmeans4, #button_kmeans5, #button_DBSCAN3, #button_OPTICS3{
+#button_km{
+  background-color:  rgb(255, 72, 0);
+  font-weight: bold;
+  margin: 0.2em;
+  font-size: 1.1em;
+  font-family: monospace;
+  padding: 10px 12px;
+  border-radius: 0.5em;
+}
+
+#button_DBSCAN3, #button_OPTICS3{
   background:  rgb(255, 72, 0);
   font-weight: bold;
 }
 
-#button_kmeans3:hover, #button_kmeans4:hover, #button_kmeans5:hover, #button_DBSCAN3:hover, #button_OPTICS3:hover{
+#button_km:hover, #button_DBSCAN3:hover, #button_OPTICS3:hover{
   color: antiquewhite;
+}
+
+.selectKM {
+  position: relative;
+  display: inline-block;
+}
+
+.selectKM-content {
+  display: none;
+  position: absolute;
+  background-color: rgba(255, 166, 0, 0.9);
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px   rgba(255, 166, 0, 0.9);
+}
+
+.selectKM-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.selectKM-content a:hover {
+background-color: rgb(255, 72, 0);
+}
+
+.selectKM:hover .selectKM-content {
+  display: block;
 }
 
 #button_train_km, #button_sql_km, #button_ncluster_km, #button_punti_cluster, #button_noise, #button_matrix_km, #button_coesione, #button_silhouette, #button_valMod_km, #button_goodMod_km, #button_classErr_km{
@@ -319,7 +369,11 @@ input{
 #button_show_km, #button_clean_km, #button_removeAdd_km, #button_commands_km{
   margin-top: 1em;
   background-color: rgba(255, 166, 0, 0.493);
-  }
+}
+
+#button_commands_km{
+  float: right;
+}
 
 #button_show_km:hover, #button_clean_km:hover, #button_removeAdd_km:hover, #button_commands_km:hover{
   color:rgb(255, 72, 0);
@@ -370,6 +424,8 @@ input{
       margin-bottom: 5.5em;
       margin-left: 22.5em;
     }
+
+  #clean{
+  margin-left: 4em;
+  }
 }
-
-

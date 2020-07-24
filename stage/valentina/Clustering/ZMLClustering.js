@@ -16,7 +16,7 @@ class KmeansLearner extends ZMLUnsupervisedLearner{
   train(){
     // fa tutto nella getModel    
   }
-  getModel(){   
+  getModel(){  /* 
     var kmeans = new KMEANS();
     var clusters=[];
     var km = kmeans.run(this.data, this.k)
@@ -28,10 +28,17 @@ class KmeansLearner extends ZMLUnsupervisedLearner{
     }
     m.clusters = clusters;
     return m;
-  }
-
+  }*/
+  var kmeans=ML.KMeans(this.data,this.k)
+  var m=new KmeansModel(this.k)
+  m.kmeans=kmeans
+  return m
+}
   getNumberOfCluster(){
     return this.k;
+  }
+  getAlgorithm(){
+    return this.algorithm;
   }
 }
 
@@ -42,10 +49,20 @@ class KmeansModel extends ZMLModel {
     this.k=k
     this.kmeans=null
   }
-  predictJS(x){
+  predictJS(x){ // punto centroide 
+    var min_d=ML.Distance.squaredEuclidean(this.kmeans.centroids[0].centroid,x),c=0;
+    for(var i=1;i<this.kmeans.centroids.length;i++){
+      var d=ML.Distance.squaredEuclidean(this.kmeans.centroids[i].centroid,x)
+      if (d<min_d){
+        min_d = d
+        c = i
+      }
+    }
+    return c;  
   }
   clusterJS(i){
-    return this.clusters[i];
+    //return this.clusters[i];
+    return this.kmeans.clusters[i];
   }
   predictSQL(c){
     return "No predizione in SQL"
@@ -89,6 +106,9 @@ class DbscanLearner extends ZMLUnsupervisedLearner{
   getNumberOfCluster(){
     return this.k;
   }
+  getAlgorithm(){
+    return this.algorithm;
+  }
 }
 
 class DbscanModel extends ZMLModel {
@@ -99,6 +119,7 @@ class DbscanModel extends ZMLModel {
     this.dbscan=null
   }
   predictJS(x){
+    return -2;  // non fa nulla
   }
   clusterJS(i){
     return this.clusters[i];
@@ -147,6 +168,12 @@ class OpticsLearner extends ZMLUnsupervisedLearner{
     m.clusters=clusters
     return m
   }
+  getNumberOfCluster(){
+    return this.k;
+  }
+  getAlgorithm(){
+    return this.algorithm;
+  }
 }
 
 class OpticsModel extends ZMLModel {
@@ -157,6 +184,7 @@ class OpticsModel extends ZMLModel {
     this.optics=null
   }
   predictJS(x){
+    return -2; // non fa nulla
   }
   clusterJS(i){
     return this.clusters[i];
@@ -165,3 +193,4 @@ class OpticsModel extends ZMLModel {
     return "No predizione in SQL"
   }
 }
+
