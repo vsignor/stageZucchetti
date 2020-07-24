@@ -8421,6 +8421,7 @@
   /**
    * Update the center values based in the new configurations of the clusters
    * @ignore
+   * @param {Array<Array<number>>} prevCenters - Centroids from the previous iteration
    * @param {Array <Array <number>>} data - the [x,y,z,...] points to cluster
    * @param {Array <number>} clusterID - the cluster identifier for each data dot
    * @param {number} K - Number of clusters
