@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+<body>
+Test classificazione non supervisionata.<br>
+
+<p>
+<b>mouse click</b> add data point<br />
+<b>ctrl + mouse click</b>: delete data point<br />
+</p>
+
+<input type="button" value="dbscan" onclick="setLearner(0)">
+<input type="button" value="kMeans(2)" onclick="setLearner(1)">
+<input type="button" value="kMeans(3)" onclick="setLearner(2)">
+<input type="button" value="kMeans(4)" onclick="setLearner(3)">
+<input type="button" value="kMeans(5)" onclick="setLearner(4)">
+<input type="button" value="HC(2)" onclick="setLearner(5)">
+<input type="button" value="HC(3)" onclick="setLearner(6)">
+<input type="button" value="HC(4)" onclick="setLearner(7)">
+<input type="button" value="HC(5)" onclick="setLearner(8)">
+<input type="button" value="EM(2)" onclick="setLearner(9)">
+<input type="button" value="EM(3)" onclick="setLearner(10)">
+<input type="button" value="EM(4)" onclick="setLearner(11)">
+<input type="button" value="EM(5)" onclick="setLearner(12)">
+<input type="button" value="optics" onclick="setLearner(13)">
+<input type="button" value="kMedoids(2)" onclick="setLearner(14)">
+<input type="button" value="kMedoids(3)" onclick="setLearner(15)">
+<input type="button" value="kMedoids(4)" onclick="setLearner(16)">
+<input type="button" value="kMedoids(5)" onclick="setLearner(17)">
+<input type="button" value="fuzzyCM(2)" onclick="setLearner(18)">
+<input type="button" value="fuzzyCM(3)" onclick="setLearner(19)">
+<input type="button" value="fuzzyCM(4)" onclick="setLearner(20)">
+<input type="button" value="fuzzyCM(5)" onclick="setLearner(21)">
+<input type="button" value="OneClassGaussian" onclick="setLearner(22)">
+<input type="button" value="IsolationForest" onclick="setLearner(23)">
+<input type="button" value="t-SNE" onclick="setLearner(24)">
+<input type="button" value="UMAP" onclick="setLearner(25)">
+</br>
+
+<canvas id="NPGcanvas" width="500" height="500" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas></br>
+<input type="button" value="train" onclick="train()">
+
+<div id="info"></div>
+<div id="sql"></div>
+<div id="r2"></div>
+
+<script src="ml.min.js"></script>
+<script src="clustering.js"></script>
+<script src="ZMLBase.js"></script>
+<script src="ZMLkMeansClassifier.js"></script>
+
+<script src="numeric.min.js"></script>
+<script src="multivariate_gaussian.js"></script>
+<script src="expectation-maximization.js"></script>
+
+<script src="cytoscape-k-means.js"></script>
+
+<!--<script src="math.min.js"></script>-->
+<script src="pw-lda.js"></script>
+
+<script src="isolationForest.js"></script>
+
+<script src="tsne.js"></script>
+<script src="umap-js.min.js"></script>
+
+<script>
+
+// variabili per la gestione del canvas
+var canvas = document.getElementById("NPGcanvas")
+var ctx = canvas.getContext('2d');
+var WIDTH=500,HEIGHT=500,ss=50.0
+
+// variabili per il learner
+var data=[]                 // valori delle x dei punti disegnati
+var trained=false
+
+var learners=[new dbscanLearner(),
+              new kMeansLearner(2),new kMeansLearner(3),new kMeansLearner(4),new kMeansLearner(5),              
+              new HierClustLearner(2),new HierClustLearner(3),new HierClustLearner(4),new HierClustLearner(5),
+              new EMLearner(2),new EMLearner(3),new EMLearner(4),new EMLearner(5),
+              new opticsLearner(),
+              new kMedoidsLearner(2),new kMedoidsLearner(3),new kMedoidsLearner(4),new kMedoidsLearner(5),
+              new fuzzyCMeansLearner(2),new fuzzyCMeansLearner(3),new fuzzyCMeansLearner(4),new fuzzyCMeansLearner(5),
+              new OneClassGaussianLearner(),
+              new IsolationForestLearner(),
+              new tSNELearner(),
+              new UMAPLearner()]
+
+var lrn=learners[0]
+var mdl=null
+
+function addDataPoint(x,y){
+  // add datapoint at location of click
+  data.push([(x-WIDTH/2)/ss,(y-HEIGHT/2)/ss]);
+  trained=false
+  Redraw()
+}
+
+function removeDataPoint(x,y){
+  var j=-1,d
+  for(var i=0;i<data.length;i++){
+    d=Math.abs(data[i][0]*ss+WIDTH/2-x)+Math.abs(data[i][1]*ss+HEIGHT/2-y)
+    if (d<3)
+      j=i;
+  }
+  if (j!=-1) {
+    data.splice(j,1)
+    trained=false
+    Redraw()
+  }
+}
+
+function mouseClick(x,y,shift,ctrl){
+  if (ctrl)
+    removeDataPoint(x,y);
+  else
+    addDataPoint(x,y);
+}
+
+function eventClick(e) {    
+  //get position of cursor relative to top left of canvas
+  var x = e.pageX;
+  var y = e.pageY;;
+  var r = canvas.getBoundingClientRect();
+  x -= r.left+window.scrollX;
+  y -= r.top+window.scrollY;  
+  //call user-defined callback
+  mouseClick(x, y, e.shiftKey, e.ctrlKey);
+}
+
+function drawCircle(x, y, r){
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2, true); 
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+}
+
+function clusterColor(i){
+  switch(i){
+    case -2:return('rgb(255,255,255)');
+    case -1:return('rgb(75,75,75)');
+    case 0:return('rgb(250,100,100)');
+    case 1:return('rgb(100,250,100)');
+    case 2:return('rgb(100,100,250)');
+    case 3:return('rgb(250,250,100)');
+    case 4:return('rgb(100,250,250)');
+    case 5:return('rgb(250,100,250)');
+    case 6:return('rgb(250,50,50)');
+    case 7:return('rgb(50,250,50)');
+    case 8:return('rgb(50,50,250)');
+    case 9:return('rgb(250,0,0)');
+    case 10:return('rgb(0,250,0)');
+    case 11:return('rgb(0,0,250)');
+    case 12:return('rgb(250,250,0)');
+    case 13:return('rgb(0,250,250)');
+    case 14:return('rgb(250,0,250)');
+  }
+}
+
+function Redraw(){
+  ctx.clearRect(0,0,WIDTH,HEIGHT);
+  
+  if (trained && mdl) {  
+    // draw decisions in the grid
+    var density= 4.0;
+    ctx.globalAlpha = 0.2
+    for(var x=0.0; x<=WIDTH; x+= density) {
+      for(var y=0.0; y<=HEIGHT; y+= density) {
+        var p = mdl.predictJS([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss])
+        ctx.fillStyle = clusterColor(p)
+        ctx.fillRect(x-density/2-1, y-density-1, density+2, density+2);
+      }
+    }  
+    ctx.globalAlpha = 1.0
+  }
+  
+  // draw axes
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgb(50,50,50)';
+  ctx.lineWidth = 1;
+  ctx.moveTo(0, HEIGHT/2);
+  ctx.lineTo(WIDTH, HEIGHT/2);
+  ctx.moveTo(WIDTH/2, 0);
+  ctx.lineTo(WIDTH/2, HEIGHT);
+  ctx.stroke();
+  // draw data points
+  ctx.fillStyle = 'rgb(150,250,150)'
+  for(var i=0;i<data.length;i++){
+    if (trained && mdl) {
+      // get color for cluster
+      ctx.fillStyle=clusterColor(mdl.clusterJS(i))
+    }
+    drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+WIDTH/2, 3);
+  }
+}
+
+Redraw()
+
+function train(){
+  lrn.resetData()
+  for(var i=0;i<data.length;i++){
+    lrn.addData(data[i])
+  }
+  lrn.train()
+  mdl=lrn.getModel()
+  trained=true
+  Redraw()
+}
+
+function setLearner(n){
+  lrn=learners[n]
+  trained=false
+  train()
+}
+
+</script>
+
+
+</body>
+</html>

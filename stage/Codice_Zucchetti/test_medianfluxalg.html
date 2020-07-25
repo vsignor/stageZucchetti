@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+<body>
+<script src="jstat.min.js"></script>
+<p>Questo documento studia l'affidabilità dello stimatore della mediana con l'algoritmo di flusso trovato in Internet.</p>
+
+<p>Vengono prodotti dei dati casuali secondo una distribuzione prestabilita, quindi calcolata la mediana sia con l'algoritmo di flusso che con l'algoritmo preciso e quindi i risulati
+sono confrontati.</p>
+
+<p>Per ora il miglior algoritmo è quello che tiene la media del valore assoluto degli scostamenti (simula la deviazione standard) e quindi si muove dell' 1% di questo valore nella direzione 
+indicata dallo scostamento. Questo algoritmo applica un delta che è indipendente dalla media (problema della media 0) ed è della misura coerente con i dati incontrati.</p>
+<input type="button" value="generate" onclick="calc(false)"></input>
+<input type="button" value="continue" onclick="calc(true)"></input>
+<input type="button" value="start" onclick="start()"></input>
+<input type="button" value="stop" onclick="stop()"></input>
+<input type="button" value="change" onclick="change()"></input><span id="datatype">&nbsp;&nbsp;0</span>
+<input type="button" value="change random" onclick="changerandom()"></input>
+<div id="hist"></div>
+
+<script>
+var data=[]
+var datatype=0
+var theo_median=[0.697,69.9,0,150,0,100,1.98,14.0,1024]
+
+var cntb_base=0,cntb_alg1=0,cntb_alg2=0,cntb_alg3=0
+var cntw_base=0,cntw_alg1=0,cntw_alg2=0,cntw_alg3=0
+var sum_base=0,sum_alg1=0,sum_alg2=0,sum_alg3=0
+
+function change(){
+  datatype=(datatype+1)%9
+  document.getElementById("datatype").innerHTML="&nbsp;&nbsp;"+datatype
+}
+
+function changerandom(){
+  datatype=Math.floor(Math.random()*9)
+  document.getElementById("datatype").innerHTML="&nbsp;&nbsp;"+datatype
+}
+
+var intervalId
+
+function start(){
+  intervalId=setInterval(function(){calc(true);},500)
+}
+
+function stop(){
+  clearInterval(intervalId)
+}
+
+function generateData(n,d,p1,p2,cont){
+  // n: numero di elementi da generare 
+  // d: distribuzione degli elementi, valori possibili
+  n=n||100
+  d=d||'unif'
+  p1=p1||0
+  p2=p2||1
+  if (!cont)
+    data=[]
+  for(var i=0;i<n;i++){
+    switch(d){
+      case "unif":data.push(jStat.uniform.sample(p1,p2));break // distribuzione uniforme
+      case "exp":data.push(jStat.exponential.sample(p1));break; // distribuzione esponenziale
+      case "gauss":data.push(jStat.normal.sample(p1,p2));break; // distribuzione normale
+      case "pareto":data.push(jStat.pareto.sample(p1,p2));break; // distribuzione normale
+    }
+  }
+}
+
+function calc(cont){
+  var npoints=100
+  switch(datatype){
+    case 0:generateData(npoints,'exp',1,null,cont);break;
+    case 1:generateData(npoints,'exp',0.01,null,cont);break;
+    case 2:generateData(npoints,'unif',-10,10,cont);break;
+    case 3:generateData(npoints,'unif',100,200,cont);break;
+    case 4:generateData(npoints,'gauss',0,10,cont);break;
+    case 5:generateData(npoints,'gauss',100,1,cont);break;
+    case 6:generateData(npoints,'pareto',1,1,cont);break;
+    case 7:generateData(npoints,'pareto',10,2,cont);break;
+    case 8:generateData(npoints,'pareto',1,0.1,cont);break;
+  }
+  if (!cont) {
+    cntb_base=0
+    cntb_alg1=0
+    cntb_alg2=0
+    cntb_alg3=0
+    cntw_base=0
+    cntw_alg1=0
+    cntw_alg2=0
+    cntw_alg3=0
+    sum_base=0
+    sum_alg1=0
+    sum_alg2=0
+    sum_alg3=0
+  }
+  //
+  var last_data=[]
+  for(i=data.length-100;i<data.length;i++) last_data.push(data[i])
+  var median=jStat.median(last_data)
+  var h=jStat.histogram(last_data,10),i,r="<br/><br/>"
+  for(i=0;i<10;i++)
+    r+="*".repeat(h[i])+"</br>"
+  r+="<br/>"
+  // ora il calcolo di flusso
+  var fm=data[0],fm_alg1=data[0],fm_alg2=data[0],fm_alg3=data[0]
+  //var fm=0,fm_alg1=0,fm_alg2=0,fm_alg3=0
+  var delta,sum_data=0,sum_delta=0,smoother_a=10,smoother_b=10,sm_a=10,sm_b=10,sopra=0,n_alg3=0,step=1,sign=1,step3=1,sign3=1
+  for(i=0;i<data.length;i++){
+    // algoritmo originale: si sposta di una distanza fissa
+    delta=(data[i]-fm)
+    fm+=(delta>0?1:-1)*0.05
+    
+    /*
+    // primo algoritmo, si sposta di una percentuale della media degli scostamenti, simula la deviazione standard per avere la scala corretta
+    delta=(data[i]-fm_alg1)
+    sum_delta+=Math.abs(delta)
+    fm_alg1+=(delta>0?1:-1)*(sum_delta/(i+1))*0.01
+    */
+    // primo algoritmo, se va nella stessa direzione del precedente raddoppia lo step, altrimenti lo dimezza (idea dal paper)
+    delta=(data[i]-fm_alg1)
+    step=((delta*sign>0)?step*1.05:step/1.05)
+    fm_alg1+=(delta>0?step:-step)*0.01 //0.1
+    sign=(delta>0?1:-1)
+    
+    // secondo algoritmo: smooter degli scostamenti
+    delta=(data[i]-fm_alg2)
+    if (delta>0) smoother_a=(smoother_a*99+delta)/100; else smoother_b=(smoother_b*99-delta)/100; 
+    fm_alg2+=(delta>0?1:-1)*(smoother_a<smoother_b?smoother_a+0.01:smoother_b+0.01)*0.01
+    
+    /*
+    // terzo algoritmo, si sposta di una percentuale del delta. 
+    delta=(data[i]-fm_alg3)
+    sum_data+=data[i]
+    fm_alg3+=delta*0.01
+    */
+    /*
+    // terzo algoritmo, contegga i casi sopra e sotto l'attuale valore in un mini-batch da 10 elementi e tiene due smoother, uno per i delta positivi ed uno per i delta negativi e usa il minore dei due   
+    delta=(data[i]-fm_alg3)
+    if (delta>0) {sopra++;sm_a=(sm_a*99+delta)/100;} else {sm_b=(sm_b*99-delta)/100;}
+    n_alg3++
+    if (n_alg3==10){
+      fm_alg3+=(sopra-5)*(sm_a<sm_b?sm_a+0.01:sm_b+0.01)*0.01
+      sopra=0
+      n_alg3=0
+    }
+    */
+    // terzo algoritmo: mini-batch e idea del paper
+    delta=(data[i]-fm_alg3)
+    sopra+=(delta>0?1:-1)
+    //step3=(sopra*sign3>0?step3*1.05:(step3>0.001?step3/1.05:step3))
+    //step3=(sopra*sign3>0?step3*1.05:step3/1.05)
+    n_alg3++
+    if (Math.abs(sopra)*n_alg3>40){
+      step3=(sopra*sign3>0?step3*1.05:step3/1.05) // per ora il migliore è con questo ... è solo un po' lento a partire
+      //step3=(sopra*sopra>n_alg3?step3*1.05:step3/1.05) // provo: se oscilla molto n_alg è alto, quindi lo step si può diminuire
+      //fm_alg3+=(sopra>0?step3:-step3)/n_alg3*0.1
+      fm_alg3+=sopra*step3/n_alg3*0.1 // per ora il migliore è con questo
+      //console.log("sopra="+sopra+" n_alg3="+n_alg3+" step3="+step3+" sopra*sign3="+(sopra*sign3))
+      sign3=sopra
+      sopra=0
+      n_alg3=0
+    }    
+   
+    //console.log("data["+i+"]="+data[i].toFixed(2)+" fix="+fm.toFixed(2)+"  alg1="+fm_alg1.toFixed(2)+"("+(sum_delta/(i+1)).toFixed(2)+") alg2= "+fm_alg2.toFixed(2)+"("+smoother_delta.toFixed(2)+") me="+fm_alg3.toFixed(2))
+  }
+  // stampa alcuni vaklori di controllo
+  r+="step="+step.toFixed(4)+" step3="+step3+" n_alg3="+n_alg3+"<br/>"
+  
+  // calcola quale algoritmo è il migliore
+  var delta_base,delta_alg1,delta_alg2,delta_alg3
+  /*
+  delta_base=median-fm
+  delta_alg1=median-fm_alg1
+  delta_alg2=median-fm_alg2
+  delta_alg3=median-fm_alg3
+  */
+  delta_base=theo_median[datatype]-fm
+  sum_base+=Math.pow(delta_base,2)
+  delta_alg1=theo_median[datatype]-fm_alg1
+  sum_alg1+=Math.pow(delta_alg1,2)
+  delta_alg2=theo_median[datatype]-fm_alg2
+  sum_alg2+=Math.pow(delta_alg2,2)
+  delta_alg3=theo_median[datatype]-fm_alg3
+  sum_alg3+=Math.pow(delta_alg3,2)
+  //var best_delta=Math.abs(delta_base),best_idx=0
+  //if (Math.abs(delta_alg1)<best_delta) {best_delta=Math.abs(delta_alg1);best_idx=1;}
+  var best_delta=Math.abs(delta_alg1),best_idx=1
+  if (Math.abs(delta_alg2)<best_delta) {best_delta=Math.abs(delta_alg2);best_idx=2;}
+  if (Math.abs(delta_alg3)<best_delta) {best_delta=Math.abs(delta_alg3);best_idx=3;}
+  switch(best_idx){
+    case 0:cntb_base++;break;
+    case 1:cntb_alg1++;break;
+    case 2:cntb_alg2++;break;
+    case 3:cntb_alg3++;break;
+  }
+  //var worst_delta=Math.abs(delta_base),worst_idx=0
+  //if (Math.abs(delta_alg1)>worst_delta) {worst_delta=Math.abs(delta_alg1);worst_idx=1;}
+  var worst_delta=Math.abs(delta_alg1),worst_idx=1
+  if (Math.abs(delta_alg2)>worst_delta) {worst_delta=Math.abs(delta_alg2);worst_idx=2;}
+  if (Math.abs(delta_alg3)>worst_delta) {worst_delta=Math.abs(delta_alg3);worst_idx=3;}
+  switch(worst_idx){
+    case 0:cntw_base++;break;
+    case 1:cntw_alg1++;break;
+    case 2:cntw_alg2++;break;
+    case 3:cntw_alg3++;break;
+  }
+  //
+  r+="<table>"
+  r+="<tr><td>median="+median.toFixed(3)+"<td>curr theo median="+theo_median[datatype]+"</td><td>data cnt="+data.length+"</td></tr>"
+  median=theo_median[datatype]
+  r+="<tr><td>Algorithm</td><td>value</td><td>diff</td><td>sum(err^2)</td><td>ok</td><td>ko</td></tr>"
+  r+="<tr><td>flux median</td><td>"+fm.toFixed(3)+"</td><td>"                            +(delta_base).toFixed(2)+"</td><td>"+(sum_base).toFixed(2)+"</td><td>"+cntb_base+"</td><td>"+cntw_base+"</td></tr>"
+  r+="<tr><td>alg1: paper</td><td>"+fm_alg1.toFixed(3)+"</td><td>"                       +(delta_alg1).toFixed(2)+"</td><td>"+(sum_alg1).toFixed(2)+"</td><td>"+cntb_alg1+"</td><td>"+cntw_alg1+"</td></tr>"
+  r+="<tr><td>alg2: media mobile exp scostamenti</td><td>"+fm_alg2.toFixed(3)+"</td><td>"+(delta_alg2).toFixed(2)+"</td><td>"+(sum_alg2).toFixed(2)+"</td><td>"+cntb_alg2+"</td><td>"+cntw_alg2+"</td></tr>"
+  r+="<tr><td>alg3: paper con mini-batch</td><td>"+fm_alg3.toFixed(3)+"</td><td>"        +(delta_alg3).toFixed(2)+"</td><td>"+(sum_alg3).toFixed(2)+"</td><td>"+cntb_alg3+"</td><td>"+cntw_alg3+"</td></tr>"
+  r+="</table>"
+  document.getElementById("hist").innerHTML=r  
+}
+
+jStat.extend(jStat.pareto,{
+  sample:function(scale,shape){
+    var r=0
+    while (r==0) r=Math.random();
+    return scale/Math.pow(r,1/shape);
+  }
+})
+
+
+</script>
+
+</body>
+</html>
