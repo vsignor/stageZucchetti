@@ -58,7 +58,7 @@ class KmeansModel extends ZMLModel {
         c = i
       }
     }
-    return c;  
+    return c; 
   }
   clusterJS(i){
     //return this.clusters[i];

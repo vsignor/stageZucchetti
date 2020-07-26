@@ -67,8 +67,9 @@
 <input id="button_punti_cluster" type="button" value="Punti per Cluster" onclick = "punti_cluster()">
 <input id="button_noise" type="button" value="Rumore" onclick = "noise()">
 
-<!--<input id="button_matrix_km" type="button" value="Confusion Matrix" onclick = "conf_matrix()">
-<input id="button_coesione" type="button" value="Indice di Coesione" onclick = "coesione()">
+<input id="button_sse_km" type="button" value="SSE" onclick = "sse()">
+
+<!--<input id="button_coesione" type="button" value="Indice di Coesione" onclick = "coesione()">
 <input id="button_silhouette" type="button" value="Silhouette" onclick = "silhouette()">
 <input id="button_valMod_km" type="button" value="Valutazioni Modello" onclick="valMod()">
 <input id="button_goodMod_km" type="button" value="Efficenza Modello" onclick="goodMod()">
@@ -81,6 +82,7 @@
 <div id="ncluster"></div>
 <div id="punti_cluster"></div>
 <div id="noise"></div>
+<div id="sse"></div>
 
 
 
@@ -197,7 +199,7 @@ function color(i){
         case -2:ctx.fillStyle = 'rgb(255, 255, 255)';break;  // bianco
         case -1:ctx.fillStyle = 'rgb(0, 0, 0)';break;   // nero -> RUMORE
         case 0:ctx.fillStyle = 'rgb(250, 100, 100)';break;  // rosso
-        case 1:ctx.fillStyle = 'rgb(0, 102, 204)';break;  // blu
+        case 1:ctx.fillStyle = 'rgb(0, 128, 255)';break;  // blu
         case 2:ctx.fillStyle = 'rgb(102, 204, 0)';break;  // verde
         case 3:ctx.fillStyle = 'rgb(255, 255, 0)';break;  // giallo
         case 4:ctx.fillStyle = 'rgb(0, 255, 255)';break;  // azzurro
@@ -305,6 +307,7 @@ function cleanGrafico(){
   nCluster();
   punti_cluster();
   noise();
+  sse();
 }
 
 function train(){
@@ -382,179 +385,10 @@ function noise(){
   document.getElementById("noise").innerHTML = "<b>Punti Anomali:</b> " + rumore;
 }
 
-/*function conf_matrix(){
+function sse(){
 
-  if(!trained)
-    show();
+  document.getElementById("sse").innerHTML="<b>Sum of Squared Error:</b>"
 
-  else{
-    var bb = 0, br = 0, bv = 0;
-    var rb = 0, rr = 0, rv = 0;
-    var vb = 0, vr = 0, vv = 0;
-    var n = data.length;
-
-    for (var i = 0; i < n; i++){
-
-    	if (data[i] == mdl.clusterJS(i)){ // reali e predetti uguali
-          if(!data) bb++;
-          else if(data==1) rr++;
-          else vv++;
-        }
-
-    	else{ // reali e predetti diversi
-        
-        if(!data[i]){
-          if(mdl.clusterJS(i)==1) br++;
-          else bv;
-        }
-        else if(data==1){
-          if(!mdl.clusterJS(i)) rb++;
-          else rv;
-        }
-       else{ // data==2
-          if(!mdl.clusterJS(i)) vb++;
-          else vr;
-       }
-    }
-  }
-
-  var tp = bb;
-  var fp = rr + vv;
-  var mc = br + bv + rb + rv + vb + vr;
-
-  document.getElementById("confusion_matrix_km").innerHTML = "<b>Confusion Matrix</b>" + "<br/>" +
-                                                         "+ -------------------------------------- +  <br/>" + "<br/>" +
-                                                         "<b> Blue </b> " +"<b>  Red  </b> "+ " <b> Green </b>" + "<br/>" + " <br/>"+
-                                                         " <b> B </b>" + "<b>TP </b>"+ bb + "<b> MC</b> "+ br + "<b> MC </b>" + bv + " <br/>" + " <br/>"+
-                                                         "<b>R </b>"+ "<b>MC </b>"+ rb +  "<b> FP</b> " + rr + "<b> MC </b>"+ rv + " <br/>" + " <br/>"+
-                                                         "<b>V </b>" + "<b>MC </b>" + vb + "<b> FP</b> "+ vr +  "<b> FP </b>" + vv +  " <br/>" + " <br/>"+
-                                                         " + --------------------------------------" + "<br/>" + " <br/>"+
-                                                         "<b>Tot TP:</b>" + tp + " ; "+
-                                                         "<b>Tot FP:</b>" + fp + " ; "+
-                                                         "<b>Tot MC:</b>" + mc;
-  } 
-}                  
-/*
-function coesione(){
-
-
-
-  document.getElementById("coesione").innerHTML = "<b>Coesione: </b>"// + probA.toFixed(4) + "% " + " ; " + " " +
-                                                //   "<b> Prob (Y = -1): </b>" + probB.toFixed(4) + "% ";
-}
-
-function silhouette(){
-
-
-  document.getElementById("silhouette").innerHTML = "<b>Silhouette: </b>" //+ oddsA.toFixed(4) + " ; " +
-                                           //      "<b> Odds (Y = -1): </b>" + oddsB.toFixed(4);
-
-}
-
-function valMod(){
-  if (!trained)
-    show();
-
-  else{
-    var tp = 0, tn = 0, fn = 0, fp = 0;
-	var n = data.length;
-	
-    for (var i = 0; i < n; i++){
-
-    	if (centroidId[i] == mdl.predictJS(data[i])){ // reali e predetti uguali  
-          if(centroidId[i] == 1) tp++;
-          else tn++;
-        }
-       
-    	else{ // reali e predetti diversi
-			if(centroidId[i] == 1) fn++;
-            else fp++;
-		}
-    }
-		//console.log(n);
-
-      var er_rate = (fp + fn) / n;  //ottimo = 0 , male = 1;
-      var prec = tp / (tp + fp);
-      var acc = (tp + tn) / n;  
-      var recall  =  tp / (tp + fn);
-      var spec = tn / (tn + fp);  //ottimo = 1 , male = 0;
-      var fp_rate = 1 - spec;  //ottimo = 0 , male = 1;
-      var f_score = (2 * recall * prec) / (recall + prec); //ottimo = 1 , male = 0;
-
-  document.getElementById("valMod_km").innerHTML = "<br/>" + "<b>Error rate = </b>" + er_rate.toFixed(4) + " ; " +  
-                                                   "<b>Precisione = </b>" + prec.toFixed(4) + " ; " +
-                                                   "<b>Accuratezza = </b>" + acc.toFixed(4) + " ; " +
-                                                   "<b>Recall = </b>" + recall.toFixed(4) +  "<br/>" +
-                                                   "<b>Specificita' = </b>" + spec.toFixed(4)  + " ; " +
-                                                   "<b>False Positive rate = </b>" + fp_rate.toFixed(4) + " ; " +
-                                                  "<b>F-Score = </b>" + f_score.toFixed(4);
-  return acc;
-}
-}                     
-
-function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er. senza mod
-                    // er. senza mod = sum [fi * ((n - fi) / n) ]  ,  dove   fi = n. casi in i
-  if(!trained)
-    show();
-
-  else{
-    var n = data.length, err = 0;
-
-    for (var i = 0; i < n; i++){
-
-      if (centroidId[i] != mdl.predictJS(data[i])) // reali e predetti diversi -> errori col modello
-         err++; 
-	}
-	
-	//console.log(err)
-
-  //err. senza modello
-    var np = 0, nn = 0; // #casi in 1 e in -1
-
-    for (var i = 0; i < n; i++){
-	  if (centroidId[i] == 1) np++;
-	  else nn++;
-    }
-     //console.log(np)
-
-	var er_NoMod1 = [np * [(n - np) / n]];
-	var er_NoMod2 = [nn * [(n - nn) / n]];
-	var er_NoMod = er_NoMod1[0] + er_NoMod2[0];
-
-  // document.write(er_NoMod1 + " + " + er_NoMod2 + " = " + er_NoMod);
-    var good = (er_NoMod - err) / er_NoMod;
-
-    document.getElementById("goodMod_km").innerHTML = "<b> Efficienza del modello = </b> " + good.toFixed(4);
-  }
-}
-
-function class_err(){
-  var acc = valMod();
-
-  var er = 1 - acc ;
-  document.getElementById("class_err_km").innerHTML = "<b> Probabilita' classificazione errata = </b> " + er.toFixed(4);
-
-}
-*/
-function show(){
-
-  if (!trained)
-  document.getElementById("show").innerHTML = "<br/>" + "<br/>" + "<b>Insert the points in the graph and select trees's number and train your model :-) </b>"
-
-  else {
- /*   document.getElementById("show").innerHTML = "<b>"+ "Coesione: " + " ; " +
-                                                "Silhouette: " + " ; " + "</br>" + "</br>" +
-                                                "Error Rate: (fp + fn) / (tp + fn + tp + tn)" + " ; " +
-                                                "Precisione: tp / (tp + fp)" + "<br/>" + "<br/>" +
-                                                "Accuratezza: (tp + tn) / (tp + fn + fp + tn)" +  " ; " +
-                                                "Recall: tp / (tp + fn)" + "<br/>" + "</br>" +
-                                                "Specificita': tn / (tn + fp)" +  " ; "  + 
-                                                "False Positive Rate: 1 - specificita'" + "<br/>" + "<br/>" + 
-												                        "F-Score: (2 * Recall * Precisione) / (Recall + Precisione)" + "<br/>" + "<br/>" + 
-                                                "Efficienza modello: (err. no modello - err. con modello) / err. no modello" +  "<br/>" + "<br/>" + 
-                                                "Probabilita' classificazione errata: 1 - Accuratezza </b>";*/
-                                        
-  } 
 }
 
 function setLearner(n){
@@ -565,6 +399,7 @@ function setLearner(n){
   nCluster();
   punti_cluster();
   noise();
+  sse();
   //conf_matrix();
   /*coesione();
   silhouette();
