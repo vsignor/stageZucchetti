@@ -37,15 +37,27 @@ input{
 #button_train, #button_sql,  #button_rss, #button_mse, #button_rse, #button_r2, #button_r2Aj, #button_F, #button_var, #button_cov{
   background-color: rgb(236, 132, 167);
 }
- #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod, #valMod,  #prob_rf, #odds_rf, #goodMod_rf, #valMod_rf, #class_err_clas, #class_err_rf, #goodMod_km, #valMod_km, #class_err_km, #coesione, #silhouette{
+ #rss, #mse, #rse, #r2, #r2_adjusted, #statistica_F, #varianza, #covarianza, #prob, #odds, #goodMod, #valMod,  #prob_rf, #odds_rf, #goodMod_rf, #valMod_rf, #class_err_clas, #class_err_rf{
   margin-top: 0.5em;
+}
+
+#punti_cluster, #noise, #dist{
+  margin-top: 0.5em;
+}
+
+#sse{
+  margin-top: 1em;
+}
+
+#ncluster{
+  margin-bottom: 1em;
 }
 
 #sql{
   margin-bottom: 1.5em;
 }
 
-#confusion_matrix, #confusion_matrix_rf, #punti_cluster{
+#confusion_matrix, #confusion_matrix_rf, #cluster0{
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -90,7 +102,7 @@ input{
   font-size: 1em;
 }
 
-#show, #clean, #commands_clas, #commands_rf, #commands, #commands_km{
+#show, #clean, #clean_km, #commands_clas, #commands_rf, #commands, #commands_km{
   font-family: monospace;
   color: black;
   margin-top: 0.5em;
@@ -103,6 +115,7 @@ input{
   margin-bottom: 3.3em;
   margin-left: 4em;
 }
+
 
 #button_reg:hover, #button_par:hover, #button_knn:hover, #button_exp:hover, #button_pol3:hover, #button_pol4:hover, #button_pol5:hover, #button_train:hover, #button_sql:hover, #button_rss:hover, #button_mse:hover, #button_rse:hover, #button_r2:hover, #button_r2Aj:hover, #button_F:hover, #button_var:hover, #button_cov:hover{
   color: antiquewhite;
@@ -311,6 +324,12 @@ input{
   border-radius: 0.5em;
 }
 
+#clean_km{
+  color: rgb(255, 72, 0);
+  margin-bottom: 3.3em;
+  margin-left: 4em;
+}
+
 #button_DBSCAN3, #button_OPTICS3{
   background:  rgb(255, 72, 0);
   font-weight: bold;
@@ -348,11 +367,11 @@ background-color: rgb(255, 72, 0);
   display: block;
 }
 
-#button_train_km, #button_sql_km, #button_ncluster_km, #button_punti_cluster, #button_noise, #button_sse_km{
+#button_train_km, #button_sql_km, #button_ncluster_km, #button_punti_cluster, #button_noise,  #button_dist, #button_sse_km, #button_cluster0{
   background-color: rgb(255,140,0);
 }
 
-#button_train_km:hover, #button_sql_km:hover, #button_ncluster_km:hover, #button_punti_cluster:hover,  #button_noise:hover,  #button_sse_km:hover{
+#button_train_km:hover, #button_sql_km:hover, #button_ncluster_km:hover, #button_punti_cluster:hover,  #button_noise:hover,  #button_dist:hover, #button_sse_km:hover, #button_cluster0:hover{
   color: antiquewhite;
 }
 
@@ -425,7 +444,7 @@ background-color: rgb(255, 72, 0);
       margin-left: 22.5em;
     }
 
-  #clean{
+  #clean, #clean_km{
   margin-left: 4em;
   }
 }

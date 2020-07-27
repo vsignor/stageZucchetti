@@ -45,7 +45,7 @@ class KmeansLearner extends ZMLUnsupervisedLearner{
 class KmeansModel extends ZMLModel {
   constructor(k){
     super()
-    this.learner="K-means"
+    this.learner="k-means"
     this.k=k
     this.kmeans=null
   }
@@ -64,6 +64,18 @@ class KmeansModel extends ZMLModel {
     //return this.clusters[i];
     return this.kmeans.clusters[i];
   }
+  distance(x){  // distamza del centroide prescelto
+    var min_d=ML.Distance.squaredEuclidean(this.kmeans.centroids[0].centroid,x),c=0;
+    for(var i=1;i<this.kmeans.centroids.length;i++){
+      var d=ML.Distance.squaredEuclidean(this.kmeans.centroids[i].centroid,x)
+      if (d<min_d){
+        min_d = d
+        c = i
+      }
+    }
+    return d; 
+  }
+
   predictSQL(c){
     return "No predizione in SQL"
   }

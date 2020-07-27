@@ -299,7 +299,7 @@ function train(){
   mdl=lrn.getModel()
   trained=true
   Redraw()
-
+  
   document.getElementById("clean").innerHTML= " " ; // mi cancella la scritta f5 se prima ero in knn e ora no
 }
 
@@ -479,7 +479,7 @@ function statistica_F(){
 function show(){
 
   if (!trained) 
-  document.getElementById("show").innerHTML = "<br/>" + "<br/>" + "<b>Insert the points in the graph and select trees's number and train your model :-) </b>"
+  document.getElementById("show").innerHTML = "<br/>" + "<br/>" + "<b>Insert the points in the graph, then select and train your model :-) </b>"
 
   else{
     document.getElementById("show").innerHTML = "<b> RSE, RSS e MSE: valori collegati fra loro, indicatori dello scarto presente fra i valori predetti rispetto a quelli reali." +

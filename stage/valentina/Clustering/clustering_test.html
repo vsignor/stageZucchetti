@@ -63,17 +63,12 @@
 <div id="azioni">
 <input id="button_train_km" type="button" value="Train" onclick="train()">
 <input id="button_sql_km" type="button" value="Sql" onclick="sql()">
-<input id="button_ncluster_km" type="button" value="Num cluster ottimali" onclick="nCluster()"> 
-<input id="button_punti_cluster" type="button" value="Punti per Cluster" onclick = "punti_cluster()">
+<input id="button_ncluster_km" type="button" value="Parametri in ingresso" onclick="nCluster()"> 
+<input id="button_punti_cluster" type="button" value="Distribuzione punti" onclick = "punti_cluster()">
 <input id="button_noise" type="button" value="Rumore" onclick = "noise()">
-
 <input id="button_sse_km" type="button" value="SSE" onclick = "sse()">
+<input id="button_cluster0" type="button" value="Cluster 0" onclick = "cluster0()">
 
-<!--<input id="button_coesione" type="button" value="Indice di Coesione" onclick = "coesione()">
-<input id="button_silhouette" type="button" value="Silhouette" onclick = "silhouette()">
-<input id="button_valMod_km" type="button" value="Valutazioni Modello" onclick="valMod()">
-<input id="button_goodMod_km" type="button" value="Efficenza Modello" onclick="goodMod()">
-<input id="button_classErr_km" type="button" value="Prob classificazione errata" onclick="class_err()">  -->
 </div>
 
 <div id="result_km">
@@ -83,22 +78,15 @@
 <div id="punti_cluster"></div>
 <div id="noise"></div>
 <div id="sse"></div>
+<div id="cluster0"></div>
 
-
-
-<!--<div id="confusion_matrix_km"></div>
-<div id="coesione"></div>
-<div id="silhouette"></div>
-<div id=valMod_km></div>
-<div id="goodMod_km"></div>
-<div id="class_err_km"></div>  -->
 </div>
 
 <input id="button_show_km" type="button" value="Details" onclick = "show()">
 <input id="button_removeAdd_km" type="submit" value="Remove Point" onclick="removeDataPointBotton()">
 
 <input id="button_clean_km" type="submit" value="Clean Desk" onclick="cleanGrafico()">
-<!--<span id="clean_km"> </span>-->
+<span id="clean_km"> </span>
 
 <input id="button_commands_km" type="button" value="Commands" onclick = "azione('commands_km')">
 <div id="commands_km" style="display:none;"><br/><!--You must insert at last three points! <br/> <br/>-->
@@ -285,32 +273,42 @@ function drawIndex(n){
 Redraw()
 
 function cleanGrafico(){
-  
-  ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
-	trained = false;
 
-  ctx.beginPath(); /*ricreo assi*/
-	ctx.strokeStyle = 'rgb(50,50,50)';
+  /*var a = lrn.getAlgorithm();   la libreria richiede che k sia un numero intero positivo minore dei data points
+ // console.log(a);
+
+  if(a == "k-means"){
+  
+    ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
+	/*  trained = false;
+
+    ctx.beginPath(); /*ricreo assi*/
+	 /* ctx.strokeStyle = 'rgb(50,50,50)';
   	ctx.lineWidth = 1;
   	ctx.moveTo(0, HEIGHT/2);
- 	ctx.lineTo(WIDTH, HEIGHT/2);
+ 	  ctx.lineTo(WIDTH, HEIGHT/2);
   	ctx.moveTo(WIDTH/2, 0);
   	ctx.lineTo(WIDTH/2, HEIGHT);
   	ctx.stroke();
 
-  /*cancello i punti vecchi*/
-	data = [];
-	show();
+    /*cancello i punti vecchi*/
+	  /*data = [];
+	  show();
 
-	train();
-  sql();
-  nCluster();
-  punti_cluster();
-  noise();
-  sse();
+	  train();
+    sql();
+   nCluster();
+   punti_cluster();
+   noise();
+   sse();
+   cluster0();
+   }
+   else */
+    document.getElementById("clean_km").innerHTML= "<b>Press f5 and retrain your model :-) </b>";
 }
 
 function train(){
+  show()
   lrn.resetData()
   for(var i=0;i<data.length;i++){
     lrn.addData(data[i])
@@ -319,6 +317,16 @@ function train(){
   mdl=lrn.getModel()
   trained=true
   Redraw()
+  
+  //cambia tutto al cambiare del numero di cluster nella tendina del K-Means
+  sql();
+  nCluster();
+  punti_cluster();
+  noise();
+  sse();
+  cluster0();
+
+ document.getElementById("clean_km").innerHTML= " " ; // mi cancella la scritta f5 se prima ero in knn e ora no
 }
 
 function sql(){
@@ -337,12 +345,11 @@ function nCluster(){   // CRITERIO RUKE OF THUMB: k = rad( n.oss / 2)
       bcluster = Math.sqrt( n / 2);
 
       if(lrn.getAlgorithm()=="k-means") {
-        document.getElementById("ncluster").innerHTML="<b>Cluster: </b>" + lrn.getNumberOfCluster() +  " ; " +
-                                                        "<b>Cluster ottimali: </b>" + bcluster.toFixed(4);
+        document.getElementById("ncluster").innerHTML="<b>Cluster = </b>" + lrn.getNumberOfCluster() +  " ; " +
+                                                        "<b>Cluster ottimali = </b>" + bcluster.toFixed(4);
       }
       else {
-        document.getElementById("ncluster").innerHTML="<b>Predittori: </b>" + lrn.getNumberOfCluster() +  " ; " +
-                                                       "<b>Predittori ottimali: </b>" + bcluster.toFixed(4);
+        document.getElementById("ncluster").innerHTML="<b>Predittori = </b>" + lrn.getNumberOfCluster();
 
       }
   }
@@ -355,40 +362,157 @@ function punti_cluster(){
     show();
 
   else{
-    var  red = 0, blue = 0, green = 0, yellow = 0, lb = 0, rm = 0, v = 0;
+    var  red = 0, blue = 0, green = 0, yellow = 0, lb = 0, rm = 0, v = 0, contaCluster = 0;
     var n = data.length;
   
       for(var i = 0; i < n; i++){
-        if(mdl.clusterJS(i)==-1) rm++;
-        else if(!mdl.clusterJS(i)) red++;
-        else if(mdl.clusterJS(i)==1) blue++;
-        else if(mdl.clusterJS(i)==2) green++;
-        else if(mdl.clusterJS(i)==3)  yellow++;
-        else if(mdl.clusterJS(i)==4)  lb++;
-        else // ==5
+        if(mdl.clusterJS(i)==-1) rm++ //rumore
+
+        else if(!mdl.clusterJS(i)){
+          if(!red) {contaCluster++}
+          red++;
+        }
+        else if(mdl.clusterJS(i)==1){
+        if(!blue) {contaCluster++}
+          blue++;
+        }
+        else if(mdl.clusterJS(i)==2){
+          if(!green) {contaCluster++}
+          green++;
+        }
+        else if(mdl.clusterJS(i)==3){
+          if(!yellow) {contaCluster++} 
+          yellow++;
+        }
+        else if(mdl.clusterJS(i)==4){
+          if(!lb) {contaCluster++}
+          lb++;
+        }
+        else{ // ==5
+          if(!v) {contaCluster++}
           v++;
         }
+      } 
  
-      document.getElementById("punti_cluster").innerHTML = "<b>Red:</b> " + red + " ; " +
-                                                           "<b>Blue:</b> " + blue + " ; " +
-                                                           "<b>Green:</b> " + green + " ; " +
-                                                           "<b>Yellow:</b> " + yellow + "; " +
-                                                           "<b>Light blue: </b>"+ lb + " ; " +
-                                                           "<b> Violet: </b>" + v;
+     if(lrn.getAlgorithm()=="k-means"){
+        document.getElementById("punti_cluster").innerHTML = "<b>Red  =</b> " + red + " ; " +
+                                                    "<b>Blue =</b> " + blue + " ; " +
+                                                    "<b>Green =</b> " + green + " ; " +
+                                                    "<b>Yellow =</b> " + yellow + "; " +
+                                                    "<b>Light blue =</b> "+ lb + " ; " +
+                                                     "<b> Violet =</b> " + v;
+      }
+
+     else{
+         document.getElementById("punti_cluster").innerHTML = "<b>Red  =</b> " + red + " ; " +
+                                                    "<b>Blue =</b> " + blue + " ; " +
+                                                    "<b>Green =</b> " + green + " ; " +
+                                                    "<b>Yellow =</b> " + yellow + "; " +
+                                                    "<b>Light blue =</b> "+ lb + " ; " +
+                                                    "<b>Violet =</b> " + v + "<br/>" + "</br>" +
+                                                    "+ -------------------------------------- +  <br/>" + "<br/>" +
+                                                    "<b>Cluster individuati = </b>" + contaCluster +  "<br/>" + "<br/>" +
+                                                    "+ -------------------------------------- +";
+      }
+
 
   return rm;
   }
 }
 
 function noise(){
-  var rumore = punti_cluster();
-  document.getElementById("noise").innerHTML = "<b>Punti Anomali:</b> " + rumore;
+ 
+  if(!trained)
+    show();
+
+  else{
+
+    var rumore = punti_cluster();
+    document.getElementById("noise").innerHTML = "<b>Punti Anomali =</b> " + rumore;
+  }
 }
 
 function sse(){
 
-  document.getElementById("sse").innerHTML="<b>Sum of Squared Error:</b>"
+  if(!trained)
+    show();
 
+  else{
+  var n = data.length, sse = 0;
+  
+    if(lrn.getAlgorithm() == "k-means"){
+    for (var i = 0; i < n; i++){
+ 
+    //console.log(data[i])
+    //console.log(mdl.predictJS(data[i]))  // mi da' l'id del cluster di appartenenza del dato
+    // console.log(mdl.clusterJS(i))  // mi da' l'id del cluster
+
+    //console.log(mdl.distance(data[i])) // distanza dal centroide per ogni data points
+    sse =+ Math.pow(mdl.distance(data[i]), 2)
+    }
+
+  document.getElementById("sse").innerHTML="<b>Sum of Squared Error:</b> " + sse.toFixed(4);
+  }
+  else 
+   document.getElementById("sse").innerHTML=" ";
+ }
+  
+}
+
+function cluster0(){  //sum(xi - media(x))^2 / n
+
+if(!trained)
+  show();
+
+else{
+  if(lrn.getAlgorithm() == "k-means"){
+    var n = data.length;
+    var err = 0, sum = 0, conta = 0;
+
+  for(var i = 0; i < n; i++){
+      if(!mdl.predictJS(data[i])){ // appartiene al cluster 0
+        sum =+ data[i][0];
+        conta++;
+      }
+    }
+
+    var mean = sum / conta;  // media del cluster
+    //console.log(sum + " " + conta)
+
+    for (var i = 0; i < conta; i++) 
+    if(!mdl.predictJS(data[i])){
+           err += Math.pow(data[i][0] - mean, 2);
+    }
+
+    varX = err / conta;
+    document.getElementById("cluster0").innerHTML =  "<b>Info Cluster 0 (red)</b>" + "<br/>" +
+                                                   "+ -------------------------------------- +  <br/>" + "<br/>" +
+                                                    "<b>Media dei punti =</b> " + mean.toFixed(4) + " ; " +
+                                                   "<b>Varianza Interna =</b> "+ varX.toFixed(4) +"<br/>" + "<br/>" +
+                                                   " + -------------------------------------- + ";
+    }
+    else 
+   document.getElementById("cluster0").innerHTML= " ";
+ }
+}
+
+function show(){ //evidenzia quando k > data points
+
+if (!trained || lrn.getNumberOfCluster < data.length) 
+  document.getElementById("show").innerHTML = "<br/>" + "<br/>" + "<b>Insert the points in the graph, then select and train your model" + "<br/>" + "<br/>" +
+                                              "Attention: data points  must be <= number of clusters" + "<br/>" +  "<br/> :-) </b>";
+
+else{
+    document.getElementById("show").innerHTML = "<b><i> K-Means</i>" + "<br/>" + "<br/>" +
+                                                "Per trovare il numero di cluster ottimali si è impiegato il CRITERIO RUKE OF THUMB:" + "<br/>" + "<br/>" + 
+                                                "k = rad( n.oss / 2)" + "<br/>" + "<br/>" + 
+                                                "SSE: sum [sqrt (dist (cluster[i], C), 2)]" + "<br/>" + "<br/>" +
+                                                "Il cluster 0 è stato usato come esempio per fornire informazioni riguardanti la media dei punti in esso contenuti " + 
+                                                "e la sua varianza interna." + "<br/>" + "<br/>" + "<br/>" +
+                                                "<b><i> DBSCAN E OPTICS</i> " + "<br/>" + "<br/>" +
+                                                "Basati sulla densità permettono di trovare gli outlaier (puntini neri del grafico). Questi algoritmi riescono quindi a " +
+                                                "identificare il rumore scartandolo, cosa che invece il K-Means non riesce a fare). </b>";
+}
 }
 
 function setLearner(n){
@@ -400,12 +524,7 @@ function setLearner(n){
   punti_cluster();
   noise();
   sse();
-  //conf_matrix();
-  /*coesione();
-  silhouette();
-  valMod();
-  goodMod();
-  class_err();*/
+  cluster0();
   show();
 }
 
