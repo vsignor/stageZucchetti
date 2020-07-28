@@ -103,7 +103,7 @@ class DbscanLearner extends ZMLUnsupervisedLearner{
   getModel(){   
     var dbscan = new DBSCAN();
     var clusters=[];
-    var db = dbscan.run(this.data, this.k)
+    var db = dbscan.run(this.data,0.7,2)
     var m=new DbscanModel()
     for(var c=0;c<db.length;c++){
       var cc=db[c]
@@ -165,7 +165,7 @@ class OpticsLearner extends ZMLUnsupervisedLearner{
   getModel(){   
     var optics = new OPTICS();
     var clusters=[];
-    var op = optics.run(this.data, this.k)
+    var op = optics.run(this.data,0.7,2)
     var m=new OpticsModel(), nc = 0;
     for(var c=0;c<op.length;c++){
       var cc=op[c]

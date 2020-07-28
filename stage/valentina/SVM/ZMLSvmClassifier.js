@@ -53,21 +53,21 @@ class SvmModel extends ZMLModel {
   }  
 }
 
-class LinearSvmLearner extends SvmLearner {
+class LinearSvmLearner extends SvmLearner {  //svm lineare
   constructor(nPredict){
     super(nPredict,"linear");
     this.algorithm="Svm(linear)" // io
   }
 }
 
-class RbfSvmLearner extends SvmLearner {
+class RbfSvmLearner extends SvmLearner {  //svm non lineare: metodo del kernel
   constructor(nPredict){
     super(nPredict,"rbf");
     this.algorithm="Svm(rbf)" // io
   }  
 }
 
-class Pol2SvmLearner extends SvmLearner {
+class Pol2SvmLearner extends SvmLearner {  //svm lineare
   constructor(nPredict){
     super(nPredict*2,"linear")
     this.algorithm="Svm(pol2)"
