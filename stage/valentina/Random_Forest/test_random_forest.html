@@ -61,7 +61,7 @@
   <input id="button_prob_rf" type="button" value="Prob(Y)" onclick="prob()">
   <input id="button_odds_rf" type="button" value="Odds(Y)" onclick="odds()">
   <input id="button_valMod_rf" type="button" value="Valutazioni Modello" onclick="valMod()">
-  <input id="button_goodMod_rf" type="button" value="Efficenza Modello" onclick="goodMod()">
+  <input id="button_goodMod_rf" type="button" value="Efficienza Modello" onclick="goodMod()">
   <input id="button_classErr_rf" type="button" value="Prob classificazione errata" onclick="class_err()">
   </div>
 
@@ -417,7 +417,7 @@ function valMod(){
                                                    "<b>Precisione = </b>" + prec.toFixed(4) + " ; " +
                                                    "<b>Accuratezza = </b>" + acc.toFixed(4) + " ; " +
                                                    "<b>Recall = </b>" + recall.toFixed(4) +  "<br/>" +
-                                                   "<b>Specificita' = </b>" + spec.toFixed(4)  + " ; " +
+                                                   "<b>Specificità = </b>" + spec.toFixed(4)  + " ; " +
                                                    "<b>False Positive rate = </b>" + fp_rate.toFixed(4) + " ; " +
                                                   "<b>F-Score = </b>" + f_score.toFixed(4);
   return acc;
@@ -464,7 +464,7 @@ function class_err(){
   var acc = valMod();
 
   var er = 1 - acc ;
-  document.getElementById("class_err_rf").innerHTML = "<b> Probabilita' classificazione errata = </b> " + er.toFixed(4);
+  document.getElementById("class_err_rf").innerHTML = "<b> Probabilità classificazione errata = </b> " + er.toFixed(4);
 
 }
 
@@ -478,11 +478,11 @@ function show(){
                                                 "Precisione: tp / (tp + fp)" + "<br/>" + "<br/>" +
                                                 "Accuratezza: (tp + tn) / (tp + fn + fp + tn)" +  " ; " +
                                                 "Recall: tp / (tp + fn)" + "<br/>" + "</br>" +
-                                                "Specificita': tn / (tn + fp)" +  " ; "  + 
-                                                "False Positive Rate: 1 - specificita'" + "<br/>" + "<br/>" + 
+                                                "Specificità: tn / (tn + fp)" +  " ; "  + 
+                                                "False Positive Rate: 1 - Specificità" + "<br/>" + "<br/>" + 
 												                        "F-Score: (2 * Recall * Precisione) / (Recall + Precisione)" + "<br/>" + "<br/>" + 
                                                 "Efficienza modello: (err. no modello - err. con modello) / err. no modello" +  "<br/>" + "<br/>" + 
-                                                "Probabilita' classificazione errata: 1 - Accuratezza </b>";
+                                                "Probabilità classificazione errata: 1 - Accuratezza </b>";
 												 
                                         
   }

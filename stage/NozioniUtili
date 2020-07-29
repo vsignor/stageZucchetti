@@ -48,3 +48,8 @@ NB: Se prendo punti linearmente dipendenti non posso sperare di frantumarli, qui
 
 17. Pearson: indice di Perarson -> mostra una correlazione fra i dati (esprime la linearita' fra x ed y)
     Fischer: padre della statistica moderna (h0, h1...)
+
+18. Box-Cox Si tratta di individuare la trasformazione più adeguata per questi dati, affinché la loro distribuzione possa assumere forma normale/lineare (la forma che mi serve), almeno in modo approssimato.  Trasformazioni Box Cox che hanno lo scopo di rendere additivi, indipendenti, lineari gli effetti sulle variabili in esame.
+
+19. Più basso è il SSE, quindi più simili sono i consumatori in quel segmento di mercato (cluster). Un SSE elevato suggerisce che i consumatori nello stesso segmento di mercato presentano un ragionevole grado di differenze tra loro e potrebbero non essere un segmento di mercato reale (o utilizzabile)  -> PIU' NE CREO PIU' DOVREBBE DIMINUIRE
+SSE è la somma delle differenze al quadrato tra ciascuna osservazione e la media del suo gruppo. Può essere utilizzato come misura di variazione all'interno di un cluster. Se tutti i casi all'interno di un cluster sono identici, SSE sarebbe uguale a 0.

@@ -4,6 +4,8 @@ class SvmLearner extends ZMLSupervisedLearner {
     this.kernel=kernel || "linear"
     this.algorithm="Svm("+kernel+")"
     this.nPredict=nPredict
+   /* this.rbfkernelsigma=[]
+    this.svmC=[]*/
     this.data=[]   
     this.labels=[]
   }
@@ -18,6 +20,9 @@ class SvmLearner extends ZMLSupervisedLearner {
   train(){
     // fa tutto nella getModel    
   }
+ /*retrain(){
+ this.getModel();
+ }*/
   getModel(){
     var svm=new svmjs.SVM()
     svm.train(this.data,this.labels,{kernel:this.kernel})
