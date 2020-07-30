@@ -1,0 +1,527 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Clustering</title>
+<link href="../stile.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" language="javascript">
+	function visualizza(id){
+	  if (document.getElementById){
+		if(document.getElementById(id).style.display == 'none'){
+		  document.getElementById(id).style.display = 'block';
+		}else{
+		  document.getElementById(id).style.display = 'none';
+		}
+	  }
+	}
+	</script>
+
+<script> 
+	//Dichiaro la funzione 
+	function azione(variabile){ 
+		if(document.getElementById(variabile).style.display=='') 
+			document.getElementById(variabile).style.display='none'; 
+		else 
+			document.getElementById(variabile).style.display=''; 
+	}
+</script>
+
+<body>
+<h1>Clustering: K-Means, DBSCAN, OPTICS</h1>
+
+<div id=big_container>
+<span id=grafico>    <!-- 550 500-->
+  <canvas id="NPGcanvas" width="700" height="650" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
+</span>
+
+<span id=destra>
+<p>Select your algorithms:</p>
+<div id="algo">
+<!--<input id="button_kmeans2" type="button" value="K-Means(2)" onclick="setLearner(0)">
+<input id="button_kmeans3" type="button" value="K-Means(3)" onclick="setLearner(1)">
+<input id="button_kmeans4" type="button" value="K-Means(4)" onclick="setLearner(2)">
+<input id="button_kmeans5" type="button" value="K-Means(5)" onclick="setLearner(3)">
+<input id="button_kmeans6" type="button" value="K-Means(6)" onclick="setLearner(4)">  -->
+
+<div class="selectKM">
+  <button id="button_km">K-Means</button>
+  <div class="selectKM-content">
+  <a href="#" onclick="setLearner(0)" class="button_rf">2 Clusters</a>
+  <a href="#" onclick="setLearner(1)" class="button_rf">3 Clusters</a>
+  <a href="#" onclick="setLearner(2)" class="button_rf">4 Clusters</a>
+  <a href="#" onclick="setLearner(3)" class="button_rf">5 Clusters</a>
+  <a href="#" onclick="setLearner(4)" class="button_rf">6 Clusters</a>
+  </div>
+</div>
+
+<input id="button_DBSCAN3" type="button" value="DBSCAN" onclick="setLearner(5)">
+<input id="button_OPTICS3" type="button" value="OPTICS" onclick="setLearner(6)">  
+</div>
+
+<p>Select your actions:</p>
+<div id="azioni">
+<input id="button_train_km" type="button" value="Train" onclick="train()">
+<input id="button_sql_km" type="button" value="Sql" onclick="sql()">
+<input id="button_ncluster_km" type="button" value="Parametri in ingresso" onclick="nCluster()"> 
+<input id="button_punti_cluster" type="button" value="Distribuzione punti" onclick = "punti_cluster()">
+<input id="button_noise" type="button" value="Rumore" onclick = "noise()">
+<input id="button_sse_km" type="button" value="SSE" onclick = "sse()">
+<input id="button_cluster0" type="button" value="Cluster 0" onclick = "cluster0()">
+
+</div>
+
+<div id="result_km">
+<div id="info"></div>
+<div id="sql"></div>
+<div id="ncluster"></div>
+<div id="punti_cluster"></div>
+<div id="noise"></div>
+<div id="sse"></div>
+<div id="cluster0"></div>
+
+</div>
+
+<input id="button_show_km" type="button" value="Details" onclick = "show()">
+<input id="button_removeAdd_km" type="submit" value="Remove Point" onclick="removeDataPointBotton()">
+
+<input id="button_clean_km" type="submit" value="Clean Desk" onclick="cleanGrafico()">
+<span id="clean_km"> </span>
+
+<input id="button_commands_km" type="button" value="Commands" onclick = "azione('commands_km')">
+<div id="commands_km" style="display:none;"><br/><!--You must insert at last three points! <br/> <br/>-->
+                                                 For add pink data point: mouse click. <br/> <br/>
+                                                 For delete data point: ciltr + mouse click or the appropriate button. <br/> <br/>
+                                                 </div>
+
+<div id="show"></div>
+</span></div>
+
+<script src="../ZMLBase.js"></script>
+
+<script src="ml.min.js"></script>  <!--libreria k-Means-->
+<script src="clustering.js"></script>  <!--libreria Dbscan e Oprics-->
+
+<script src="ZMLClustering.js"></script>
+
+
+
+<script>
+// variabili per la gestione del canvas
+var canvas = document.getElementById("NPGcanvas")
+var ctx = canvas.getContext('2d');
+const WIDTH=700;
+const HEIGHT=650;
+const ss=50.0;  //<!-- 550 500-->
+
+const ux = WIDTH/ss/2;
+const uy = HEIGHT/ss/2;
+const Ox=WIDTH/2;  //origine dell'ascissa
+const Oy=HEIGHT/2; //origine dell'ordinata
+const u=20; //unita' di misura in px
+
+// variabili per il learner
+var data=[];               // valori delle x dei punti disegnati      
+var trained=false;
+
+var learners=[new KmeansLearner(2), new KmeansLearner(3), new KmeansLearner(4), new KmeansLearner(5), new KmeansLearner(6), new DbscanLearner(3), new OpticsLearner(3)];
+var lrn=learners[0]
+var mdl=null
+
+function addDataPoint(x,y){
+  // add datapoint at location of click
+  data.push([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
+  trained=false
+  Redraw()
+}
+
+function removeDataPointBotton(x,y) { //rimozione punti bottone
+  // remove datapoint at location of click
+  data.pop([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
+  trained=false
+  Redraw()
+}
+
+function removeDataPoint(x,y){  //rimozione punti mouse
+  var j=-1,d
+  for(var i=0;i<data.length;i++){
+    d=Math.abs(data[i][0]*ss+WIDTH/2-x)+Math.abs(data[i][1]*ss+HEIGHT/2-y)
+    if (d<3)
+      j=i;
+  }
+  if (j!=-1) {
+    data.splice(j,1)
+    trained=false
+    Redraw()
+  }
+}
+
+function mouseClick(x,y,shift,ctrl){
+  if (ctrl)
+    removeDataPoint(x,y);
+  else
+    addDataPoint(x,y);
+}
+
+function eventClick(e) {    
+  //get position of cursor relative to top left of canvas
+  var x = e.pageX;
+  var y = e.pageY;
+  var r = canvas.getBoundingClientRect();
+  x -= r.left+window.scrollX;
+  y -= r.top+window.scrollY;  
+  //call user-defined callback
+  mouseClick(x, y, e.shiftKey, e.ctrlKey);
+}
+
+function drawCircle(x, y, r){
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2, true); 
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+}
+
+function color(i){
+  switch(i){
+        case -2:ctx.fillStyle = 'rgb(255, 255, 255)';break;  // bianco
+        case -1:ctx.fillStyle = 'rgb(0, 0, 0)';break;   // nero -> RUMORE
+        case 0:ctx.fillStyle = 'rgb(250, 100, 100)';break;  // rosso
+        case 1:ctx.fillStyle = 'rgb(0, 128, 255)';break;  // blu
+        case 2:ctx.fillStyle = 'rgb(102, 204, 0)';break;  // verde
+        case 3:ctx.fillStyle = 'rgb(255, 255, 0)';break;  // giallo
+        case 4:ctx.fillStyle = 'rgb(0, 255, 255)';break;  // azzurro
+        case 5:ctx.fillStyle = 'rgb(102, 0, 204)';break;  // viola
+      }
+}
+
+function Redraw(){ 
+  ctx.clearRect(0,0,WIDTH,HEIGHT);
+
+  if (trained && mdl) {  
+    // costruzione griglia per l'area di influenza
+    var density= 4.0;
+    ctx.globalAlpha = 0.2
+    for(var x=0.0; x<=WIDTH; x+= density) {
+      for(var y=0.0; y<=HEIGHT; y+= density) {
+        var p = mdl.predictJS([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss])
+        ctx.fillStyle = color(p) // metodo che colora l'area -> ogni volta entra e prende il colore che gli interessa
+        ctx.fillRect(x-density/2-1, y-density-1, density+2, density+2);
+      }
+    }  
+    ctx.globalAlpha = 1.0
+  }
+      
+ ctx.beginPath();   // draw axes
+  ctx.strokeStyle = 'rgb(50,50,50)';
+  ctx.lineWidth = 1;
+ 
+   //disegna asse x
+   ctx.moveTo(0,Oy);  // punto di partenza
+  ctx.lineTo(WIDTH,Oy);  //asse x
+  //disegna punta asse x
+  ctx.moveTo(WIDTH-10,Oy-4);  //punta asse x
+  ctx.lineTo(WIDTH-10,Oy+4);
+  ctx.lineTo(WIDTH,Oy);
+  ctx.lineTo(WIDTH-10,Oy-4); //fine punta asse x
+  //disegna asse y
+  ctx.moveTo(Ox,10);  //coordinate punto di partenza
+  ctx.lineTo(Ox,HEIGHT);  //asse y
+  //disegna punta asse y
+  ctx.moveTo(Ox-4,10);  //punta asse y
+  ctx.lineTo(Ox+4,10);
+  ctx.lineTo(Ox,2);
+  ctx.lineTo(Ox-4,10); //fine punta asse y
+
+  //ctx.fill() //riempimento frecce
+  ctx.fillStyle="rgb(0,0,0)"
+  
+  // write x, y, O, u
+  ctx.fillText('x',WIDTH-20,Oy-10)
+  ctx.fillText('y',Ox+5,20)
+  ctx.fillText('O',Ox+2,Oy+10)
+
+  // scrivi unita' assi
+  for(var i=1;i<ux;i++){
+    drawIndex(i);
+  }
+
+  ctx.stroke();  //disegna
+  
+  ctx.fillStyle = 'rgb(255, 153, 255)' // draw data points
+  for(var i=0;i<data.length;i++){
+      if(trained && mdl) {   //console.log(mdl.clusterJS(i))
+        ctx.fillStyle=color(mdl.clusterJS(i))  // chiamta al metodo
+      }
+    drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
+  }
+}
+
+function drawIndex(n){
+  ctx.moveTo(WIDTH-(Ox+(n*ss)),Oy-5);  //segmento unita' di misura
+  ctx.lineTo(WIDTH-(Ox+(n*ss)),Oy+5);
+  ctx.moveTo(Ox+(n*ss),Oy-5);  //segmento unita' di misura
+  ctx.lineTo(Ox+(n*ss),Oy+5);
+  ctx.fillText(n,Ox+(n*ss)-3,Oy+18);
+  ctx.moveTo(Ox-5,HEIGHT-(Oy+(n*ss)));  //segmento unita' di misura
+  ctx.lineTo(Ox+5,HEIGHT-(Oy+(n*ss))); 
+  ctx.moveTo(Ox-5,Oy+(n*ss));  //segmento unita' di misura
+  ctx.lineTo(Ox+5,Oy+(n*ss));
+  ctx.fillText(n,Ox-20,HEIGHT-(Oy+(n*ss))+3);
+}
+
+Redraw()
+
+function cleanGrafico(){
+
+  /*var a = lrn.getAlgorithm();   la libreria richiede che k sia un numero intero positivo minore dei data points
+ // console.log(a);
+
+  if(a == "k-means"){
+  
+    ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
+	/*  trained = false;
+
+    ctx.beginPath(); /*ricreo assi*/
+	 /* ctx.strokeStyle = 'rgb(50,50,50)';
+  	ctx.lineWidth = 1;
+  	ctx.moveTo(0, HEIGHT/2);
+ 	  ctx.lineTo(WIDTH, HEIGHT/2);
+  	ctx.moveTo(WIDTH/2, 0);
+  	ctx.lineTo(WIDTH/2, HEIGHT);
+  	ctx.stroke();
+
+    /*cancello i punti vecchi*/
+	  /*data = [];
+	  show();
+
+	  train();
+    sql();
+   nCluster();
+   punti_cluster();
+   noise();
+   sse();
+   cluster0();
+   }
+   else */
+    document.getElementById("clean_km").innerHTML= "<b>Press f5 and retrain your model :-) </b>";
+}
+
+function train(){
+  show()
+  lrn.resetData()
+  for(var i=0;i<data.length;i++){
+    lrn.addData(data[i])
+  }
+  lrn.train()
+  mdl=lrn.getModel()
+  trained=true
+  Redraw()
+
+ document.getElementById("clean_km").innerHTML= " " ; // mi cancella la scritta f5 se prima ero in knn e ora no
+}
+
+function sql(){
+  if (trained)
+    document.getElementById("sql").innerHTML="<b>SQL =</b> " + mdl.predictSQL();
+
+  else
+	  show();
+}
+
+function nCluster(){   // CRITERIO RUKE OF THUMB: k = rad( n.oss / 2)
+  
+  var n = data.length, bcluster;
+
+  if (trained){
+      bcluster = Math.sqrt( n / 2);
+
+      if(lrn.getAlgorithm()=="k-means") {
+        document.getElementById("ncluster").innerHTML="<b>Cluster = </b>" + lrn.getNumberOfCluster() +  " ; " +
+                                                        "<b>Cluster ottimali = </b>" + bcluster.toFixed(4);
+      }
+      else {
+        document.getElementById("ncluster").innerHTML="<b>Predittori = </b>" + lrn.getNumberOfCluster();
+
+      }
+  }
+  else
+	    show();
+}
+
+function punti_cluster(){
+  if(!trained)
+    show();
+
+  else{
+    var  red = 0, blue = 0, green = 0, yellow = 0, lb = 0, rm = 0, v = 0, contaCluster = 0;
+    var n = data.length;
+  
+      for(var i = 0; i < n; i++){
+        if(mdl.clusterJS(i)==-1) rm++ //rumore
+
+        else if(!mdl.clusterJS(i)){
+          if(!red) {contaCluster++}
+          red++;
+        }
+        else if(mdl.clusterJS(i)==1){
+        if(!blue) {contaCluster++}
+          blue++;
+        }
+        else if(mdl.clusterJS(i)==2){
+          if(!green) {contaCluster++}
+          green++;
+        }
+        else if(mdl.clusterJS(i)==3){
+          if(!yellow) {contaCluster++} 
+          yellow++;
+        }
+        else if(mdl.clusterJS(i)==4){
+          if(!lb) {contaCluster++}
+          lb++;
+        }
+        else{ // ==5
+          if(!v) {contaCluster++}
+          v++;
+        }
+      } 
+ 
+     if(lrn.getAlgorithm()=="k-means"){
+        document.getElementById("punti_cluster").innerHTML = "<b>Red  =</b> " + red + " ; " +
+                                                    "<b>Blue =</b> " + blue + " ; " +
+                                                    "<b>Green =</b> " + green + " ; " +
+                                                    "<b>Yellow =</b> " + yellow + "; " +
+                                                    "<b>Light blue =</b> "+ lb + " ; " +
+                                                     "<b> Violet =</b> " + v;
+      }
+
+     else{
+         document.getElementById("punti_cluster").innerHTML = "<b>Red  =</b> " + red + " ; " +
+                                                    "<b>Blue =</b> " + blue + " ; " +
+                                                    "<b>Green =</b> " + green + " ; " +
+                                                    "<b>Yellow =</b> " + yellow + "; " +
+                                                    "<b>Light blue =</b> "+ lb + " ; " +
+                                                    "<b>Violet =</b> " + v + "<br/>" + "</br>" +
+                                                    "+ -------------------------------------- +  <br/>" + "<br/>" +
+                                                    "<b>Cluster individuati = </b>" + contaCluster +  "<br/>" + "<br/>" +
+                                                    "+ -------------------------------------- +";
+      }
+
+
+  return rm;
+  }
+}
+
+function noise(){
+ 
+  if(!trained)
+    show();
+
+  else{
+
+    var rumore = punti_cluster();
+    document.getElementById("noise").innerHTML = "<b>Punti Anomali =</b> " + rumore;
+  }
+}
+
+function sse(){
+
+  if(!trained)
+    show();
+
+  else{
+  var n = data.length, sse = 0;
+  
+    if(lrn.getAlgorithm() == "k-means"){
+    for (var i = 0; i < n; i++){
+ 
+    //console.log(data[i])
+    //console.log(mdl.predictJS(data[i]))  // mi da' l'id del cluster di appartenenza del dato
+    // console.log(mdl.clusterJS(i))  // mi da' l'id del cluster
+
+    //console.log(mdl.distance(data[i])) // distanza dal centroide per ogni data points
+    sse =+ Math.pow(mdl.distance(data[i]), 2)
+    }
+
+  document.getElementById("sse").innerHTML="<b>Sum of Squared Error:</b> " + sse.toFixed(4);
+  }
+  else 
+   document.getElementById("sse").innerHTML=" ";
+ }
+  
+}
+
+function cluster0(){  //sum(xi - media(x))^2 / n
+
+if(!trained)
+  show();
+
+else{
+  if(lrn.getAlgorithm() == "k-means"){
+    var n = data.length;
+    var err = 0, sum = 0, conta = 0;
+
+  for(var i = 0; i < n; i++){
+      if(!mdl.predictJS(data[i])){ // appartiene al cluster 0
+        sum =+ data[i][0];
+        conta++;
+      }
+    }
+
+    var mean = sum / conta;  // media del cluster
+    //console.log(sum + " " + conta)
+
+    for (var i = 0; i < conta; i++) 
+    if(!mdl.predictJS(data[i])){
+           err += Math.pow(data[i][0] - mean, 2);
+    }
+
+    varX = err / conta;
+    document.getElementById("cluster0").innerHTML =  "<b>Info Cluster 0 (red)</b>" + "<br/>" +
+                                                   "+ -------------------------------------- +  <br/>" + "<br/>" +
+                                                    "<b>Media dei punti =</b> " + mean.toFixed(4) + " ; " +
+                                                   "<b>Varianza Interna =</b> "+ varX.toFixed(4) +"<br/>" + "<br/>" +
+                                                   " + -------------------------------------- + ";
+    }
+    else 
+   document.getElementById("cluster0").innerHTML= " ";
+ }
+}
+
+function show(){ //evidenzia quando k > data points
+
+if (!trained || lrn.getNumberOfCluster < data.length) 
+  document.getElementById("show").innerHTML = "<br/>" + "<br/>" + "<b>Insert the points in the graph, then select and train your model" + "<br/>" + "<br/>" +
+                                              "Attention: data points  must be <= number of clusters" + "<br/>" +  "<br/> :-) </b>";
+
+else{
+    document.getElementById("show").innerHTML = "<b><i> K-Means</i>" + "<br/>" + "<br/>" +
+                                                "Per trovare il numero di cluster ottimali si è impiegato il CRITERIO RUKE OF THUMB:" + "<br/>" + "<br/>" + 
+                                                "k = rad( n.oss / 2)" + "<br/>" + "<br/>" + 
+                                                "SSE: sum [sqrt (dist (cluster[i], C), 2)]" + "<br/>" + "<br/>" +
+                                                "Il cluster 0 è stato usato come esempio per fornire informazioni riguardanti la media dei punti in esso contenuti " + 
+                                                "e la sua varianza interna." + "<br/>" + "<br/>" + "<br/>" +
+                                                "<b><i> DBSCAN E OPTICS</i> " + "<br/>" + "<br/>" +
+                                                "Basati sulla densità permettono di trovare gli outlaier (puntini neri del grafico). Questi algoritmi riescono ad " +
+                                                "identificare il rumore scartandolo, cosa che invece il K-Means non riesce a fare. </b>";
+}
+}
+
+function setLearner(n){
+  lrn=learners[n]
+  trained=false;
+  train();
+  sql();
+  nCluster();
+  punti_cluster();
+  noise();
+  sse();
+  cluster0();
+  show();
+}
+
+</script>
+
+
+</body>
+</html>

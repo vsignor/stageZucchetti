@@ -1,0 +1,510 @@
+<!doctype html>
+<html>
+
+  <head>
+    <title>Random Forest</title>
+  <link href="../stile.css" rel="stylesheet" type="text/css">
+
+  <script type="text/javascript" language="javascript">
+    function visualizza(id){
+      if (document.getElementById){
+      if(document.getElementById(id).style.display == 'none'){
+        document.getElementById(id).style.display = 'block';
+      }else{
+        document.getElementById(id).style.display = 'none';
+      }
+      }
+    }
+    </script>
+  
+  <script> 
+    //Dichiaro la funzione 
+    function azione(variabile){ 
+      if(document.getElementById(variabile).style.display=='') 
+        document.getElementById(variabile).style.display='none'; 
+      else 
+        document.getElementById(variabile).style.display=''; 
+    }
+  </script>
+</head>
+
+<body>
+  <h1>Random Forest </h1>
+
+  <div id=big_container>
+  <span id=grafico>  <!-- 550 500-->
+  <canvas id="NPGcanvas" width="700" height="650" onclick="eventClick(event)">Browser not supported for Canvas. Get a real browser.</canvas>
+  </span> 
+
+  <span id=destra>
+  <p>Select your algorithms:</p>
+  <div id="algo">
+
+  <div class="selectTree">
+    <button id="button_rf">Random Forest</button>
+    <div class="selectTree-content">
+    <a href="#" onclick="setLearner(0)" class="button_rf">10 Trees</a>
+    <a href="#" onclick="setLearner(1)" class="button_rf">25 Trees</a>
+    <a href="#" onclick="setLearner(2)" class="button_rf">50 Trees</a>
+    <a href="#" onclick="setLearner(3)" class="button_rf">100 Trees</a>
+    </div>
+  </div>
+  
+  </div>
+
+  <p>Select your actions:</p>
+  <div id="azioni">
+  <input id="button_train_rf" type="button" value="Train" onclick="train()">
+  <input id="button_sql_rf" type="button" value="Sql" onclick="sql()">
+  <input id="button_nTrees_rf" type="button" value="Trees" onclick="nTrees()">
+  <input id="button_matrix_rf" type="button" value="Confusion Matrix" onclick = "conf_matrix()">
+  <input id="button_prob_rf" type="button" value="Prob(Y)" onclick="prob()">
+  <input id="button_odds_rf" type="button" value="Odds(Y)" onclick="odds()">
+  <input id="button_valMod_rf" type="button" value="Valutazioni Modello" onclick="valMod()">
+  <input id="button_goodMod_rf" type="button" value="Efficienza Modello" onclick="goodMod()">
+  <input id="button_classErr_rf" type="button" value="Prob classificazione errata" onclick="class_err()">
+  </div>
+
+  <div id="result_rf">
+  <div id="info"></div>
+  <div id="sql"></div>
+  <div id="ntrees"></div>
+
+  <div id="confusion_matrix_rf"></div>
+  <div id="prob_rf"></div>
+  <div id="odds_rf"></div>
+  <div id="valMod_rf"></div>
+  <div id="goodMod_rf"></div>
+  <div id="class_err_rf"></div>
+</div>
+
+<input id="button_show_rf" type="button" value="Details" onclick = "show()">
+<input id="button_removeAdd_rf" type="submit" value="Remove Point" onclick="removeDataPointBotton()">
+<input id="button_clean_rf" type="submit" value="Clean Desk" onclick="cleanGrafico()">
+
+<input id="button_commands_rf" type="button" value="Commands" onclick = "azione('commands_rf')">
+<div id="commands_rf" style="display:none;"><br/> For add yellow data point: mouse click. <br/> <br/>
+                                                  For add blue data point: shift + mouse click.  <br/> <br/>
+                                                  For delete data point: ciltr + mouse click or the appropriate button.<br/> <br/></div>
+
+
+
+<div id="show"></div>
+<span></div>
+
+<script src="../ZMLBase.js"></script>
+
+<script src="randomforest.js"></script>
+<script src="ZMLRandomForest.js"></script>
+
+
+<script>
+
+// variabili per la gestione del canvas
+var canvas = document.getElementById("NPGcanvas")
+var ctx = canvas.getContext('2d');
+const WIDTH=700;
+const HEIGHT=650;
+const ss=50.0;  //<!-- 550 500-->
+
+const ux = WIDTH/ss/2;
+const uy = HEIGHT/ss/2;
+const Ox=WIDTH/2;  //origine dell'ascissa
+const Oy=HEIGHT/2; //origine dell'ordinata
+const u=20; //unita' di misura in px
+
+// variabili per il learner
+var data=[]       // valori delle x dei punti disegnati
+var labels=[]     // valori delle classi dei punti disegnati
+
+var trained=false
+
+var learners= [new RandomForestLearner(10), new RandomForestLearner(25), new RandomForestLearner(50), new RandomForestLearner(100)];
+
+var lrn=learners[0]
+var mdl=null
+
+function addDataPoint(x,y,c){
+  // add datapoint at location of click
+  data.push([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
+  labels.push(c);
+  trained=false
+  Redraw()
+}
+
+function removeDataPointBotton(x,y,c) { //rimozione punti bottone
+  // remove datapoint at location of click
+  data.pop([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss]);
+  labels.pop(c);
+  trained=false
+  Redraw()
+}
+
+function removeDataPoint(x,y){  //rimozione punti mouse
+  var j=-1,d
+  for(var i=0;i<data.length;i++){
+    d=Math.abs(data[i][0]*ss+WIDTH/2-x)+Math.abs(data[i][1]*ss+HEIGHT/2-y)
+    if (d<3)
+      j=i;
+  }
+  if (j!=-1) {
+    data.splice(j,1)
+    trained=false
+    Redraw()
+  }
+}
+
+function mouseClick(x,y,shift,ctrl){
+  if (ctrl)
+    removeDataPoint(x,y);
+  else
+    addDataPoint(x,y,(shift?1:-1)); //tasto dx e sx
+}
+
+function eventClick(e) {    
+  //get position of cursor relative to top left of canvas
+  var x = e.pageX;
+  var y = e.pageY;
+  var r = canvas.getBoundingClientRect();
+  x -= r.left+window.scrollX;
+  y -= r.top+window.scrollY;  
+  //call user-defined callback
+  mouseClick(x, y, e.shiftKey, e.ctrlKey);
+}
+
+function drawCircle(x, y, r){
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2, true); 
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+}
+
+function Redraw(){
+  ctx.clearRect(0,0,WIDTH,HEIGHT);
+  if (trained) {  
+    // draw decisions in the grid
+    var density= 4.0;
+    for(var x=0.0; x<=WIDTH; x+= density) {
+      for(var y=0.0; y<=HEIGHT; y+= density) {
+        var p = mdl.predictJS([(x-WIDTH/2)/ss, (y-HEIGHT/2)/ss])
+        ctx.fillStyle = (p==1?'rgb(204, 204, 255)': 'rgb(255, 204, 255)'); //colori della classificazione 
+        ctx.fillRect(x-density/2-1, y-density-1, density+2, density+2);
+      }
+    }  
+  }
+  
+  // draw axes
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgb(50,50,50)';
+  ctx.lineWidth = 1;
+  
+   //disegna asse x
+  ctx.moveTo(0,Oy);  // punto di partenza
+  ctx.lineTo(WIDTH,Oy);  //asse x
+  //disegna punta asse x
+  ctx.moveTo(WIDTH-10,Oy-4);  //punta asse x
+  ctx.lineTo(WIDTH-10,Oy+4);
+  ctx.lineTo(WIDTH,Oy);
+  ctx.lineTo(WIDTH-10,Oy-4); //fine punta asse x
+  //disegna asse y
+  ctx.moveTo(Ox,10);  //coordinate punto di partenza
+  ctx.lineTo(Ox,HEIGHT);  //asse y
+  //disegna punta asse y
+  ctx.moveTo(Ox-4,10);  //punta asse y
+  ctx.lineTo(Ox+4,10);
+  ctx.lineTo(Ox,2);
+  ctx.lineTo(Ox-4,10); //fine punta asse y
+
+  //ctx.fill() //riempimento frecce
+  ctx.fillStyle="rgb(0,0,0)"
+  
+  // write x, y, O, u
+  ctx.fillText('x',WIDTH-20,Oy-10)
+  ctx.fillText('y',Ox+5,20)
+  ctx.fillText('O',Ox+2,Oy+10)
+
+  // scrivi unita' assi
+  for(var i=1;i<ux;i++){
+    drawIndex(i);
+  }
+
+  ctx.stroke();  //disegna
+
+  // draw data points
+  for(var i=0;i<data.length;i++){
+    ctx.fillStyle = (labels[i]==1?'rgb(0, 128, 255)':'rgb(255, 255, 0)'); //colori punti
+    drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 3);
+  }
+}
+
+function drawIndex(n){
+  ctx.moveTo(WIDTH-(Ox+(n*ss)),Oy-5);  //segmento unita' di misura
+  ctx.lineTo(WIDTH-(Ox+(n*ss)),Oy+5);
+  ctx.moveTo(Ox+(n*ss),Oy-5);  //segmento unita' di misura
+  ctx.lineTo(Ox+(n*ss),Oy+5);
+  ctx.fillText(n,Ox+(n*ss)-3,Oy+18);
+  ctx.moveTo(Ox-5,HEIGHT-(Oy+(n*ss)));  //segmento unita' di misura
+  ctx.lineTo(Ox+5,HEIGHT-(Oy+(n*ss))); 
+  ctx.moveTo(Ox-5,Oy+(n*ss));  //segmento unita' di misura
+  ctx.lineTo(Ox+5,Oy+(n*ss));
+  ctx.fillText(n,Ox-20,HEIGHT-(Oy+(n*ss))+3);
+}
+
+Redraw()
+
+function cleanGrafico(){
+	ctx.clearRect(0,0,WIDTH,HEIGHT); /*cancello assi*/
+	trained = false;
+
+	ctx.beginPath(); /*ricreo assi*/
+	ctx.strokeStyle = 'rgb(50,50,50)';
+  	ctx.lineWidth = 1;
+  	ctx.moveTo(0, HEIGHT/2);
+ 	ctx.lineTo(WIDTH, HEIGHT/2);
+  	ctx.moveTo(WIDTH/2, 0);
+  	ctx.lineTo(WIDTH/2, HEIGHT);
+  	ctx.stroke();
+
+	labels = [];  /*cancello i punti vecchi*/
+	data = [];
+	show();
+
+	train();
+  sql();
+  nTrees();
+  conf_matrix();
+  prob();
+ 	odds();
+  valMod();
+  goodMod();
+  class_err();
+}
+
+function train(){
+  lrn.resetData()
+  for(var i=0;i<data.length;i++){
+    lrn.addData(labels[i],data[i])
+  }
+  lrn.train()
+  mdl=lrn.getModel()
+  trained=true
+  Redraw()
+}
+
+function sql(){
+  if (trained)
+    document.getElementById("sql").innerHTML="<b>SQL =</b> " + mdl.predictSQL();
+
+  else
+	  show();
+}
+
+function nTrees(){
+  if (trained)
+    document.getElementById("ntrees").innerHTML="<b>Alberi: </b>" + lrn.getNumberOfPredictors();
+
+    else
+	    show();
+}
+
+function conf_matrix(){
+
+  if(!trained)
+    show();
+
+  else{
+    var tp = 0, tn = 0, fn = 0, fp = 0;
+    var n = data.length;
+
+    for (var i = 0; i < n; i++){
+
+    	if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali
+          if(labels[i] == 1) tp++;
+          else tn++;
+        }
+
+    	else{ // reali e predetti diversi
+			if(labels[i] == 1) fn++;
+            else fp++;
+       }
+    }
+
+  document.getElementById("confusion_matrix_rf").innerHTML = "<b>Confusion Matrix</b>" + "<br/>" +
+                                                         "+ -------------------------------------- +  <br/>" + "<br/>" +
+                                                         "<b>TRUE POSITIVE </b> " + tp + " " + "<b> FALSE NEGATIVE</b> "+ " " + fn + " <br/>" + " <br/>"+
+                                                         "<b>FALSE POSITIVE</b> " + fp + " " + "<b>TRUE NEGATIVE</b> " + " " + tn + " <br/>" +  "<br/>" +
+                                                         " + -------------------------------------- + ";
+  } 
+}                  
+
+function prob(){
+
+  if(!trained)
+	show();
+ 
+  else {
+    var n = data.length, classeA = 0, classeB = 0;
+
+    for (var i = 0; i < n; i++){
+      if (labels[i] == 1) classeA++;
+      else classeB++;
+    }
+    //document.write(classeA + " " + classeB);
+
+    var probA = (classeA / n) * 100;  //probabilita in % di appartenere alle classi -1 ed 1
+    var probB = (classeB / n) * 100; 
+
+    document.getElementById("prob_rf").innerHTML = "<b>Prob (Y = 1): </b>" + probA.toFixed(4) + "% " + " ; " + " " +
+                                                   "<b> Prob (Y = -1): </b>" + probB.toFixed(4) + "% ";
+  }
+}
+
+function odds(){
+
+  if(!trained)
+    show();
+
+  else{
+    var n = data.length;
+    var classeA = 0, classeB = 0;
+
+  for (var i = 0; i < n; i++){
+	if (labels[i] == 1) classeA++;
+    else classeB++;
+  }
+  //document.write(classeA + " " + classeB);
+
+  var oddsA =  classeA / classeB; // odds: relazione fra A e B
+  var oddsB =  classeB / classeA;  // odds: relazione fra B ed A
+
+  document.getElementById("odds_rf").innerHTML = "<b>Odds (Y = 1): </b>" + oddsA.toFixed(4) + " ; " +
+                                                 "<b> Odds (Y = -1): </b>" + oddsB.toFixed(4);
+  }
+}
+
+function valMod(){
+  if (!trained)
+    show();
+
+  else{
+    var tp = 0, tn = 0, fn = 0, fp = 0;
+	var n = data.length;
+	
+    for (var i = 0; i < n; i++){
+
+    	if (labels[i] == mdl.predictJS(data[i])){ // reali e predetti uguali  
+          if(labels[i] == 1) tp++;
+          else tn++;
+        }
+       
+    	else{ // reali e predetti diversi
+			if(labels[i] == 1) fn++;
+            else fp++;
+		}
+    }
+		//console.log(n);
+
+      var er_rate = (fp + fn) / n;  //ottimo = 0 , male = 1;
+      var prec = tp / (tp + fp);
+      var acc = (tp + tn) / n;  
+      var recall  =  tp / (tp + fn);
+      var spec = tn / (tn + fp);  //ottimo = 1 , male = 0;
+      var fp_rate = 1 - spec;  //ottimo = 0 , male = 1;
+      var f_score = (2 * recall * prec) / (recall + prec); //ottimo = 1 , male = 0;
+
+  document.getElementById("valMod_rf").innerHTML = "<br/>" + "<b>Error rate = </b>" + er_rate.toFixed(4) + " ; " +  
+                                                   "<b>Precisione = </b>" + prec.toFixed(4) + " ; " +
+                                                   "<b>Accuratezza = </b>" + acc.toFixed(4) + " ; " +
+                                                   "<b>Recall = </b>" + recall.toFixed(4) +  "<br/>" +
+                                                   "<b>Specificità = </b>" + spec.toFixed(4)  + " ; " +
+                                                   "<b>False Positive rate = </b>" + fp_rate.toFixed(4) + " ; " +
+                                                  "<b>F-Score = </b>" + f_score.toFixed(4);
+  return acc;
+}
+}                     
+
+function goodMod(){ //efficienza predittiva = (er. senza mod - er. col mod) / er. senza mod
+                    // er. senza mod = sum [fi * ((n - fi) / n) ]  ,  dove   fi = n. casi in i
+  if(!trained)
+    show();
+
+  else{
+    var n = data.length, err = 0;
+
+    for (var i = 0; i < n; i++){
+
+      if (labels[i] != mdl.predictJS(data[i])) // reali e predetti diversi -> errori col modello
+         err++; 
+	}
+	
+	//console.log(err)
+
+  //err. senza modello
+    var np = 0, nn = 0; // #casi in 1 e in -1
+
+    for (var i = 0; i < n; i++){
+	  if (labels[i] == 1) np++;
+	  else nn++;
+    }
+     //console.log(np)
+
+	var er_NoMod1 = [np * [(n - np) / n]];
+	var er_NoMod2 = [nn * [(n - nn) / n]];
+	var er_NoMod = er_NoMod1[0] + er_NoMod2[0];
+
+  // document.write(er_NoMod1 + " + " + er_NoMod2 + " = " + er_NoMod);
+    var good = (er_NoMod - err) / er_NoMod;
+
+    document.getElementById("goodMod_rf").innerHTML = "<b> Efficienza del modello = </b> " + good.toFixed(4);
+  }
+}
+
+function class_err(){
+  var acc = valMod();
+
+  var er = 1 - acc ;
+  document.getElementById("class_err_rf").innerHTML = "<b> Probabilità classificazione errata = </b> " + er.toFixed(4);
+
+}
+
+function show(){
+
+  if (!trained) 
+  document.getElementById("show").innerHTML = "<br/>" + "<br/>" + "<b>Insert the points in the graph and select trees's number and train your model :-) </b>"
+
+  else{
+    document.getElementById("show").innerHTML = "<b>"+ "Error Rate: (fp + fn) / (tp + fn + tp + tn)" + " ; " +
+                                                "Precisione: tp / (tp + fp)" + "<br/>" + "<br/>" +
+                                                "Accuratezza: (tp + tn) / (tp + fn + fp + tn)" +  " ; " +
+                                                "Recall: tp / (tp + fn)" + "<br/>" + "</br>" +
+                                                "Specificità: tn / (tn + fp)" +  " ; "  + 
+                                                "False Positive Rate: 1 - Specificità" + "<br/>" + "<br/>" + 
+												                        "F-Score: (2 * Recall * Precisione) / (Recall + Precisione)" + "<br/>" + "<br/>" + 
+                                                "Efficienza modello: (err. no modello - err. con modello) / err. no modello" +  "<br/>" + "<br/>" + 
+                                                "Probabilità classificazione errata: 1 - Accuratezza </b>";
+												 
+                                        
+  }
+}
+
+function setLearner(n){
+  lrn=learners[n]
+  trained=false;
+  train();
+  sql();
+  nTrees();
+  conf_matrix();
+  prob();
+  odds();
+  valMod();
+  goodMod();
+  class_err();
+  show();
+}
+
+</script>
+
+
+</body>
+</html>
